@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{903407af-206e-41ae-929c-dcdedaea352e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\gba">
+      <UniqueIdentifier>{7685440c-d806-4892-a5b1-f54809aab2b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{2f97e0c7-ccd1-4d56-98ec-e389043793ce}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\gba\int.hpp">
+      <Filter>include\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gba\packed_int.hpp">
+      <Filter>include\gba</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\test.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Makefile" />
+  </ItemGroup>
+</Project>
