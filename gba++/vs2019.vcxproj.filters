@@ -18,11 +18,9 @@
     <ClInclude Include="..\include\gba\packed_int.hpp">
       <Filter>include\gba</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\src\test.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
+    <ClInclude Include="..\include\gba\int_type.hpp">
+      <Filter>include\gba</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Makefile" />

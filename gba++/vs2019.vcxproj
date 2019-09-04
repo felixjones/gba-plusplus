@@ -12,10 +12,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\gba\int.hpp" />
+    <ClInclude Include="..\include\gba\int_type.hpp" />
     <ClInclude Include="..\include\gba\packed_int.hpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\src\test.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Makefile" />
@@ -50,7 +48,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <NMakeOutput>$(OutputPath)libgba++.a</NMakeOutput>
-    <NMakePreprocessorDefinitions>__attribute__=//;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <NMakePreprocessorDefinitions>__attribute__(A)=;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
     <IncludePath>$(DEVKIT_PRO)\devkitARM\arm-none-eabi\include\c++\8.3.0\arm-none-eabi;$(DEVKIT_PRO)\devkitARM\arm-none-eabi\include\c++\8.3.0;$(DEVKIT_PRO)\devkitARM\arm-none-eabi\include;$(ProjectDir)..\include</IncludePath>
     <SourcePath>$(ProjectDir)..\src</SourcePath>
     <NMakeBuildCommandLine>make -C $(ProjectDir)..\ CONFIG=$(Configuration.toLower())</NMakeBuildCommandLine>
@@ -66,7 +64,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <NMakeOutput>$(OutputPath)libgba++.a</NMakeOutput>
-    <NMakePreprocessorDefinitions>__attribute__=//;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <NMakePreprocessorDefinitions>__attribute__(A)=;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
     <IncludePath>$(DEVKIT_PRO)\devkitARM\arm-none-eabi\include\c++\8.3.0\arm-none-eabi;$(DEVKIT_PRO)\devkitARM\arm-none-eabi\include\c++\8.3.0;$(DEVKIT_PRO)\devkitARM\arm-none-eabi\include;$(ProjectDir)..\include</IncludePath>
     <SourcePath>$(ProjectDir)..\src</SourcePath>
     <NMakeBuildCommandLine>make -C $(ProjectDir)..\ CONFIG=$(Configuration.toLower())</NMakeBuildCommandLine>

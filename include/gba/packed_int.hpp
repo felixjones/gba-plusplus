@@ -11,7 +11,7 @@ template <typename Container, unsigned int Size>
 class packed_int {
 public:
 	using value_type = Container;
-	using machine_type = std::conditional<std::is_signed<Container>::value, int_type<sizeof( Container ) * Size>::fast, uint_type<sizeof( Container ) * Size>::fast>::type;
+	using machine_type = typename std::conditional<std::is_signed<Container>::value, typename int_type<sizeof( Container ) * Size>::fast, typename uint_type<sizeof( Container ) * Size>::fast>::type;
 
 	constexpr packed_int() : m_data {} {}
 
@@ -27,9 +27,10 @@ public:
 	}
 
 	constexpr operator machine_type() const {
-		machine_type value = std::is_signed<Container>::value ? ( m_data[Size - 1] & ( 0x80 << ( 8 * sizeof( Container ) ) ? -1 << ( ( sizeof( machine_type ) - 1 ) * 8 ) : 0 ) ) : 0;
+		// Negative numbers have their high bits padded with 0xff
+		machine_type value = ( std::is_signed<Container>::value && sizeof( machine_type ) > ( sizeof( Container ) * Size ) && m_data[Size - 1] < 0 ) ? static_cast<machine_type>( -1 ) << ( Size * ( 8 * sizeof( Container ) ) ) : 0;
 		for ( unsigned int ii = 0; ii < Size; ++ii ) {
-			value |= static_cast<std::make_unsigned<machine_type>::type>( m_data[ii] ) << ( ii * ( 8 * sizeof( Container ) ) );
+			value |= static_cast<typename std::make_unsigned<machine_type>::type>( m_data[ii] ) << ( ii * ( 8 * sizeof( Container ) ) );
 		}
 		return value;
 	}
