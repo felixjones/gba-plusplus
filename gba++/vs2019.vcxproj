@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\gba\fixed_point.hpp" />
     <ClInclude Include="..\include\gba\int.hpp" />
     <ClInclude Include="..\include\gba\int_type.hpp" />
     <ClInclude Include="..\include\gba\packed_int.hpp" />

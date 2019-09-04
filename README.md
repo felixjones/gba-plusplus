@@ -53,6 +53,7 @@ void user_function_to_wrap( int regIF ) {}
 const auto my_vector = gba::interrupt_handler<user_function_to_wrap>();
 
 int main( int argc, char * argv[] ) {
+  // Reading the current interrupt vector would be useful
   if ( gba::irq::vector() != my_vector ) {
     gba::irq::vector() = my_vector;
   }
@@ -63,3 +64,11 @@ int main( int argc, char * argv[] ) {
 ### What License?
 
 Gravitating towards [Apache License 2.0](https://choosealicense.com/licenses/apache-2.0/) but this needs thought.
+
+### Fixed point implementation?
+
+Probably a thousand ways to do various fixed point operations.
+
+GBA hardware should be kept in mind at all times.
+
+Maybe also have a `fixed_fast` type that sacrifices any of the sanity checks?

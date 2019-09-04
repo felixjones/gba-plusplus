@@ -8,13 +8,21 @@ EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
 		Release|ARM = Release|ARM
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{BF90D5E8-7484-46EE-9DDD-74CBA807A830}.Debug|ARM.ActiveCfg = Debug|ARM
 		{BF90D5E8-7484-46EE-9DDD-74CBA807A830}.Debug|ARM.Build.0 = Debug|ARM
+		{BF90D5E8-7484-46EE-9DDD-74CBA807A830}.Debug|x64.ActiveCfg = Debug|ARM
+		{BF90D5E8-7484-46EE-9DDD-74CBA807A830}.Debug|x86.ActiveCfg = Debug|ARM
 		{BF90D5E8-7484-46EE-9DDD-74CBA807A830}.Release|ARM.ActiveCfg = Release|ARM
 		{BF90D5E8-7484-46EE-9DDD-74CBA807A830}.Release|ARM.Build.0 = Release|ARM
+		{BF90D5E8-7484-46EE-9DDD-74CBA807A830}.Release|x64.ActiveCfg = Release|ARM
+		{BF90D5E8-7484-46EE-9DDD-74CBA807A830}.Release|x86.ActiveCfg = Release|ARM
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
