@@ -71,4 +71,4 @@ Probably a thousand ways to do various fixed point operations.
 
 GBA hardware should be kept in mind at all times.
 
-Maybe also have a `fixed_fast` type that sacrifices any of the sanity checks?
+Maybe also have a `fixed_fast` type that sacrifices accuracy and checks?

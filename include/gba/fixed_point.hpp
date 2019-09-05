@@ -33,7 +33,7 @@ public:
 	}
 
 	constexpr fixed_point& operator=( value_type value ) {
-		using uvalue_type = typename uint_size_type<sizeof( value_type )>::fast;
+		using uvalue_type = typename uint_sized_type<sizeof( value_type )>::fast;
 
 		m_value = static_cast<uvalue_type>( value ) << Exponent;
 		if ( std::numeric_limits<value_type>::is_signed && value < 0 && Fast == false ) {
@@ -49,7 +49,7 @@ public:
 	}
 
 	constexpr operator value_type() const {
-		using uvalue_type = typename uint_size_type<sizeof( value_type )>::fast;
+		using uvalue_type = typename uint_sized_type<sizeof( value_type )>::fast;
 
 		if ( std::numeric_limits<value_type>::is_signed && m_value < 0 && Fast == false ) {
 			// Negative numbers have their high bits padded with 0xff
