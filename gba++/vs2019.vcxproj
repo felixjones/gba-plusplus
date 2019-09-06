@@ -11,10 +11,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\gba\display.hpp" />
     <ClInclude Include="..\include\gba\fixed_point.hpp" />
     <ClInclude Include="..\include\gba\int.hpp" />
     <ClInclude Include="..\include\gba\int_type.hpp" />
+    <ClInclude Include="..\include\gba\math.hpp" />
     <ClInclude Include="..\include\gba\packed_int.hpp" />
+    <ClInclude Include="..\include\gba\registers.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Makefile" />
@@ -61,7 +64,7 @@
     <LibraryWPath />
     <OutDir>$(ProjectDir)..\lib\</OutDir>
     <IntDir>$(Configuration.toLower())\</IntDir>
-    <AdditionalOptions>/std:c++17 /Zc:__cplusplus</AdditionalOptions>
+    <AdditionalOptions>/std:c++latest /Zc:__cplusplus</AdditionalOptions>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <NMakeOutput>$(OutputPath)libgba++.a</NMakeOutput>
@@ -77,7 +80,7 @@
     <LibraryWPath />
     <OutDir>$(ProjectDir)..\lib\</OutDir>
     <IntDir>$(Configuration.toLower())\</IntDir>
-    <AdditionalOptions>/std:c++17 /Zc:__cplusplus</AdditionalOptions>
+    <AdditionalOptions>/std:c++latest /Zc:__cplusplus</AdditionalOptions>
   </PropertyGroup>
   <ItemDefinitionGroup>
   </ItemDefinitionGroup>

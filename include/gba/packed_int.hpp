@@ -138,7 +138,7 @@ public:
 private:
 	std::array<value_type, Size>	m_data;
 
-} __attribute__((packed));
+};
 
 } // gba
 

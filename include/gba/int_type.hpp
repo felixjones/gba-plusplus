@@ -14,11 +14,11 @@ struct int_type {
 	using least = typename std::conditional<Bits <= 8, std::int_least8_t, typename std::conditional<Bits <= 16, std::int_least16_t, typename std::conditional<Bits <= 32, std::int_least32_t, std::int_least64_t>::type>::type>::type;
 	using fast = typename std::conditional<Bits <= 8, std::int_fast8_t, typename std::conditional<Bits <= 16, std::int_fast16_t, typename std::conditional<Bits <= 32, std::int_fast32_t, std::int_fast64_t>::type>::type>::type;
 
-	static constexpr typename fast min() {
+	static constexpr fast min() {
 		return Bits == 2 ? -2 : 2 * int_type<Bits - 1>::min();
 	}
 
-	static constexpr typename fast max() {
+	static constexpr fast max() {
 		return -min() - 1;
 	}
 
@@ -32,11 +32,11 @@ struct uint_type {
 	using least = typename std::conditional<Bits <= 8, std::uint_least8_t, typename std::conditional<Bits <= 16, std::uint_least16_t, typename std::conditional<Bits <= 32, std::uint_least32_t, std::uint_least64_t>::type>::type>::type;
 	using fast = typename std::conditional<Bits <= 8, std::uint_fast8_t, typename std::conditional<Bits <= 16, std::uint_fast16_t, typename std::conditional<Bits <= 32, std::uint_fast32_t, std::uint_fast64_t>::type>::type>::type;
 
-	static constexpr typename fast min() {
+	static constexpr fast min() {
 		return 0;
 	}
 
-	static constexpr typename fast max() {
+	static constexpr fast max() {
 		return int_type<Bits + 1>::max();
 	}
 

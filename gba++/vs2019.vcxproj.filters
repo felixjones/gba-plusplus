@@ -24,6 +24,15 @@
     <ClInclude Include="..\include\gba\fixed_point.hpp">
       <Filter>include\gba</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\gba\math.hpp">
+      <Filter>include\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gba\display.hpp">
+      <Filter>include\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gba\registers.hpp">
+      <Filter>include\gba</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Makefile" />
