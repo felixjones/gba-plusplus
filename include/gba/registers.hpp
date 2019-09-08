@@ -16,6 +16,16 @@ volatile display::control& registers<display::control>() {
 	return *reinterpret_cast<volatile display::control *>( 0x4000000 );
 }
 
+template <>
+volatile display::status& registers<display::status>() {
+	return *reinterpret_cast< volatile display::status * >( 0x4000004 );
+}
+
+template <>
+volatile display::vertical_counter& registers<display::vertical_counter>() {
+	return *reinterpret_cast< volatile display::vertical_counter * >( 0x4000006 );
+}
+
 } // io
 } // gba
 

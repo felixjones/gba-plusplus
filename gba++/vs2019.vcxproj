@@ -13,11 +13,14 @@
   <ItemGroup>
     <ClInclude Include="..\include\gba\display.hpp" />
     <ClInclude Include="..\include\gba\fixed_point.hpp" />
+    <ClInclude Include="..\include\gba\gba.hpp" />
     <ClInclude Include="..\include\gba\int.hpp" />
     <ClInclude Include="..\include\gba\int_type.hpp" />
     <ClInclude Include="..\include\gba\math.hpp" />
     <ClInclude Include="..\include\gba\packed_int.hpp" />
     <ClInclude Include="..\include\gba\registers.hpp" />
+    <ClInclude Include="..\include\gba\graphics.hpp" />
+    <ClInclude Include="..\include\gba\video.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Makefile" />

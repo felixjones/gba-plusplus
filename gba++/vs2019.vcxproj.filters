@@ -33,6 +33,15 @@
     <ClInclude Include="..\include\gba\registers.hpp">
       <Filter>include\gba</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\gba\gba.hpp">
+      <Filter>include\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gba\graphics.hpp">
+      <Filter>include\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gba\video.hpp">
+      <Filter>include\gba</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Makefile" />

@@ -21,12 +21,15 @@ struct control_setting {
 	uint16	background_windows : 2;
 	uint16	object_window : 1;
 
-};
+} __attribute__((packed));
 
-struct control : control_setting {
+class control : public control_setting {
+public:
+
+	constexpr control() : control_setting {} {}
 
 	control( const volatile control& other ) : control_setting {} {
-		*( ( uint16 * )this ) = *( ( const uint16 * )& other );
+		*( ( uint16 * )this ) = *( ( const uint16 * )&other );
 	}
 
 	void operator=( const control_setting& other ) volatile {
@@ -34,6 +37,21 @@ struct control : control_setting {
 	}
 
 };
+
+struct status {
+
+	const uint8	in_vertical_blank : 1;
+	const uint8	in_horizontal_blank : 1;
+	const uint8	in_vertical_counter : 1;
+	uint8	irq_vertical_blank : 1;
+	uint8	irq_horizontal_blank : 1;
+	uint8	irq_vertical_counter : 1;
+
+	uint8	vertical_counter_line;
+
+} __attribute__( ( packed ) );
+
+using vertical_counter = uint16;
 
 } // display
 } // gba
