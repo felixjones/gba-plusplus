@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\gba\backgrounds.hpp" />
     <ClInclude Include="..\include\gba\display.hpp" />
     <ClInclude Include="..\include\gba\fixed_point.hpp" />
     <ClInclude Include="..\include\gba\gba.hpp" />

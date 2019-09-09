@@ -45,6 +45,9 @@
     <ClInclude Include="..\include\gba\irq_handler.hpp">
       <Filter>include\gba</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\gba\backgrounds.hpp">
+      <Filter>include\gba</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Makefile" />
