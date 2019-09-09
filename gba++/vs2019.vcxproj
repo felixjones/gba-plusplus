@@ -16,6 +16,7 @@
     <ClInclude Include="..\include\gba\gba.hpp" />
     <ClInclude Include="..\include\gba\int.hpp" />
     <ClInclude Include="..\include\gba\int_type.hpp" />
+    <ClInclude Include="..\include\gba\irq_handler.hpp" />
     <ClInclude Include="..\include\gba\math.hpp" />
     <ClInclude Include="..\include\gba\packed_int.hpp" />
     <ClInclude Include="..\include\gba\registers.hpp" />
@@ -56,7 +57,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <NMakeOutput>$(OutputPath)libgba++.a</NMakeOutput>
     <NMakePreprocessorDefinitions>__attribute__(A)=;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
-    <IncludePath>$(DEVKIT_PRO)\devkitARM\arm-none-eabi\include\c++\8.3.0\arm-none-eabi;$(DEVKIT_PRO)\devkitARM\arm-none-eabi\include\c++\8.3.0;$(DEVKIT_PRO)\devkitARM\arm-none-eabi\include;$(ProjectDir)..\include</IncludePath>
+    <IncludePath>$(ProjectDir)..\include;$(IncludePath)</IncludePath>
     <SourcePath>$(ProjectDir)..\src</SourcePath>
     <NMakeBuildCommandLine>make -C $(ProjectDir)..\ CONFIG=$(Configuration.toLower())</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>$(NMakeBuildCommandLine) clean all</NMakeReBuildCommandLine>
@@ -72,7 +73,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <NMakeOutput>$(OutputPath)libgba++.a</NMakeOutput>
     <NMakePreprocessorDefinitions>__attribute__(A)=;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
-    <IncludePath>$(DEVKIT_PRO)\devkitARM\arm-none-eabi\include\c++\8.3.0\arm-none-eabi;$(DEVKIT_PRO)\devkitARM\arm-none-eabi\include\c++\8.3.0;$(DEVKIT_PRO)\devkitARM\arm-none-eabi\include;$(ProjectDir)..\include</IncludePath>
+    <IncludePath>$(ProjectDir)..\include;$(IncludePath)</IncludePath>
     <SourcePath>$(ProjectDir)..\src</SourcePath>
     <NMakeBuildCommandLine>make -C $(ProjectDir)..\ CONFIG=$(Configuration.toLower())</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>$(NMakeBuildCommandLine) clean all</NMakeReBuildCommandLine>

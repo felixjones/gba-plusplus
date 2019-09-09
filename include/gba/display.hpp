@@ -8,18 +8,16 @@ namespace display {
 
 struct control_setting {
 
-	uint16	mode : 3;
-
-	const uint16	is_game_boy : 1;
-
-	uint16	page : 1;
-	uint16	unlock_oam_hblank : 1;
-	uint16	linear_object_mapping : 1;
-	uint16	forced_blank : 1;
-	uint16	background_layers : 4;
-	uint16	object_layer : 1;
-	uint16	background_windows : 2;
-	uint16	object_window : 1;
+	uint16	mode : 3, 
+		: 1,
+		page : 1,
+		unlock_oam_hblank : 1, 
+		linear_object_mapping : 1, 
+		forced_blank : 1, 
+		background_layers : 4, 
+		object_layer : 1, 
+		background_windows : 2,
+		object_window : 1;
 
 } __attribute__((packed));
 
