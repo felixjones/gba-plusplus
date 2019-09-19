@@ -32,7 +32,7 @@ constexpr auto make_handler() {
 }
 
 // 1 function handler
-template <void( *Runnable )( flags )>
+template <void( * Runnable )( flags )>
 constexpr auto make_handler() {
 	struct handler_impl1 {
 		[[gnu::naked, gnu::target( "arm" ), gnu::section( ".iwram" ), gnu::long_call]]
@@ -78,6 +78,7 @@ constexpr auto make_handler() {
 	return handler_impl1::entry;
 }
 
+// Multi function handler
 template <class... Conditionals>
 constexpr auto make_handler() {
 	struct handler_impl2 {
@@ -107,22 +108,22 @@ constexpr auto make_handler() {
 				 "msr cpsr_c, #0x9F\n\t"
 			);
 
+			asm(
+				"stmfd sp!, {lr}\n\t"
+			);
+
 			( []() {
 				asm(
-					"stmfd sp!, {r0-r1, lr}\n\t"
-				);
-
-				asm(
-					"ldr r1, =%[run]\n\t"
-					"ands r0, r0, %[Mask]\n\t"
+					"tst r0, %[Mask]\n\t"
+					"ldr r1, =%[runnable]\n\t"
 					"mov lr, pc\n\t"
-					"bxne r1\n\t" : : [Mask] "g"( Conditionals::mask ), [run] "g"( Conditionals::runnable )
-				);
-
-				asm(
-					"ldmfd sp!, {r0-r1, lr}\n\t"
+					"bxne r1\n\t" : : [Mask] "g"( Conditionals::mask ), [runnable] "g"( Conditionals::runnable )
 				);
 			}(), ... );
+
+			asm(
+				"ldmfd sp!, {lr}\n\t"
+			);
 
 			asm( // Switch to IRQ mode (IRQ stays disabled)
 				 "msr cpsr_c, #0x92\n\t"
@@ -134,7 +135,15 @@ constexpr auto make_handler() {
 	return handler_impl2::entry;
 }
 
+// TODO : Nested handler
+
 typedef void ( *handler_type )( void );
+
+template <uint16 Mask, void ( * Runnable )( void )>
+struct conditional {
+	static constexpr auto mask = Mask;
+	static constexpr auto runnable = Runnable;
+};
 
 static volatile handler_type& vector = *reinterpret_cast<volatile handler_type *>( 0x3007FFC );
 

@@ -6,10 +6,8 @@
 #include <gba/fixed_point.hpp>
 #include <gba/int.hpp>
 #include <gba/int_type.hpp>
-#include <gba/irq_conditional.hpp>
 #include <gba/irq_flags.hpp>
 #include <gba/irq_handler.hpp>
-#include <gba/irq_handler_conditional.hpp>
 #include <gba/packed_int.hpp>
 #include <gba/registers.hpp>
 #include <gba/video.hpp>
