@@ -24,19 +24,10 @@
     <ClInclude Include="..\include\gba\fixed_point.hpp">
       <Filter>include\gba</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\gba\math.hpp">
-      <Filter>include\gba</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\gba\display.hpp">
       <Filter>include\gba</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\gba\registers.hpp">
-      <Filter>include\gba</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\gba\gba.hpp">
-      <Filter>include\gba</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\gba\graphics.hpp">
       <Filter>include\gba</Filter>
     </ClInclude>
     <ClInclude Include="..\include\gba\video.hpp">
@@ -46,6 +37,18 @@
       <Filter>include\gba</Filter>
     </ClInclude>
     <ClInclude Include="..\include\gba\backgrounds.hpp">
+      <Filter>include\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gba\irq_flags.hpp">
+      <Filter>include\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gba\registers.hpp">
+      <Filter>include\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gba\irq_conditional.hpp">
+      <Filter>include\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gba\irq_handler_conditional.hpp">
       <Filter>include\gba</Filter>
     </ClInclude>
   </ItemGroup>

@@ -49,8 +49,6 @@ struct status {
 
 } __attribute__( ( packed ) );
 
-using vertical_counter = uint16;
-
 } // display
 } // gba
 

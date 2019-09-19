@@ -1,126 +1,142 @@
 #ifndef GBAXX_IRQ_HANDLER_HPP
 #define GBAXX_IRQ_HANDLER_HPP
 
+#include <gba/irq_flags.hpp>
+
 namespace gba {
 namespace irq {
 
-typedef void ( * vector_type )( void );
+// Null handler
+constexpr auto make_handler() {
+	struct handler_impl0 {
+		[[gnu::naked, gnu::target( "arm" ), gnu::section( ".iwram" ), gnu::long_call]]
+		static void entry() {
+			asm(
+				"mov r3, #0x4000000\n\t" // REG_BASE
+				"ldr r1, [r3, #0x200]\n\t" // Read REG_IE
+				"and r0, r1, r1, lsr #16\n\t" // r0 = IE & IF
+			);
 
-template <void( * Runnable )( void )>
-constexpr vector_type handler() {
-	class handler_impl {
-	private:
-		static void end() __attribute__( ( naked, target( "arm" ) ) ) {
-			asm( "ldmia sp!, {lr}\n\t" );
+			asm( // combine with BIOS IRQ flags (0x3FFFFF8 mirror)
+				 "ldrh r1, [r3, #-8]\n\t"
+				 "orr r1, r1, r0\n\t"
+				 "strh r1, [r3, #-8]\n\t"
+			);
 
-			// Switch to IRQ mode
-			asm( "mrs r2, cpsr\n\t"
-				 "bic r2, r2, #0x1F\n\t"
-				 "orr r2, r2, #0x92\n\t"
-				 "msr cpsr_cf, r2\n\t" );
-
-			// Restore IRQ stack pointer and IME
-			asm( "ldmia sp!, {r0-r2,lr}\n\t"
-				 "strh r1, [r2, #8]\n\t"
-				 "msr spsr_cf, r0\n\t" );
-
-			// Return to BIOS IRQ handler
-			asm( "bx lr\n\t" );
-		}
-
-	public:
-		static void start() __attribute__( ( naked, target( "arm" ) ) ) {
-			// Load base I/O register address
-			asm( "mov r2, #0x04000000\n\t"
-				 "add r2, r2, #0x200\n\t" );
-
-			// Save IRQ stack pointer and IME
-			asm( "mrs r0, spsr\n\t"
-				 "ldrh r1, [r2, #8]\n\t"
-				 "stmdb sp!, {r0-r2,lr}\n\t" );
-
-			// Disable all interrupts by writing to IME
-			asm( "mov r0, #0\n\t"
-				 "strh r0, [r2, #8]\n\t" );
-
-			// Acknowledge all received interrupts that were enabled in IE
-			asm( "ldr r3, [r2, #0]\n\t"
-				 "and r0, r3, r3, lsr #16\n\t"
-				 "strh r0, [r2, #2]\n\t" );
-
-			// Switch to system mode
-			asm( "mrs r2, cpsr\n\t"
-				 "bic r2, r2, #0x1F\n\t"
-				 "orr r2, r2, #0x1F\n\t"
-				 "msr cpsr_cf, r2\n\t" );
-
-			// Jump to user specified IRQ handler
-			asm( "stmdb sp!, {lr}\n\t"
-				 "mov lr, %[handlerEnd]\n\t"
-				 "bx %[handlerRunnable]\n\t" : : [handlerEnd] "r"( handler_impl::end ), [handlerRunnable]"r"( Runnable ) );
+			asm(
+				"mov pc, lr\n\t"
+			);
 		}
 	};
-
-	return handler_impl::start;
+	return handler_impl0::entry;
 }
 
-template <void( * Runnable )( int )>
-constexpr vector_type handler() {
-	class handler_impl {
-	private:
-		static void end() __attribute__( ( naked, target( "arm" ) ) ) {
-			asm( "ldmia sp!, {lr}\n\t" );
+// 1 function handler
+template <void( *Runnable )( flags )>
+constexpr auto make_handler() {
+	struct handler_impl1 {
+		[[gnu::naked, gnu::target( "arm" ), gnu::section( ".iwram" ), gnu::long_call]]
+		static void entry() {
+			asm(
+				"mov r3, #0x4000000\n\t" // REG_BASE
+				"ldr r2, [r3, #0x200]\n\t" // Read REG_IE
+			);
 
-			// Switch to IRQ mode
-			asm( "mrs r2, cpsr\n\t"
-				 "bic r2, r2, #0x1F\n\t"
-				 "orr r2, r2, #0x92\n\t"
-				 "msr cpsr_cf, r2\n\t" );
+			asm( // Get raised flags
+				"and r0, r2, r2, lsr #16\n\t" // r0 = IE & IF
+			);
 
-			// Restore IRQ stack pointer and IME
-			asm( "ldmia sp!, {r0-r2,lr}\n\t"
-				 "strh r1, [r2, #8]\n\t"
-				 "msr spsr_cf, r0\n\t" );
+			asm( // combine with BIOS IRQ flags (0x3FFFFF8 mirror)
+				 "ldrh r2, [r3, #-8]\n\t"
+				 "orr r2, r2, r0\n\t"
+				 "strh r2, [r3, #-8]\n\t"
+			);
 
-			// Return to BIOS IRQ handler
-			asm( "bx lr\n\t" );
-		}
+			asm(
+				"add r3, r3, #0x200\n\t"
+				"strh r0, [r3, #2]\n\t" // IF Clear
+			);
 
-	public:
-		static void start() __attribute__( ( naked, target( "arm" ) ) ) {
-			// Load base I/O register address
-			asm( "mov r2, #0x04000000\n\t"
-				 "add r2, r2, #0x200\n\t" );
+			asm( // Switch to system mode (IRQ stays disabled)
+				"msr cpsr_c, #0x9F\n\t"
+			);
 
-			// Save IRQ stack pointer and IME
-			asm( "mrs r0, spsr\n\t"
-				 "ldrh r1, [r2, #8]\n\t"
-				 "stmdb sp!, {r0-r2,lr}\n\t" );
+			asm(
+				"stmfd sp!, {lr}\n\t"
+				"ldr r1, =%[runnable]\n\t"
+				"mov lr, pc\n\t"
+				"bx r1\n\t"
+				"ldmfd sp!, {lr}\n\t" : : [runnable] "g"( Runnable ) : "r0"
+			);
 
-			// Disable all interrupts by writing to IME
-			asm( "mov r0, #0\n\t"
-				 "strh r0, [r2, #8]\n\t" );
-
-			// Acknowledge all received interrupts that were enabled in IE
-			asm( "ldr r3, [r2, #0]\n\t"
-				 "and r0, r3, r3, lsr #16\n\t"
-				 "strh r0, [r2, #2]\n\t" );
-
-			// Switch to system mode
-			asm( "mrs r2, cpsr\n\t"
-				 "bic r2, r2, #0x1F\n\t"
-				 "orr r2, r2, #0x1F\n\t"
-				 "msr cpsr_cf, r2\n\t" );
-
-			// Jump to user specified IRQ handler
-			asm( "stmdb sp!, {lr}\n\t"
-				 "mov lr, %[handlerEnd]\n\t"
-				 "bx %[handlerRunnable]\n\t" : : [handlerEnd] "r"( handler_impl::end ), [handlerRunnable]"r"( Runnable ) );
+			asm( // Switch to IRQ mode (IRQ stays disabled)
+				"msr cpsr_c, #0x92\n\t"
+				"mov pc, lr\n\t"
+			);
 		}
 	};
-
-	return handler_impl::start;
+	return handler_impl1::entry;
 }
+
+template <class... Conditionals>
+constexpr auto make_handler() {
+	struct handler_impl2 {
+		[[gnu::naked, gnu::target( "arm" ), gnu::section( ".iwram" ), gnu::long_call]]
+		static void entry() {
+			asm(
+				"mov r3, #0x4000000\n\t" // REG_BASE
+				"ldr r2, [r3, #0x200]\n\t" // Read REG_IE
+			);
+
+			asm( // Get raised flags
+				 "and r0, r2, r2, lsr #16\n\t" // r0 = IE & IF
+			);
+
+			asm( // combine with BIOS IRQ flags (0x3FFFFF8 mirror)
+				 "ldrh r2, [r3, #-8]\n\t"
+				 "orr r2, r2, r0\n\t"
+				 "strh r2, [r3, #-8]\n\t"
+			);
+
+			asm(
+				"add r3, r3, #0x200\n\t"
+				"strh r0, [r3, #2]\n\t" // IF Clear
+			);
+
+			asm( // Switch to system mode (IRQ stays disabled)
+				 "msr cpsr_c, #0x9F\n\t"
+			);
+
+			( []() {
+				asm(
+					"stmfd sp!, {r0-r1, lr}\n\t"
+				);
+
+				asm(
+					"ldr r1, =%[run]\n\t"
+					"ands r0, r0, %[Mask]\n\t"
+					"mov lr, pc\n\t"
+					"bxne r1\n\t" : : [Mask] "g"( Conditionals::mask ), [run] "g"( Conditionals::runnable )
+				);
+
+				asm(
+					"ldmfd sp!, {r0-r1, lr}\n\t"
+				);
+			}(), ... );
+
+			asm( // Switch to IRQ mode (IRQ stays disabled)
+				 "msr cpsr_c, #0x92\n\t"
+				 "mov pc, lr\n\t"
+			);
+		}
+
+	};
+	return handler_impl2::entry;
+}
+
+typedef void ( *handler_type )( void );
+
+static volatile handler_type& vector = *reinterpret_cast<volatile handler_type *>( 0x3007FFC );
 
 } // irq
 } // gba
