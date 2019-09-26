@@ -1,5 +1,7 @@
-#ifndef GBAXX_IRQ_HPP
-#define GBAXX_IRQ_HPP
+#ifndef GBAXX_IRQ_TYPES_HPP
+#define GBAXX_IRQ_TYPES_HPP
+
+#include <gba/int.hpp>
 
 namespace gba {
 namespace irq {
@@ -25,7 +27,7 @@ struct [[gnu::packed]] bits {
 
 };
 
-typedef void ( *handler_type )( void );
+typedef void ( * handler_type )( void );
 
 // Null handler
 constexpr handler_type empty_handler() {
@@ -166,7 +168,7 @@ constexpr handler_type make_handler() {
 
 // TODO : Nested handler
 
-template <unsigned Mask, void ( * Runnable )( void )>
+template <unsigned Mask, void ( * Runnable )( bits )>
 struct conditional {
 	static constexpr auto mask = Mask;
 	static constexpr auto runnable = Runnable;
@@ -175,4 +177,4 @@ struct conditional {
 } // irq
 } // gba
 
-#endif // define GBAXX_IRQ_HPP
+#endif // define GBAXX_IRQ_TYPES_HPP

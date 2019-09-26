@@ -9,8 +9,9 @@
 
 namespace gba {
 
+// TODO : Make volatile compatible
 template <typename Container, unsigned int Size>
-class packed_int {
+class [[gnu::packed]] packed_int {
 	static_assert( std::numeric_limits<Container>::is_integer, "packed_int Container must be integer type" );
 	static_assert( Size > 0, "packed_int Size cannot be zero" );
 public:
@@ -138,7 +139,7 @@ public:
 private:
 	std::array<value_type, Size>	m_data;
 
-} __attribute__((packed));
+};
 
 } // gba
 
@@ -158,5 +159,11 @@ struct std::numeric_limits<gba::packed_int<Container, Size>> : public std::numer
 	}
 
 };
+
+template <typename Container, unsigned int Size>
+struct std::is_integral<gba::packed_int<Container, Size>> : std::is_integral<Container> {};
+
+template <typename Container, unsigned int Size>
+struct std::is_arithmetic<gba::packed_int<Container, Size>> : std::is_arithmetic<Container> {};
 
 #endif // define GBAXX_PACKED_INT_HPP

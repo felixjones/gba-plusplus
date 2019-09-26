@@ -6,48 +6,42 @@
 namespace gba {
 namespace display {
 
-struct control_setting {
+struct [[gnu::packed]] control {
 
-	uint16	mode : 3, 
-		: 1,
-		page : 1,
-		unlock_oam_hblank : 1, 
-		linear_object_mapping : 1, 
-		forced_blank : 1, 
-		background_layers : 4, 
-		object_layer : 1, 
-		background_windows : 2,
-		object_window : 1;
+	uint8	mode : 3,
+			: 1;
 
-} __attribute__((packed));
-
-class control : public control_setting {
-public:
-
-	constexpr control() : control_setting {} {}
-
-	control( const volatile control& other ) : control_setting {} {
-		*( ( uint16 * )this ) = *( ( const uint16 * )&other );
-	}
-
-	void operator=( const control_setting& other ) volatile {
-		*( ( volatile uint16 * )this ) = *( ( const uint16 * )&other );
-	}
+	bool	page : 1,
+			unlock_oam_hblank : 1,
+			linear_object_mapping : 1,
+			forced_blank : 1,
+			background_layer0 : 1,
+			background_layer1 : 1,
+			background_layer2 : 1,
+			background_layer3 : 1,
+			object_layer : 1,
+			background_window0 : 1,
+			background_window1 : 1,
+			object_window : 1;
 
 };
 
-struct status {
+struct [[gnu::packed]] status {
 
-	const uint8	in_vertical_blank : 1;
-	const uint8	in_horizontal_blank : 1;
-	const uint8	in_vertical_counter : 1;
-	uint8	irq_vertical_blank : 1;
-	uint8	irq_horizontal_blank : 1;
-	uint8	irq_vertical_counter : 1;
+	const bool	in_vblank : 1,
+				in_hblank : 1,
+				in_vcounter : 1;
 
-	uint8	vertical_counter_line;
+	bool	emit_vblank : 1,
+			emit_hblank : 1,
+			emit_vcounter : 1;
 
-} __attribute__( ( packed ) );
+	const bool	: 1;
+	bool	:	1;
+
+	uint16	vcount;
+
+};
 
 } // display
 } // gba
