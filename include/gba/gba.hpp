@@ -1,7 +1,9 @@
 #ifndef GBAXX_GBA_HPP
 #define GBAXX_GBA_HPP
 
+#include <gba/bios.hpp>
 #include <gba/bit_bool.hpp>
+#include <gba/bool.hpp>
 #include <gba/color.hpp>
 #include <gba/display.hpp>
 #include <gba/int.hpp>
@@ -13,5 +15,7 @@
 #include <gba/irq.hpp>
 #include <gba/keypad.hpp>
 #include <gba/packed_int.hpp>
+#include <gba/sized_bool.hpp>
+#include <gba/vram.hpp>
 
 #endif // define GBAXX_GBA_HPP

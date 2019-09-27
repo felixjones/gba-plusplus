@@ -10,7 +10,7 @@ struct [[gnu::packed]] bits {
 
 	bool	vblank : 1,
 			hblank : 1,
-			vcounter : 1,
+			vcount : 1,
 			timer0 : 1,
 			timer1 : 1,
 			timer2 : 1,

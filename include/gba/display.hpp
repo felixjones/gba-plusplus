@@ -30,11 +30,11 @@ struct [[gnu::packed]] status {
 
 	const bool	in_vblank : 1,
 				in_hblank : 1,
-				in_vcounter : 1;
+				in_vcount : 1;
 
 	bool	emit_vblank : 1,
 			emit_hblank : 1,
-			emit_vcounter : 1;
+			emit_vcount : 1;
 
 	const bool	: 1;
 	bool	:	1;

@@ -12,7 +12,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\gba\backgrounds.hpp" />
+    <ClInclude Include="..\include\gba\bios.hpp" />
+    <ClInclude Include="..\include\gba\bit_bool.hpp" />
     <ClInclude Include="..\include\gba\bool.hpp" />
+    <ClInclude Include="..\include\gba\color.hpp" />
+    <ClInclude Include="..\include\gba\io_display.hpp" />
+    <ClInclude Include="..\include\gba\io_interrupt.hpp" />
+    <ClInclude Include="..\include\gba\io_keypad.hpp" />
+    <ClInclude Include="..\include\gba\keypad.hpp" />
     <ClInclude Include="..\include\gba\math.hpp" />
     <ClInclude Include="..\include\gba\sized_bool.hpp" />
     <ClInclude Include="..\include\gba\display.hpp" />
@@ -20,11 +27,11 @@
     <ClInclude Include="..\include\gba\gba.hpp" />
     <ClInclude Include="..\include\gba\int.hpp" />
     <ClInclude Include="..\include\gba\int_type.hpp" />
-    <ClInclude Include="..\include\gba\io.hpp" />
-    <ClInclude Include="..\include\gba\irq_handler.hpp" />
+    <ClInclude Include="..\include\gba\io_reg.hpp" />
+    <ClInclude Include="..\include\gba\irq.hpp" />
     <ClInclude Include="..\include\gba\packed_int.hpp" />
     <ClInclude Include="..\include\gba\registers.hpp" />
-    <ClInclude Include="..\include\gba\video.hpp" />
+    <ClInclude Include="..\include\gba\vram.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Makefile" />
@@ -59,7 +66,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <NMakeOutput>$(OutputPath)libgba++.a</NMakeOutput>
-    <NMakePreprocessorDefinitions>__attribute__(A)=;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <NMakePreprocessorDefinitions>__attribute__(A)=;asm(A)=;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
     <IncludePath>$(ProjectDir)..\include;$(IncludePath)</IncludePath>
     <SourcePath>$(ProjectDir)..\src</SourcePath>
     <NMakeBuildCommandLine>make -C $(ProjectDir)..\ CONFIG=$(Configuration.toLower())</NMakeBuildCommandLine>
@@ -75,7 +82,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <NMakeOutput>$(OutputPath)libgba++.a</NMakeOutput>
-    <NMakePreprocessorDefinitions>__attribute__(A)=;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <NMakePreprocessorDefinitions>__attribute__(A)=;asm(A)=;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
     <IncludePath>$(ProjectDir)..\include;$(IncludePath)</IncludePath>
     <SourcePath>$(ProjectDir)..\src</SourcePath>
     <NMakeBuildCommandLine>make -C $(ProjectDir)..\ CONFIG=$(Configuration.toLower())</NMakeBuildCommandLine>
