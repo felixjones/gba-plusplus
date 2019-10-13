@@ -9,10 +9,12 @@
 namespace gba {
 namespace keypad {
 
-class [[gnu::packed]] input {
+class [[gnu::packed]] raw_input {
 public:
-	operator uint16() const {
-		return ~m_bits; // Invert bits so 1 = pressed
+	uint16 value() const {
+		// Flip bits when reading so 1 means pressed
+		// Flipping is 1 instruction, vs XOR's 2 instructions
+		return ~m_bits;
 	}
 
 private:

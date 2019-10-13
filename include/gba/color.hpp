@@ -2,6 +2,7 @@
 #define GBAXX_COLOR_HPP
 
 #include <cstring>
+#include <type_traits>
 
 #include <gba/int.hpp>
 
@@ -9,27 +10,32 @@ namespace gba {
 
 struct [[gnu::packed]] color {
 
-	template <unsigned Value>
-	constexpr static color from_rgb24() {
+	constexpr static color from_rgb24( uint32 rgb888 ) {
 		return color {
-			.blue = static_cast< uint8 >( ( Value & 0x0000f8 ) >> 3 ),
-			.green = static_cast< uint8 >( ( Value & 0x00f800 ) >> 11 ),
-			.red = static_cast< uint8 >( ( Value & 0xf80000 ) >> 19 )
+			.red = static_cast<uint8>( ( rgb888 & 0xff0000 ) >> ( 16 + 3 ) ),
+			.green = static_cast<uint8>( ( rgb888 & 0x00ff00 ) >> ( 8 + 3 ) ),
+			.blue = static_cast<uint8>( ( rgb888 & 0x0000ff ) >> ( 0 + 3 ) )
 		};
 	}
 
-	constexpr static color from_rgb24( uint24 rgb888 ) {
-		return color {
-			.blue = static_cast<uint8>( ( rgb888 & 0x0000f8 ) >> 3 ),
-			.green = static_cast<uint8>( ( rgb888 & 0x00f800 ) >> 11 ),
-			.red = static_cast<uint8>( ( rgb888 & 0xf80000 ) >> 19 )
-		};
-	}
-
-	static color from_rgb15( uint16 rgb555 ) {
+	static color from_bgr15( uint16 bgr555 ) {
 		color c;
-		std::memcpy( &c, &rgb555, sizeof( rgb555 ) );
+		std::memcpy( &c, &bgr555, sizeof( bgr555 ) );
 		return c;
+	}
+
+	uint16 to_uint16() const {
+		return *( const uint16 * )this;
+	}
+
+	uint32 to_uint32() const {
+		union {
+			uint32 u32;
+			uint16 u16[2];
+		} v;
+		v.u16[0] = to_uint16();
+		v.u16[1] = to_uint16();
+		return v.u32;
 	}
 
 	color rotl( unsigned s ) const {
@@ -56,10 +62,9 @@ struct [[gnu::packed]] color {
 		return c;
 	}
 
-	uint16	: 1,
-			blue : 5,
+	uint16	red : 5,
 			green : 5,
-			red : 5;
+			blue : 5;
 
 };
 

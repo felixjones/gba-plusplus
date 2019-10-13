@@ -10,7 +10,7 @@ namespace io {
 
 namespace keypad {
 
-static const reg<gba::keypad::input>& input = *reinterpret_cast<const reg<gba::keypad::input> *>( 0x4000130 );
+static const reg<gba::keypad::raw_input>& input = *reinterpret_cast<const reg<gba::keypad::raw_input> *>( 0x4000130 );
 static reg<gba::keypad::irq_control>& irq_control = *reinterpret_cast<reg<gba::keypad::irq_control> *>( 0x4000132 );
 
 } // keypad

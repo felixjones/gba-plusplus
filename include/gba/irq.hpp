@@ -55,7 +55,7 @@ constexpr handler_type empty_handler() {
 			);
 
 			asm(
-				 "mov pc, lr\n\t"
+				"mov pc, lr\n\t"
 			);
 		}
 	};
@@ -93,11 +93,11 @@ constexpr handler_type make_handler() {
 			);
 
 			asm(
-				"stmfd sp!, {lr}\n\t"
+				"stmfd sp!, {r0-r1, lr}\n\t"
 				"ldr r1, =%[runnable]\n\t"
 				"mov lr, pc\n\t"
 				"bx r1\n\t"
-				"ldmfd sp!, {lr}\n\t" : : [runnable] "g"( Runnable ) : "r0"
+				"ldmfd sp!, {r0-r1, lr}\n\t" : : [runnable] "g"( Runnable ) : "r0"
 			);
 
 			asm( // Switch to IRQ mode (IRQ stays disabled)
@@ -140,7 +140,7 @@ constexpr handler_type make_handler() {
 			);
 
 			asm(
-				"stmfd sp!, {lr}\n\t"
+				"stmfd sp!, {r0-r1, lr}\n\t"
 			);
 
 			( []() {
@@ -153,7 +153,7 @@ constexpr handler_type make_handler() {
 			}(), ... );
 
 			asm(
-				"ldmfd sp!, {lr}\n\t"
+				"ldmfd sp!, {r0-r1, lr}\n\t"
 			);
 
 			asm( // Switch to IRQ mode (IRQ stays disabled)

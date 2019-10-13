@@ -72,7 +72,16 @@
     <ClInclude Include="..\include\gba\bios.hpp">
       <Filter>include\gba</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\gba\vram.hpp">
+    <ClInclude Include="..\include\gba\video_traits.hpp">
+      <Filter>include\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gba\video_buffer.hpp">
+      <Filter>include\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gba\drawing.hpp">
+      <Filter>include\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gba\dma.hpp">
       <Filter>include\gba</Filter>
     </ClInclude>
   </ItemGroup>

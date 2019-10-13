@@ -1,27 +1,29 @@
 #ifndef GBAXX_IO_REG_HPP
 #define GBAXX_IO_REG_HPP
 
-#include <cstring>
+#include <gba/int_type.hpp>
 
 namespace gba {
 namespace io {
 
+// Register access class
+// Optimised to remove std::memcpy calls
 template <typename Type>
 class reg {
 public:
+	using uint_type = typename uint_sized_type<sizeof( Type )>::type;
 
 	Type read() const {
-		Type b;
-		std::memcpy( &b, ( const void * )&m_data, sizeof( m_data ) );
-		return b;
+		const auto value = m_data;
+		return *( const Type * )&value;
 	}
 
-	void write( const Type& b ) {
-		std::memcpy( ( void * )&m_data, &b, sizeof( b ) );
+	void write( const Type& value ) {
+		m_data = *( const uint_type * )&value;
 	}
 
 private:
-	volatile Type	m_data;
+	volatile uint_type	m_data;
 
 };
 

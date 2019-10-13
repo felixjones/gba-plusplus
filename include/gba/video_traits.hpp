@@ -1,8 +1,8 @@
-#ifndef GBAXX_VRAM_HPP
-#define GBAXX_VRAM_HPP
+#ifndef GBAXX_VIDEO_TRAITS_HPP
+#define GBAXX_VIDEO_TRAITS_HPP
 
 namespace gba {
-namespace vram {
+namespace video {
 
 template <unsigned Mode>
 struct mode_limits {};
@@ -36,7 +36,7 @@ struct mode_limits<3> {
 
 };
 
-} // vram
+} // video
 } // gba
 
-#endif // define GBAXX_VRAM_HPP
+#endif // define GBAXX_VIDEO_TRAITS_HPP

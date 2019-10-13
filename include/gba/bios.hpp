@@ -60,7 +60,7 @@ inline std::tuple<int32, int32, uint32> div_arm( int32 denominator, int32 numera
 	return { r0, r1, r3 };
 }
 
-inline uint32 sqrt( uint32 value ) {
+static uint32 sqrt( uint32 value ) {
 	auto r0 asm( "r0" ) = value;
 
 #if defined( __thumb__ )
@@ -76,10 +76,7 @@ inline uint32 sqrt( uint32 value ) {
 	return r0;
 }
 
-inline void intr_wait( bool32 clearFlags, irq::bits waitFlags ) {
-	auto r0 [[gnu::unused]] asm( "r0" ) = clearFlags;
-	auto r1 [[gnu::unused]] asm( "r1" ) = waitFlags;
-
+static void intr_wait( bool32 clearFlags, irq::bits waitFlags ) {
 #if defined( __thumb__ )
 	asm(
 		"swi %0\t\n" : : "g"( 0x4 ) : "r0", "r1"

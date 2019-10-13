@@ -16,6 +16,8 @@
     <ClInclude Include="..\include\gba\bit_bool.hpp" />
     <ClInclude Include="..\include\gba\bool.hpp" />
     <ClInclude Include="..\include\gba\color.hpp" />
+    <ClInclude Include="..\include\gba\dma.hpp" />
+    <ClInclude Include="..\include\gba\drawing.hpp" />
     <ClInclude Include="..\include\gba\io_display.hpp" />
     <ClInclude Include="..\include\gba\io_interrupt.hpp" />
     <ClInclude Include="..\include\gba\io_keypad.hpp" />
@@ -31,7 +33,8 @@
     <ClInclude Include="..\include\gba\irq.hpp" />
     <ClInclude Include="..\include\gba\packed_int.hpp" />
     <ClInclude Include="..\include\gba\registers.hpp" />
-    <ClInclude Include="..\include\gba\vram.hpp" />
+    <ClInclude Include="..\include\gba\video_traits.hpp" />
+    <ClInclude Include="..\include\gba\video_buffer.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Makefile" />
