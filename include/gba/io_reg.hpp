@@ -6,6 +6,9 @@
 namespace gba {
 namespace io {
 
+#pragma GCC push_options
+#pragma GCC optimize ( "O0" )
+
 // Register access class
 // Optimised to remove std::memcpy calls
 template <typename Type>
@@ -26,6 +29,8 @@ private:
 	volatile uint_type	m_data;
 
 };
+
+#pragma GCC pop_options
 
 } // io
 } // gba

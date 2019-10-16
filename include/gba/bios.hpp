@@ -8,6 +8,9 @@
 namespace gba {
 namespace bios {
 
+#pragma GCC push_options
+#pragma GCC optimize ( "O0" )
+
 [[gnu::unused]]
 static void intr_wait( [[gnu::unused]] bool32 clearFlags, [[gnu::unused]] irq::bits waitFlags ) {
 #if defined( __thumb__ )
@@ -21,8 +24,7 @@ static void intr_wait( [[gnu::unused]] bool32 clearFlags, [[gnu::unused]] irq::b
 #endif
 }
 
-[[gnu::unused]]
-static void vblank_intr_wait() {
+inline void vblank_intr_wait() {
 #if defined( __thumb__ )
 	asm(
 		"swi %0\t\n" : : "g"( 0x5 ) : "r0", "r1"
@@ -50,6 +52,8 @@ static void custom_halt( [[gnu::unused]] bit_bool<uint32, 7> stop ) {
 }
 
 } // undocumented
+
+#pragma GCC pop_options
 
 } // bios
 } // gba

@@ -116,7 +116,7 @@ constexpr handler_type make_handler() {
 				"ldr r1, =%[runnable]\n\t"
 				"mov lr, pc\n\t"
 				"bx r1\n\t"
-				"ldmfd sp!, {r0-r1, lr}\n\t" : : [runnable] "g"( Runnable )
+				"ldmfd sp!, {r0-r1, lr}\n\t" : : [runnable] "g"( Runnable ) : "r0", "r1", "lr"
 			);
 
 			asm( // Switch to IRQ mode (IRQ stays disabled)
@@ -165,7 +165,7 @@ constexpr handler_type make_handler() {
 					"ldr r1, =%[runnable]\n\t"
 					"mov lr, pc\n\t"
 					"bxne r1\n\t"
-					"ldmfd sp!, {r0-r1, lr}\n\t" : : [mask] "g"( Conditionals::mask ), [runnable] "g"( Conditionals::runnable )
+					"ldmfd sp!, {r0-r1, lr}\n\t" : : [mask] "g"( Conditionals::mask ), [runnable] "g"( Conditionals::runnable ) : "r0", "r1", "lr"
 				);
 			}(), ... );
 

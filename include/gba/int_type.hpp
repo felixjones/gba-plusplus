@@ -2,6 +2,7 @@
 #define GBAXX_INT_TYPE_HPP
 
 #include <cstdint>
+#include <cstring>
 #include <type_traits>
 
 namespace gba {
