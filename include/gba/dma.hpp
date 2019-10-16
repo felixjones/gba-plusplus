@@ -9,24 +9,18 @@
 namespace gba {
 namespace dma {
 
-enum dest_op {
-	dest_inc = 0x0,
-	dest_dec = 0x1,
-	dest_fix = 0x2,
-	dest_inc_rel = 0x3
-};
-
-enum src_op {
-	src_inc = 0x0,
-	src_dec = 0x1,
-	src_fix = 0x2
+enum addr_op {
+	op_increment = 0x0,
+	op_decrement = 0x1,
+	op_fixed = 0x2,
+	op_increment_reload = 0x3
 };
 
 struct [[gnu::packed]] control {
 
-	uint16	: 5,
-			destination : 2,
-			source : 2;
+	uint8	: 5;
+	addr_op	destination_op : 2;
+	addr_op	source_op : 2;
 	bool	repeat : 1,
 			long_word : 1,
 			dreq_stop : 1;
@@ -65,9 +59,13 @@ public:
 		return *this;
 	}
 
-	channel& control( gba::dma::control value ) {
+	channel& control( const gba::dma::control& value ) {
 		m_control.write( value );
 		return *this;
+	}
+
+	gba::dma::control control() const {
+		return m_control.read();
 	}
 
 private:

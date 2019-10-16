@@ -1,15 +1,64 @@
 #ifndef GBAXX_BIOS_HPP
 #define GBAXX_BIOS_HPP
 
-#include <tuple>
-
 #include <gba/bit_bool.hpp>
 #include <gba/bool.hpp>
-#include <gba/int.hpp>
 #include <gba/irq.hpp>
 
 namespace gba {
 namespace bios {
+
+[[gnu::unused]]
+static void intr_wait( [[gnu::unused]] bool32 clearFlags, [[gnu::unused]] irq::bits waitFlags ) {
+#if defined( __thumb__ )
+	asm(
+		"swi %0\t\n" : : "g"( 0x4 ) : "r0", "r1"
+	);
+#else
+	asm(
+		"swi %0 << 16\t\n" : : "g"( 0x4 ) : "r0", "r1"
+	);
+#endif
+}
+
+[[gnu::unused]]
+static void vblank_intr_wait() {
+#if defined( __thumb__ )
+	asm(
+		"swi %0\t\n" : : "g"( 0x5 ) : "r0", "r1"
+	);
+#else
+	asm(
+		"swi %0 << 16\t\n" : : "g"( 0x5 ) : "r0", "r1"
+	);
+#endif
+}
+
+namespace undocumented {
+
+[[gnu::unused]]
+static void custom_halt( [[gnu::unused]] bit_bool<uint32, 7> stop ) {
+#if defined( __thumb__ )
+	asm(
+		"swi %0\t\n" : : "g"( 0x27 ) : "r0"
+	);
+#else
+	asm(
+		"swi %0 << 16\t\n" : : "g"( 0x27 ) : "r0"
+	);
+#endif
+}
+
+} // undocumented
+
+} // bios
+} // gba
+
+#endif // define GBAXX_BIOS_HPP
+
+/*
+#include <tuple>
+#include <gba/int.hpp>
 
 template <unsigned Number>
 void swi() {
@@ -76,52 +125,7 @@ static uint32 sqrt( uint32 value ) {
 	return r0;
 }
 
-static void intr_wait( bool32 clearFlags, irq::bits waitFlags ) {
-#if defined( __thumb__ )
-	asm(
-		"swi %0\t\n" : : "g"( 0x4 ) : "r0", "r1"
-	);
-#else
-	asm(
-		"swi %0 << 16\t\n" : : "g"( 0x4 ) : "r0", "r1"
-	);
-#endif
-}
-
-inline void vblank_intr_wait() {
-#if defined( __thumb__ )
-	asm(
-		"swi %0\t\n" : : "g"( 0x5 ) : "r0", "r1"
-	);
-#else
-	asm(
-		"swi %0 << 16\t\n" : : "g"( 0x5 ) : "r0", "r1"
-	);
-#endif
-}
-
 constexpr auto halt = swi<0x02>;
 constexpr auto stop = swi<0x03>;
 
-namespace undocumented {
-
-inline void custom_halt( bit_bool<uint32, 7> stop ) {
-	auto r0 [[gnu::unused]] asm( "r0" ) = stop;
-
-#if defined( __thumb__ )
-	asm(
-		"swi %0\t\n" : : "g"( 0x27 ) : "r0"
-	);
-#else
-	asm(
-		"swi %0 << 16\t\n" : : "g"( 0x27 ) : "r0"
-	);
-#endif
-}
-
-} // undocumented
-
-} // bios
-} // gba
-
-#endif // define GBAXX_BIOS_HPP
+*/

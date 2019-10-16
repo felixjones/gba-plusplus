@@ -37,9 +37,9 @@ struct [[gnu::packed]] status {
 			emit_vcount : 1;
 
 	const bool	: 1;
-	bool	:	1;
+	bool		: 1;
 
-	uint16	vcount;
+	uint16	vcount_line;
 
 };
 

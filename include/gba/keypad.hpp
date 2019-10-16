@@ -69,6 +69,8 @@ public:
 	constexpr state( uint16 s ) : m_bitmask( s ) {}
 	constexpr state( const state& other ) : m_bitmask( other.m_bitmask ) {}
 
+	state( const raw_input& raw ) : m_bitmask( raw.value() ) {}
+
 	template <typename Type = int_sized_type<1>::fast>
 	constexpr Type axis_x() const {
 		Type axis = 0;

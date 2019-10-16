@@ -15,11 +15,11 @@ public:
 
 	Type read() const {
 		const auto value = m_data;
-		return *( const Type * )&value;
+		return *reinterpret_cast<const Type *>( &value );
 	}
 
 	void write( const Type& value ) {
-		m_data = *( const uint_type * )&value;
+		m_data = *reinterpret_cast<const uint_type *>( &value );
 	}
 
 private:

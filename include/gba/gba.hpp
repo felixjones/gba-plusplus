@@ -17,6 +17,7 @@
 #include <gba/keypad.hpp>
 #include <gba/packed_int.hpp>
 #include <gba/sized_bool.hpp>
+#include <gba/timer.hpp>
 #include <gba/video_traits.hpp>
 
 #endif // define GBAXX_GBA_HPP

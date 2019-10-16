@@ -6,6 +6,25 @@
 namespace gba {
 namespace irq {
 
+namespace flags {
+
+	constexpr auto Vblank = ( 0x1 << 0 );
+	constexpr auto Hblank = ( 0x1 << 1 );
+	constexpr auto Vcount = ( 0x1 << 2 );
+	constexpr auto Timer0 = ( 0x1 << 3 );
+	constexpr auto Timer1 = ( 0x1 << 4 );
+	constexpr auto Timer2 = ( 0x1 << 5 );
+	constexpr auto Timer3 = ( 0x1 << 6 );
+	constexpr auto SerialCommunication = ( 0x1 << 7 );
+	constexpr auto Dma0 = ( 0x1 << 8 );
+	constexpr auto Dma1 = ( 0x1 << 9 );
+	constexpr auto Dma2 = ( 0x1 << 10 );
+	constexpr auto Dma3 = ( 0x1 << 11 );
+	constexpr auto Keypad = ( 0x1 << 12 );
+	constexpr auto GamePak = ( 0x1 << 13 );
+
+} // flags
+
 struct [[gnu::packed]] bits {
 
 	bool	vblank : 1,
@@ -97,7 +116,7 @@ constexpr handler_type make_handler() {
 				"ldr r1, =%[runnable]\n\t"
 				"mov lr, pc\n\t"
 				"bx r1\n\t"
-				"ldmfd sp!, {r0-r1, lr}\n\t" : : [runnable] "g"( Runnable ) : "r0"
+				"ldmfd sp!, {r0-r1, lr}\n\t" : : [runnable] "g"( Runnable )
 			);
 
 			asm( // Switch to IRQ mode (IRQ stays disabled)
@@ -139,22 +158,16 @@ constexpr handler_type make_handler() {
 				 "msr cpsr_c, #0x9F\n\t"
 			);
 
-			asm(
-				"stmfd sp!, {r0-r1, lr}\n\t"
-			);
-
 			( []() {
 				asm(
-					"tst r0, %[Mask]\n\t"
+					"stmfd sp!, {r0-r1, lr}\n\t"
+					"tst r0, %[mask]\n\t"
 					"ldr r1, =%[runnable]\n\t"
 					"mov lr, pc\n\t"
-					"bxne r1\n\t" : : [Mask] "g"( Conditionals::mask ), [runnable] "g"( Conditionals::runnable )
+					"bxne r1\n\t"
+					"ldmfd sp!, {r0-r1, lr}\n\t" : : [mask] "g"( Conditionals::mask ), [runnable] "g"( Conditionals::runnable )
 				);
 			}(), ... );
-
-			asm(
-				"ldmfd sp!, {r0-r1, lr}\n\t"
-			);
 
 			asm( // Switch to IRQ mode (IRQ stays disabled)
 				 "msr cpsr_c, #0x92\n\t"
