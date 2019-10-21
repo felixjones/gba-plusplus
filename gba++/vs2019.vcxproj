@@ -14,6 +14,7 @@
     <ClInclude Include="..\include\gba\backgrounds.hpp" />
     <ClInclude Include="..\include\gba\bios.hpp" />
     <ClInclude Include="..\include\gba\bit_bool.hpp" />
+    <ClInclude Include="..\include\gba\bit_cast.hpp" />
     <ClInclude Include="..\include\gba\bool.hpp" />
     <ClInclude Include="..\include\gba\color.hpp" />
     <ClInclude Include="..\include\gba\dma.hpp" />
@@ -33,6 +34,7 @@
     <ClInclude Include="..\include\gba\irq.hpp" />
     <ClInclude Include="..\include\gba\packed_int.hpp" />
     <ClInclude Include="..\include\gba\registers.hpp" />
+    <ClInclude Include="..\include\gba\timer.hpp" />
     <ClInclude Include="..\include\gba\video_traits.hpp" />
     <ClInclude Include="..\include\gba\video_buffer.hpp" />
   </ItemGroup>

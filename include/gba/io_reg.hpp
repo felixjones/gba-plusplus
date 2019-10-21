@@ -1,36 +1,33 @@
 #ifndef GBAXX_IO_REG_HPP
 #define GBAXX_IO_REG_HPP
 
+#include <gba/bit_cast.hpp>
 #include <gba/int_type.hpp>
 
 namespace gba {
 namespace io {
 
-#pragma GCC push_options
-#pragma GCC optimize ( "O0" )
-
 // Register access class
-// Optimised to remove std::memcpy calls
 template <typename Type>
 class reg {
 public:
 	using uint_type = typename uint_sized_type<sizeof( Type )>::type;
 
 	Type read() const {
-		const auto value = m_data;
-		return *reinterpret_cast<const Type *>( &value );
+		const auto data = m_data;
+		return gba::bit_cast<Type>( data );
 	}
 
 	void write( const Type& value ) {
-		m_data = *reinterpret_cast<const uint_type *>( &value );
+		uint_type data = 0;
+		std::memcpy( &data, &value, sizeof( value ) );
+		m_data = data;
 	}
 
 private:
 	volatile uint_type	m_data;
 
 };
-
-#pragma GCC pop_options
 
 } // io
 } // gba

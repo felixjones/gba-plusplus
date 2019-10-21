@@ -51,9 +51,6 @@
     <ClInclude Include="..\include\gba\irq.hpp">
       <Filter>include\gba</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\gba\io_reg.hpp">
-      <Filter>include\gba</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\gba\bit_bool.hpp">
       <Filter>include\gba</Filter>
     </ClInclude>
@@ -82,6 +79,15 @@
       <Filter>include\gba</Filter>
     </ClInclude>
     <ClInclude Include="..\include\gba\dma.hpp">
+      <Filter>include\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gba\io_reg.hpp">
+      <Filter>include\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gba\timer.hpp">
+      <Filter>include\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gba\bit_cast.hpp">
       <Filter>include\gba</Filter>
     </ClInclude>
   </ItemGroup>

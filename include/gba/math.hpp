@@ -31,18 +31,21 @@ constexpr auto floor2( Type n ) {
 	}
 }
 
+// Rotate left
 template <typename Type>
 constexpr auto rotl( Type n, unsigned s ) {
 	typename std::make_unsigned<Type>::type un = n;
 	return ( un << s ) | ( un >> ( ( sizeof( un ) * 8 ) - s ) );
 }
 
+// Rotate right
 template <typename Type>
 constexpr auto rotr( Type n, unsigned s ) {
 	typename std::make_unsigned<Type>::type un = n;
 	return ( un >> s ) | ( un << ( ( sizeof( un ) * 8 ) - s ) );
 }
 
+// Count trailing zeros
 template <typename Type>
 constexpr auto ctz( Type n ) {
 	if constexpr ( sizeof( n ) == 8 ) {
@@ -52,6 +55,7 @@ constexpr auto ctz( Type n ) {
 	}
 }
 
+// Count leading zeros
 template <typename Type>
 constexpr auto clz( Type n ) {
 	if constexpr ( sizeof( n ) == 8 ) {
