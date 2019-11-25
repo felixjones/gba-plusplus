@@ -132,10 +132,55 @@ private:
 
 };
 
-// TODO : Some handy helper stuff
+class events {
+public:
+	constexpr events() : m_bitmask( 0 ), m_diff( 0 ) {}
+
+	void update( const raw_input& raw ) {
+		m_diff = m_bitmask ^ raw.value(); // What keys have changed state?
+		if ( m_diff ) {
+			m_bitmask = raw.value(); // What keys are pressed?
+		}
+	}
+
+	constexpr bool key_pressed( uint16 k ) const {
+		return ( m_bitmask & k ) == k;
+	}
+
+	constexpr bool key_released( uint16 k ) const {
+		return ( m_bitmask & k ) == 0;
+	}
+
+	constexpr bool key_down( uint16 k ) const {
+		if ( ( m_diff & k ) == k ) {
+			return ( m_bitmask & k ) == k;
+		}
+		return false;
+	}
+
+	constexpr bool key_up( uint16 k ) const {
+		if ( ( m_diff & k ) == k ) {
+			return ( m_bitmask & k ) == 0;
+		}
+		return false;
+	}
+
+	template <typename Type>
+	constexpr bool axis_changed( Type& mask ) const {
+		if ( m_diff & 0xf0 ) {
+			mask = ( m_bitmask >> 4 ) & 0xf;
+			return true;
+		}
+		return false;
+	}
+
+private:
+	uint16	m_bitmask;
+	uint16	m_diff;
+	
+};
 
 } // keypad
 } // gba
-
 
 #endif // define GBAXX_KEYPAD_HPP

@@ -54,26 +54,11 @@ constexpr handler_type empty_handler() {
 		[[gnu::naked, gnu::target( "arm" ), gnu::section( ".iwram" ), gnu::long_call]]
 		static void entry() {
 			asm(
-				"mov r3, #0x4000000\n\t" // REG_BASE
-				"ldr r2, [r3, #0x200]\n\t" // Read REG_IE
-			);
-
-			asm( // Get raised flags
-				 "and r0, r2, r2, lsr #16\n\t" // r0 = IE & IF
-			);
-
-			asm( // combine with BIOS IRQ flags (0x3FFFFF8 mirror)
-				 "ldrh r2, [r3, #-8]\n\t"
-				 "orr r2, r2, r0\n\t"
-				 "strh r2, [r3, #-8]\n\t"
-			);
-
-			asm(
+				"mov r3, #0x4000000\n\t"
+				"mov r2, #0xFF\n\t"
+				"strh r2, [r3, #-8]\n\t"
 				"add r3, r3, #0x200\n\t"
-				"strh r0, [r3, #2]\n\t" // IF Clear
-			);
-
-			asm(
+				"strh r2, [r3, #2]\n\t"
 				"mov pc, lr\n\t"
 			);
 		}

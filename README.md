@@ -38,28 +38,31 @@ Everything is within a `gba::` namespace.
 
 Use gba++ types `gba::int16 gba::uint16` and keep volatile as a separate keyword.
 
-## Things to consider
+## Sample code
 
-### Interrupt vector?
+```C++
+#include <gba/gba.hpp>
 
-Default interrupt vector must be an ARM function. Should we just let the user handle this?
+#define EVER ;;
 
-Perhaps somehow wrap user vectors at compile-time somehow?
+typedef gba::color mode3_line[240];
 
-```cpp
-void user_function_to_wrap( int regIF ) {}
-
-// Wrap user function to support nested interrupts and Thumb functions?
-const auto my_vector = gba::interrupt_handler<user_function_to_wrap>();
+static auto& DISPCNT = gba::io::display::control;
+static auto& mode3_memory = ( mode3_line * )0x6000000;
 
 int main( int argc, char * argv[] ) {
-  // Reading the current interrupt vector would be useful
-  if ( gba::irq::vector() != my_vector ) {
-    gba::irq::vector() = my_vector;
-  }
-  // ...
+	DISPCNT.write( gba::display::control { .mode = 3, .background_layer2 = true } );
+
+	mode3_memory[80][120] = gba::color { .red = 31, .green =  0, .blue =  0 };
+	mode3_memory[80][136] = gba::color { .red =  0, .green = 31, .blue =  0 };
+	mode3_memory[96][120] = gba::color { .red =  0, .green =  0, .blue = 31 };
+
+	for ( EVER ) {}
+	return 0;
 }
 ```
+
+## Things to consider
 
 ### What License?
 

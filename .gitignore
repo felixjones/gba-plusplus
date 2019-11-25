@@ -526,3 +526,9 @@ healthchecksdb
 MigrationBackup/
 
 # End of https://www.gitignore.io/api/c,c++,xcode,linux,macos,windows,visualstudio
+
+build/
+lib/
+html/
+latex/
+doxygen_sqlite3.db

@@ -15,11 +15,11 @@ inline void intr_wait( bool32 clearFlags, irq::bits waitFlags ) {
 	const register auto r1 asm( "r1" ) = gba::bit_cast<short>( waitFlags );
 #if defined( __thumb__ )
 	asm(
-		"swi %0\t\n" : : "g"( 0x4 ), "r"( r0 ), "r"( r1 ) : "r2", "r3"
+		"swi %0\t\n" : : "g"( 0x4 ), "r"( r0 ), "r"( r1 )
 	);
 #else
 	asm(
-		"swi %0 << 16\t\n" : : "g"( 0x4 ), "r"( r0 ), "r"( r1 ) : "r2", "r3"
+		"swi %0 << 16\t\n" : : "g"( 0x4 ), "r"( r0 ), "r"( r1 )
 	);
 #endif
 }
@@ -27,11 +27,11 @@ inline void intr_wait( bool32 clearFlags, irq::bits waitFlags ) {
 inline void vblank_intr_wait() {
 #if defined( __thumb__ )
 	asm(
-		"swi %0\t\n" : : "g"( 0x5 ) : "r0", "r1", "r2", "r3"
+		"swi %0\t\n" : : "g"( 0x5 ) : "r0", "r1"
 	);
 #else
 	asm(
-		"swi %0 << 16\t\n" : : "g"( 0x5 ) : "r0", "r1", "r2", "r3"
+		"swi %0 << 16\t\n" : : "g"( 0x5 ) : "r0", "r1"
 	);
 #endif
 }
@@ -39,14 +39,14 @@ inline void vblank_intr_wait() {
 namespace undocumented {
 
 inline void custom_halt( bit_bool<uint32, 7> stop ) {
-	const register auto r0 asm( "r0" ) = gba::bit_cast<int>( stop );
+	const register auto r2 asm( "r2" ) = gba::bit_cast<int>( stop );
 #if defined( __thumb__ )
 	asm(
-		"swi %0\t\n" : : "g"( 0x27 ), "r"( r0 ) : "r1", "r2", "r3"
+		"swi %0\t\n" : : "g"( 0x27 ), "r"( r2 ) : "r0", "r1"
 	);
 #else
 	asm(
-		"swi %0 << 16\t\n" : : "g"( 0x27 ), "r"( r0 ) : "r1", "r2", "r3"
+		"swi %0 << 16\t\n" : : "g"( 0x27 ), "r"( r2 ) : "r0", "r1"
 	);
 #endif
 }

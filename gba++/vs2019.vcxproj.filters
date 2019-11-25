@@ -90,8 +90,31 @@
     <ClInclude Include="..\include\gba\bit_cast.hpp">
       <Filter>include\gba</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\gba\io_system.hpp">
+      <Filter>include\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gba\waitstate.hpp">
+      <Filter>include\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gba\sound.hpp">
+      <Filter>include\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gba\io_sound.hpp">
+      <Filter>include\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gba\video_allocator.hpp">
+      <Filter>include\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gba\iwram_allocator.hpp">
+      <Filter>include\gba</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Makefile" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\iwram_allocator.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

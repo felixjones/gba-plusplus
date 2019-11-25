@@ -14,12 +14,16 @@
 #include <gba/io_interrupt.hpp>
 #include <gba/io_keypad.hpp>
 #include <gba/io_reg.hpp>
+#include <gba/io_sound.hpp>
+#include <gba/io_system.hpp>
 #include <gba/irq.hpp>
 #include <gba/keypad.hpp>
 #include <gba/math.hpp>
 #include <gba/packed_int.hpp>
 #include <gba/sized_bool.hpp>
+#include <gba/sound.hpp>
 #include <gba/timer.hpp>
 #include <gba/video_traits.hpp>
+#include <gba/waitstate.hpp>
 
 #endif // define GBAXX_GBA_HPP

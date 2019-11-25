@@ -8,6 +8,7 @@ namespace gba {
 namespace io {
 
 // Register access class
+// TODO : Extract out read and write only registers
 template <typename Type>
 class reg {
 public:
@@ -19,12 +20,12 @@ public:
 	}
 
 	void write( const Type& value ) {
-		uint_type data = 0;
+		uint_type data = 0; // Little endian
 		std::memcpy( &data, &value, sizeof( value ) );
 		m_data = data;
 	}
 
-private:
+protected:
 	volatile uint_type	m_data;
 
 };
