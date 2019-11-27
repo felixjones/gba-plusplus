@@ -7,6 +7,7 @@
 
 namespace gba {
 
+[[nodiscard]]
 void * iwram_malloc( std::size_t n );
 void iwram_free( void * p );
 
@@ -29,7 +30,7 @@ struct iwram_allocator {
 
 	[[nodiscard]]
 	constexpr T * allocate( std::size_t n ) {
-		return reinterpret_cast<T *>( iwram_malloc( n ) );
+		return reinterpret_cast<T *>( iwram_malloc( n * sizeof( value_type ) ) );
 	}
 
 	constexpr void deallocate( T * p, std::size_t n ) {

@@ -40,7 +40,7 @@ CFLAGS	:=	-Wall\
 ifeq ($(CONFIGURATION),Debug)
 CFLAGS	+=	-Og -g -D_DEBUG
 else
-CFLAGS	+=	-O3 -flto -DNDEBUG
+CFLAGS	+=	-O3 -DNDEBUG
 endif
 
 CFLAGS	+=	$(INCLUDE)

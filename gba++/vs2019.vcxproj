@@ -43,16 +43,19 @@
     <ClInclude Include="..\include\gba\registers.hpp" />
     <ClInclude Include="..\include\gba\sound.hpp" />
     <ClInclude Include="..\include\gba\timer.hpp" />
+    <ClInclude Include="..\include\gba\tiny_alloc.hpp" />
     <ClInclude Include="..\include\gba\video_allocator.hpp" />
     <ClInclude Include="..\include\gba\video_traits.hpp" />
     <ClInclude Include="..\include\gba\video_buffer.hpp" />
     <ClInclude Include="..\include\gba\waitstate.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\libgba++.dox" />
     <None Include="..\Makefile" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\iwram_allocator.cpp" />
+    <ClCompile Include="..\src\tiny_alloc.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

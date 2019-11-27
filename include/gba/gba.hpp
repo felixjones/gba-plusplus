@@ -17,6 +17,7 @@
 #include <gba/io_sound.hpp>
 #include <gba/io_system.hpp>
 #include <gba/irq.hpp>
+#include <gba/iwram_allocator.hpp>
 #include <gba/keypad.hpp>
 #include <gba/math.hpp>
 #include <gba/packed_int.hpp>
