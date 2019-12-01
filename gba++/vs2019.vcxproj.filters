@@ -108,20 +108,12 @@
     <ClInclude Include="..\include\gba\iwram_allocator.hpp">
       <Filter>include\gba</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\gba\tiny_alloc.hpp">
+    <ClInclude Include="..\include\gba\heap.hpp">
       <Filter>include\gba</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Makefile" />
     <None Include="..\libgba++.dox" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\src\iwram_allocator.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\tiny_alloc.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

@@ -8,6 +8,7 @@
 #include <gba/color.hpp>
 #include <gba/display.hpp>
 #include <gba/dma.hpp>
+#include <gba/heap.hpp>
 #include <gba/int.hpp>
 #include <gba/int_type.hpp>
 #include <gba/io_display.hpp>
