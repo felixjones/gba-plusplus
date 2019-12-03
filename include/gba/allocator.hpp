@@ -1,8 +1,12 @@
-#ifndef GBAXX_TINY_ALLOC_HPP
-#define GBAXX_TINY_ALLOC_HPP
+#ifndef GBAXX_ALLOCATOR_HPP
+#define GBAXX_ALLOCATOR_HPP
 
 #include <cstddef>
 #include <cstring>
+
+#if defined( __EXCEPTIONS )
+#include <new>
+#endif
 
 #include <gba/int.hpp>
 
@@ -11,7 +15,7 @@ namespace gba::util {
 // C++ implementation of tiny alloc
 // https://github.com/thi-ng/tinyalloc
 template <std::size_t MaxBlocks, std::size_t SplitThreshold, std::size_t Alignment>
-class heap {
+class allocator {
 private:
 	struct block {
 		uintptr			addr;
@@ -20,7 +24,7 @@ private:
 	};
 
 public:
-	heap( uintptr base, uintptr limit ) noexcept : m_base( base ), m_limit( limit ), m_free( nullptr ), m_used( nullptr ), m_fresh( &m_blocks[0] ), m_top( base ), m_blocks {} {
+	allocator( uintptr base, uintptr limit ) noexcept : m_base( base ), m_limit( limit ), m_free( nullptr ), m_used( nullptr ), m_fresh( &m_blocks[0] ), m_top( base ), m_blocks {} {
 		auto b = &m_blocks[0];
 		auto ii = MaxBlocks;
 		while ( ii-- ) {
@@ -29,7 +33,7 @@ public:
 		}
 	}
 
-	heap( const heap& other ) = delete;
+	allocator( const allocator& other ) = delete;
 	
 	[[nodiscard]]
 	void * malloc( std::size_t size ) {
@@ -40,6 +44,9 @@ public:
 #endif
 			return ( void * )b->addr;
 		}
+#if defined( __EXCEPTIONS )
+		throw std::bad_alloc();
+#endif
 		return nullptr;
 	}
 
@@ -51,13 +58,21 @@ public:
 			std::memset( ( void * )b->addr, 0, size );
 			return ( void * )b->addr;
 		}
+#if defined( __EXCEPTIONS )
+		throw std::bad_alloc();
+#endif
 		return nullptr;
 	}
 
 	[[nodiscard]]
 	void * realloc( void * ptr, std::size_t size ) {
 		const auto newPtr = malloc( size );
-		if ( !newPtr ) return nullptr;
+		if ( !newPtr ) {
+#if defined( __EXCEPTIONS )
+			throw std::bad_alloc();
+#endif
+			return nullptr;
+		}
 		if ( !ptr ) return newPtr;
 
 		auto b = m_used;
@@ -86,6 +101,9 @@ public:
 		}
 
 		free( newPtr );
+#if defined( __EXCEPTIONS )
+		throw std::bad_alloc();
+#endif
 		return nullptr;
 	}
 
@@ -118,9 +136,10 @@ public:
 
 protected:
 	void release_blocks( block * scan, block * to ) {
-		block * scanNext;
 		while ( scan != to ) {
-			scanNext = scan->next;
+			mgba_printf( MGBA_LOG_INFO, "release %p", scan );
+
+			const auto scanNext = scan->next;
 			scan->next = m_fresh;
 			m_fresh = scan;
 			scan->addr = 0;
@@ -135,6 +154,7 @@ protected:
 
 		while ( ptr ) {
 			if ( b->addr <= ptr->addr ) {
+				mgba_printf( MGBA_LOG_INFO, "insert %p", ptr );
 				break;
 			}
 
@@ -143,8 +163,12 @@ protected:
 		}
 
 		if ( prev ) {
+			if ( !ptr ) {
+				mgba_printf( MGBA_LOG_INFO, "new tail" );
+			}
 			prev->next = b;
 		} else {
+			mgba_printf( MGBA_LOG_INFO, "new head" );
 			m_free = b;
 		}
 
@@ -153,20 +177,21 @@ protected:
 
 	void compact() {
 		auto ptr = m_free;
-		block * prev;
-		block * scan;
 
 		while ( ptr ) {
-			prev = ptr;
-			scan = ptr->next;
+			auto prev = ptr;
+			auto scan = ptr->next;
 
 			while ( scan && ( prev->addr + prev->size ) == scan->addr ) {
+				mgba_printf( MGBA_LOG_INFO, "merge %p", scan );
+
 				prev = scan;
 				scan = scan->next;
 			}
 
 			if ( prev != ptr ) {
 				const auto new_size = prev->addr - ptr->addr + prev->size;
+				mgba_printf( MGBA_LOG_INFO, "new size %d", new_size );
 
 				ptr->size = new_size;
 				const auto next = prev->next;
@@ -260,4 +285,4 @@ private:
 
 } // gba::util
 
-#endif // define GBAXX_TINY_ALLOC_HPP
+#endif // define GBAXX_ALLOCATOR_HPP

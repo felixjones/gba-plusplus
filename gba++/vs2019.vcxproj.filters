@@ -108,7 +108,7 @@
     <ClInclude Include="..\include\gba\iwram_allocator.hpp">
       <Filter>include\gba</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\gba\heap.hpp">
+    <ClInclude Include="..\include\gba\allocator.hpp">
       <Filter>include\gba</Filter>
     </ClInclude>
   </ItemGroup>

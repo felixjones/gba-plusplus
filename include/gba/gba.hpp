@@ -1,6 +1,7 @@
 #ifndef GBAXX_GBA_HPP
 #define GBAXX_GBA_HPP
 
+#include <gba/allocator.hpp>
 #include <gba/bios.hpp>
 #include <gba/bit_bool.hpp>
 #include <gba/bit_cast.hpp>
@@ -8,7 +9,6 @@
 #include <gba/color.hpp>
 #include <gba/display.hpp>
 #include <gba/dma.hpp>
-#include <gba/heap.hpp>
 #include <gba/int.hpp>
 #include <gba/int_type.hpp>
 #include <gba/io_display.hpp>
