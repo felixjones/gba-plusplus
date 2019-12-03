@@ -137,8 +137,6 @@ public:
 protected:
 	void release_blocks( block * scan, block * to ) {
 		while ( scan != to ) {
-			mgba_printf( MGBA_LOG_INFO, "release %p", scan );
-
 			const auto scanNext = scan->next;
 			scan->next = m_fresh;
 			m_fresh = scan;
@@ -154,7 +152,6 @@ protected:
 
 		while ( ptr ) {
 			if ( b->addr <= ptr->addr ) {
-				mgba_printf( MGBA_LOG_INFO, "insert %p", ptr );
 				break;
 			}
 
@@ -163,12 +160,8 @@ protected:
 		}
 
 		if ( prev ) {
-			if ( !ptr ) {
-				mgba_printf( MGBA_LOG_INFO, "new tail" );
-			}
 			prev->next = b;
 		} else {
-			mgba_printf( MGBA_LOG_INFO, "new head" );
 			m_free = b;
 		}
 
@@ -183,15 +176,12 @@ protected:
 			auto scan = ptr->next;
 
 			while ( scan && ( prev->addr + prev->size ) == scan->addr ) {
-				mgba_printf( MGBA_LOG_INFO, "merge %p", scan );
-
 				prev = scan;
 				scan = scan->next;
 			}
 
 			if ( prev != ptr ) {
 				const auto new_size = prev->addr - ptr->addr + prev->size;
-				mgba_printf( MGBA_LOG_INFO, "new size %d", new_size );
 
 				ptr->size = new_size;
 				const auto next = prev->next;
