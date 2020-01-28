@@ -9,6 +9,7 @@
 #include <gba/color.hpp>
 #include <gba/display.hpp>
 #include <gba/dma.hpp>
+#include <gba/fixed_point.hpp>
 #include <gba/int.hpp>
 #include <gba/int_type.hpp>
 #include <gba/io_display.hpp>
@@ -18,7 +19,6 @@
 #include <gba/io_sound.hpp>
 #include <gba/io_system.hpp>
 #include <gba/irq.hpp>
-#include <gba/iwram_allocator.hpp>
 #include <gba/keypad.hpp>
 #include <gba/math.hpp>
 #include <gba/packed_int.hpp>

@@ -21,19 +21,10 @@
     <ClInclude Include="..\include\gba\int_type.hpp">
       <Filter>include\gba</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\gba\fixed_point.hpp">
-      <Filter>include\gba</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\gba\display.hpp">
       <Filter>include\gba</Filter>
     </ClInclude>
     <ClInclude Include="..\include\gba\gba.hpp">
-      <Filter>include\gba</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\gba\backgrounds.hpp">
-      <Filter>include\gba</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\gba\registers.hpp">
       <Filter>include\gba</Filter>
     </ClInclude>
     <ClInclude Include="..\include\gba\sized_bool.hpp">
@@ -72,12 +63,6 @@
     <ClInclude Include="..\include\gba\video_traits.hpp">
       <Filter>include\gba</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\gba\video_buffer.hpp">
-      <Filter>include\gba</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\gba\drawing.hpp">
-      <Filter>include\gba</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\gba\dma.hpp">
       <Filter>include\gba</Filter>
     </ClInclude>
@@ -102,13 +87,10 @@
     <ClInclude Include="..\include\gba\io_sound.hpp">
       <Filter>include\gba</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\gba\video_allocator.hpp">
-      <Filter>include\gba</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\gba\iwram_allocator.hpp">
-      <Filter>include\gba</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\gba\allocator.hpp">
+      <Filter>include\gba</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gba\fixed_point.hpp">
       <Filter>include\gba</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,72 +1,141 @@
 #ifndef GBAXX_FIXED_POINT_HPP
 #define GBAXX_FIXED_POINT_HPP
 
-#include <type_traits>
+#include <algorithm>
+#include <cstdint>
 #include <limits>
+#include <type_traits>
 
-#include <gba/int.hpp>
 #include <gba/int_type.hpp>
 
 namespace gba {
 
-template <typename Container, unsigned int Exponent = 0, bool Fast = false>
+template <class ReprType = int, int Exponent = 0>
 class fixed_point {
-	static_assert( std::numeric_limits<Container>::is_integer, "fixed_point Container must be integer type" );
+	static_assert( std::is_fundamental<ReprType>::value, "ReprType must be a fundamental type" );
+	static_assert( std::is_integral<ReprType>::value, "ReprType must be a integral type" );
+	static_assert( sizeof( ReprType ) < sizeof( std::uintmax_t ), "ReprType should not be the largest size" );
+	
 public:
-	using value_type = Container;
+	using repr_type = ReprType;
 
-	constexpr fixed_point() : m_value {} {}
+	constexpr static int exponent = Exponent;
+	constexpr static int digits = ( sizeof( repr_type ) * 8 ) - ( std::is_signed<repr_type>::value ? 1 : 0 );
+	constexpr static int integer_digits = digits - Exponent;
+	constexpr static int fractional_digits = Exponent;
 
-	template <typename FloatType, typename = std::enable_if<std::is_floating_point<FloatType>::value>>
-	constexpr fixed_point( FloatType value ) : m_value {} {
-		operator=( value );
+	static constexpr fixed_point from_data( repr_type repr ) noexcept {
+		fixed_point a;
+		a.m_value = repr;
+		return a;
 	}
 
-	constexpr fixed_point( value_type value ) : m_value {} {
-		operator=( value );
-	}
+	constexpr fixed_point() noexcept : m_value( 0 ) {}
 
-	template <typename FloatType, typename = std::enable_if<std::is_floating_point<FloatType>::value>>
-	constexpr fixed_point & operator=( FloatType value ) {
-		m_value = value * ( 1 << Exponent );
-		return *this;
-	}
+	template <class S, typename std::enable_if<std::is_integral<S>::value, int>::type Dummy = 0>
+	explicit constexpr fixed_point( S s ) noexcept : m_value( s * ( 1 << Exponent ) ) {}
 
-	constexpr fixed_point& operator=( value_type value ) {
-		using uvalue_type = typename uint_sized_type<sizeof( value_type )>::fast;
+	template <class S, typename std::enable_if<std::is_floating_point<S>::value, int>::type Dummy = 0>
+	explicit constexpr fixed_point( S s ) noexcept : m_value( static_cast<repr_type>( s * ( 1 << Exponent ) ) ) {}
 
-		m_value = static_cast<uvalue_type>( value ) << Exponent;
-		if ( std::numeric_limits<value_type>::is_signed && value < 0 && Fast == false ) {
-			// Negative numbers need sign to be restored
-			m_value |= ( 1 << ( sizeof( value_type ) * 8 - 1 ) );
-		}
-		return *this;
-	}
-
-	template <typename FloatType, typename = std::enable_if<std::is_floating_point<FloatType>::value>>
-	constexpr operator FloatType() const {
-		return m_value / static_cast<FloatType>( 1 << Exponent );
-	}
-
-	constexpr operator value_type() const {
-		using uvalue_type = typename uint_sized_type<sizeof( value_type )>::fast;
-
-		if ( std::numeric_limits<value_type>::is_signed && m_value < 0 && Fast == false ) {
-			// Negative numbers have their high bits padded with 0xff
-			constexpr auto minus_bits = ~( static_cast<uvalue_type>( -1 ) >> Exponent );
-			return ( minus_bits | ( static_cast<uvalue_type>( m_value ) >> Exponent ) ) + 1;
+	template <class FromReprType, int FromExponent>
+	explicit constexpr fixed_point( const fixed_point<FromReprType, FromExponent>& rhs ) noexcept : m_value( 0 ) {
+		if constexpr ( std::is_signed<repr_type>::value ) {
+			if constexpr ( Exponent > FromExponent ) {
+				m_value = rhs.data() * ( 1 << ( Exponent - FromExponent ) );
+			} else {
+				m_value = rhs.data() / ( 1 << ( FromExponent - Exponent ) );
+			}
 		} else {
-			return static_cast<uvalue_type>( m_value ) >> Exponent;
+			if constexpr ( Exponent > FromExponent ) {
+				m_value = rhs.data() << ( Exponent - FromExponent );
+			} else {
+				m_value = rhs.data() >> ( FromExponent - Exponent );
+			}
 		}
 	}
 
-private:
-	value_type	m_value;
+	template <class S, typename std::enable_if<std::is_integral<S>::value, int>::type Dummy = 0>
+	explicit constexpr operator S() const noexcept {
+		if constexpr ( std::is_signed<repr_type>::value ) {
+			return m_value / ( 1 << Exponent );
+		} else {
+			return m_value >> Exponent;
+		}
+	}
+
+	template <class S, typename std::enable_if<std::is_floating_point<S>::value, int>::type Dummy = 0>
+	explicit constexpr operator S() const noexcept {
+		return m_value / static_cast<S>( 1 << Exponent );
+	}
+
+	explicit constexpr operator bool() const noexcept {
+		return m_value != 0;
+	}
+
+	constexpr repr_type data() const noexcept {
+		return m_value;
+	}
+
+protected:
+	repr_type	m_value;
 
 };
 
-template <typename Container, unsigned int Exponent = 0>
-using fixed_point_fast = fixed_point<Container, Exponent, true>;
+template <int IntegerBits, int FractionalBits = 0>
+using make_fixed = fixed_point<typename int_type<IntegerBits + FractionalBits>::type, FractionalBits>;
+
+template <int IntegerBits, int FractionalBits = 0>
+using make_ufixed = fixed_point<typename uint_type<IntegerBits + FractionalBits>::type, FractionalBits>;
+
+} // gba
+
+template <class ReprType, int Exponent>
+struct std::numeric_limits<gba::fixed_point<ReprType, Exponent>> : public std::numeric_limits<ReprType> {
+
+	static constexpr auto min() {
+		return std::numeric_limits<ReprType>::min() * ( 1 << Exponent );
+	}
+
+	static constexpr auto max() {
+		return std::numeric_limits<ReprType>::max() * ( 1 << Exponent );
+	}
+
+	static constexpr auto lowest() {
+		return min();
+	}
+
+};
+
+namespace gba {
+
+	template<class T, class U>
+	using wider = typename std::conditional<sizeof( T ) >= sizeof( U ), T, U>::type;
+
+	template <class FixedA, class FixedB>
+	using fixed_promote = 
+		typename std::conditional<std::is_signed<typename FixedA::repr_type>::value || std::is_signed<typename FixedB::repr_type>::value,
+			fixed_point<
+				typename std::make_signed<wider<typename FixedA::repr_type, typename FixedB::repr_type>>::type,
+				( sizeof( wider<typename FixedA::repr_type, typename FixedB::repr_type> ) * 8 ) - std::max( sizeof( typename FixedA::repr_type ) * 8 - FixedA::exponent, sizeof( typename FixedB::repr_type ) * 8 - FixedB::exponent )
+			>,
+			fixed_point<
+				typename std::make_unsigned<wider<typename FixedA::repr_type, typename FixedB::repr_type>>::type,
+				( sizeof( wider<typename FixedA::repr_type, typename FixedB::repr_type> ) * 8 ) - std::max( FixedA::integer_digits, FixedB::integer_digits )
+			>
+		>::type;
+	
+	template <class AReprType, int AExponent, class BReprType, int BExponent>
+	constexpr auto operator+( fixed_point<AReprType, AExponent> a, fixed_point<BReprType, BExponent> b ) -> fixed_promote<decltype( a ), decltype( b )> {
+		typedef fixed_promote<decltype( a ), decltype( b )> fixed_promoted;
+		return fixed_promoted::from_data( fixed_promoted( a ).data() + fixed_promoted( b ).data() );
+	}
+
+	template <class AReprType, int AExponent, class BReprType, int BExponent>
+	constexpr auto operator-( fixed_point<AReprType, AExponent> a, fixed_point<BReprType, BExponent> b ) -> fixed_promote<decltype( a ), decltype( b )> {
+		typedef fixed_promote<decltype( a ), decltype( b )> fixed_promoted;
+		return fixed_promoted::from_data( fixed_promoted( a ).data() - fixed_promoted( b ).data() );
+	}
 
 } // gba
 
