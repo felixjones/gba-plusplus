@@ -1,6 +1,6 @@
 ## gba++
 
-### Modern C++ library for Game Boy Advance
+### Modern Header-only C++ library for Game Boy Advance
 
 ## Philosophy
 
