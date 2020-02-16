@@ -9,6 +9,7 @@
 #endif
 
 #include <gba/int.hpp>
+#include <gba/packed_ptr.hpp>
 
 namespace gba::util {
 

@@ -22,6 +22,7 @@
 #include <gba/keypad.hpp>
 #include <gba/math.hpp>
 #include <gba/packed_int.hpp>
+#include <gba/packed_ptr.hpp>
 #include <gba/sized_bool.hpp>
 #include <gba/sound.hpp>
 #include <gba/timer.hpp>
