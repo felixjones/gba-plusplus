@@ -8,61 +8,76 @@
 namespace gba {
 namespace math {
 
+// Count trailing zeros
 template <typename Type>
-constexpr auto ceil2( Type n ) {
-	--n;
-	if constexpr ( sizeof( n ) == 8 ) {
-		n = __builtin_clzll( n );
-		return 1 << ( 64 - n );
-	} else {
-		n = __builtin_clz( n );
-		return 1 << ( 32 - n );
-	}
+constexpr typename std::enable_if<std::is_integral<Type>::value && sizeof( Type ) == 8, int>::type
+ctz( Type n ) noexcept {
+	return __builtin_ctzll( n );
 }
 
 template <typename Type>
-constexpr auto floor2( Type n ) {
-	if constexpr ( sizeof( n ) == 8 ) {
-		n = __builtin_clzll( n );
-		return 1 << ( 63 - n );
-	} else {
-		n = __builtin_clz( n );
-		return 1 << ( 31 - n );
-	}
+constexpr typename std::enable_if<std::is_integral<Type>::value && sizeof( Type ) < 8, int>::type
+ctz( Type n ) noexcept {
+	return __builtin_ctz( n );
+}
+
+// Count leading zeros
+template <typename Type>
+constexpr typename std::enable_if<std::is_integral<Type>::value && sizeof( Type ) == 8, int>::type
+clz( Type n ) noexcept {
+	return __builtin_clzll( n );
+}
+
+template <typename Type>
+constexpr typename std::enable_if<std::is_integral<Type>::value && sizeof( Type ) < 8, int>::type
+clz( Type n ) noexcept {
+	return __builtin_clz( n );
+}
+
+template <typename Type>
+constexpr typename std::enable_if<std::is_integral<Type>::value && sizeof( Type ) == 8, Type>::type
+ceil2( Type n ) noexcept {
+	--n;
+	n = __builtin_clzll( n );
+	return 1 << ( 64 - n );
+}
+
+template <typename Type>
+constexpr typename std::enable_if<std::is_integral<Type>::value && sizeof( Type ) < 8, Type>::type
+ceil2( Type n ) noexcept {
+	--n;
+	n = __builtin_clz( n );
+	return 1 << ( 32 - n );
+}
+
+template <typename Type>
+constexpr typename std::enable_if<std::is_integral<Type>::value && sizeof( Type ) == 8, Type>::type
+floor2( Type n ) noexcept {
+	n = __builtin_clzll( n );
+	return 1 << ( 63 - n );
+}
+
+template <typename Type>
+constexpr typename std::enable_if<std::is_integral<Type>::value && sizeof( Type ) < 8, Type>::type
+floor2( Type n ) noexcept {
+	n = __builtin_clz( n );
+	return 1 << ( 31 - n );
 }
 
 // Rotate left
 template <typename Type>
-constexpr auto rotl( Type n, unsigned s ) {
+constexpr typename std::enable_if<std::is_integral<Type>::value, Type>::type
+rotl( Type n, unsigned s ) noexcept {
 	typename std::make_unsigned<Type>::type un = n;
 	return ( un << s ) | ( un >> ( ( sizeof( un ) * 8 ) - s ) );
 }
 
 // Rotate right
 template <typename Type>
-constexpr auto rotr( Type n, unsigned s ) {
+constexpr typename std::enable_if<std::is_integral<Type>::value, Type>::type
+rotr( Type n, unsigned s ) noexcept {
 	typename std::make_unsigned<Type>::type un = n;
 	return ( un >> s ) | ( un << ( ( sizeof( un ) * 8 ) - s ) );
-}
-
-// Count trailing zeros
-template <typename Type>
-constexpr auto ctz( Type n ) {
-	if constexpr ( sizeof( n ) == 8 ) {
-		return __builtin_ctzll( n );
-	} else {
-		return __builtin_ctz( n );
-	}
-}
-
-// Count leading zeros
-template <typename Type>
-constexpr auto clz( Type n ) {
-	if constexpr ( sizeof( n ) == 8 ) {
-		return __builtin_clzll( n );
-	} else {
-		return __builtin_clz( n );
-	}
 }
 
 } // math
