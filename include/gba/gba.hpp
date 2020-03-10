@@ -23,8 +23,6 @@ namespace io {
 	using interrupt_master_enable = iomemmap<gba::bool32, 0x04000208>;
 	using interrupt_mask_enable = iomemmap<gba::interrupt, 0x4000200>;
 	using interrupt_flags = iomemmap<gba::interrupt, 0x4000202>;
-
-	using interrupt_handler = iomemmap<gba::interrupt_handler::vector_type, 0x3007FFC>;
 } // io
 
 namespace undocumented {
