@@ -12,12 +12,16 @@
 #include <gba/int_type.hpp>
 #include <gba/interrupt.hpp>
 #include <gba/interrupt_handler.hpp>
+#include <gba/keypad.hpp>
 #include <gba/mat2.hpp>
+#include <gba/mat3x2.hpp>
 #include <gba/math.hpp>
 #include <gba/memmap.hpp>
+#include <gba/mosaic.hpp>
 #include <gba/sized_bool.hpp>
 #include <gba/vec2.hpp>
 #include <gba/vec3.hpp>
+#include <gba/window.hpp>
 
 namespace gba {
 namespace io {
@@ -26,10 +30,10 @@ namespace io {
 	using display_status = iomemmap<gba::display_status, 0x04000004>;
 	using vertical_counter = imemmap<gba::uint16, 0x04000006>;
 
-	using background0_control = iomemmap<gba::display_control, 0x04000008>;
-	using background1_control = iomemmap<gba::display_control, 0x0400000A>;
-	using background2_control = iomemmap<gba::display_control, 0x0400000C>;
-	using background3_control = iomemmap<gba::display_control, 0x0400000E>;
+	using background0_control = iomemmap<gba::background_control, 0x04000008>;
+	using background1_control = iomemmap<gba::background_control, 0x0400000A>;
+	using background2_control = iomemmap<gba::background_control, 0x0400000C>;
+	using background3_control = iomemmap<gba::background_control, 0x0400000E>;
 
 	using background0_scroll = omemmap<gba::vec2<gba::int16>, 0x04000010>;
 	using background1_scroll = omemmap<gba::vec2<gba::int16>, 0x04000014>;
@@ -51,10 +55,29 @@ namespace io {
 	using background3_y = omemmap<gba::make_fixed<20, 8>, 0x0400003C>;
 
 	using background2_matrix = omemmap<gba::mat2<gba::make_fixed<8, 8>>, 0x04000020>;
-	using background2_origin = omemmap<gba::vec2<gba::make_fixed<20, 8>>, 0x04000028>;
+	using background2_offset = omemmap<gba::vec2<gba::make_fixed<20, 8>>, 0x04000028>;
 
 	using background3_matrix = omemmap<gba::mat2<gba::make_fixed<8, 8>>, 0x04000030>;
-	using background3_origin = omemmap<gba::vec2<gba::make_fixed<20, 8>>, 0x04000038>;
+	using background3_offset = omemmap<gba::vec2<gba::make_fixed<20, 8>>, 0x04000038>;
+
+	using background2_mat3x2 = omemmap<gba::mat3x2<gba::make_fixed<8, 8>, gba::make_fixed<20, 8>>, 0x04000020>;
+	using background3_mat3x2 = omemmap<gba::mat3x2<gba::make_fixed<8, 8>, gba::make_fixed<20, 8>>, 0x04000030>;
+
+	using window0_hdim = omemmap<gba::dim<gba::uint8>, 0x04000040>;
+	using window1_hdim = omemmap<gba::dim<gba::uint8>, 0x04000042>;
+
+	using window0_vdim = omemmap<gba::dim<gba::uint8>, 0x04000044>;
+	using window1_vdim = omemmap<gba::dim<gba::uint8>, 0x04000046>;
+
+	using window0_inside_control = iomemmap<gba::window_control, 0x04000048>;
+	using window1_inside_control = iomemmap<gba::window_control, 0x04000049>;
+
+	using window0_outside_control = iomemmap<gba::window_control, 0x0400004A>;
+	using window1_outside_control = iomemmap<gba::window_control, 0x0400004B>;
+
+	using mosaic_control = omemmap<gba::mosaic_control, 0x0400004C>;
+
+	using key_status = imemmap<gba::keys, 0x04000130>;
 
 	using interrupt_master_enable = iomemmap<gba::bool32, 0x04000208>;
 	using interrupt_mask_enable = iomemmap<gba::interrupt, 0x4000200>;

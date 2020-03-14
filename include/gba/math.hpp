@@ -147,7 +147,7 @@ constexpr auto sin( const fixed_point<ReprType, Exponent>& radian ) noexcept {
 
 template <class ReprType, int Exponent>
 constexpr auto cos( const fixed_point<ReprType, Exponent>& radian ) noexcept {
-	return detail::sin_bam16( detail::radian_to_bam16( radian ) + 8192 );
+	return detail::sin_bam16( detail::radian_to_bam16( radian ) + 0x2000 );
 }
 
 } // math

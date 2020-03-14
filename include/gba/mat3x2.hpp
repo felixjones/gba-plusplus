@@ -12,7 +12,8 @@ namespace gba {
 template <typename MType, typename VType = MType>
 struct mat3x2 {
 	using size_type = uint32;
-
+	using matrix_type = MType;
+	using vector_type = VType;
 	using type = mat3x2<MType, VType>;
 
 	vec2<MType>	ab;
@@ -38,38 +39,6 @@ struct mat3x2 {
 		ab( v0 ),
 		cd( v1 ),
 		xy( v2 ) {}
-
-	/*
-	template <typename = typename std::enable_if<std::is_same<MType, VType>::value>::type>
-	constexpr auto& operator []( size_type i ) noexcept {
-		assert( i >= 0 && i < 3 );
-
-		switch ( i ) {
-		default:
-		case 0:
-			return ab;
-		case 1:
-			return cd;
-		case 2:
-			return xy;
-		}
-	}
-
-	template <typename = typename std::enable_if<std::is_same<MType, VType>::value>::type>
-	constexpr const auto& operator []( size_type i ) const noexcept {
-		assert( i >= 0 && i < 3 );
-
-		switch ( i ) {
-		default:
-		case 0:
-			return ab;
-		case 1:
-			return cd;
-		case 2:
-			return xy;
-		}
-	}
-	*/
 
 	template <typename OMType, typename OVType>
 	constexpr auto& operator =( const mat3x2<OMType, OVType>& other ) noexcept {
@@ -164,7 +133,7 @@ constexpr const auto& operator +( const mat3x2<MType, VType>& m ) noexcept {
 }
 
 template <typename MType, typename VType>
-constexpr const auto& operator -( const mat3x2<MType, VType>& m ) noexcept {
+constexpr auto operator -( const mat3x2<MType, VType>& m ) noexcept {
 	return mat3x2<MType, VType>( -m.ab, -m.cd, -m.xy );
 }
 

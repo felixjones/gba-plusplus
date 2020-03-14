@@ -142,7 +142,7 @@ constexpr const auto& operator +( const mat2<OType>& m ) noexcept {
 }
 
 template <typename OType>
-constexpr const auto& operator -( const mat2<OType>& m ) noexcept {
+constexpr auto operator -( const mat2<OType>& m ) noexcept {
 	return mat2<OType>( -m.ab, -m.cd );
 }
 
