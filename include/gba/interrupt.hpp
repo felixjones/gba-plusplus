@@ -4,12 +4,6 @@
 namespace gba {
 
 struct interrupt {
-	static constexpr interrupt make( void( *f )( interrupt& ) ) {
-		interrupt value {};
-		f( value );
-		return value;
-	}
-
 	bool	vblank : 1,
 			hblank : 1,
 			vcount : 1,
@@ -26,7 +20,6 @@ struct interrupt {
 			keypad : 1,
 			game_pak : 1,
 			: 2;
-
 };
 
 } // gba

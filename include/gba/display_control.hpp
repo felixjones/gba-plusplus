@@ -1,21 +1,11 @@
 #ifndef GBAXX_DISPLAY_CONTROL_HPP
 #define GBAXX_DISPLAY_CONTROL_HPP
 
-#include <cstring>
-
-#include <gba/memmap.hpp>
 #include <gba/int.hpp>
-#include <gba/bool.hpp>
 
 namespace gba {
 
 struct display_control {
-	static constexpr display_control make( void( *f )( display_control& ) ) {
-		display_control value {};
-		f( value );
-		return value;
-	}
-
 	uint8	mode : 3;
 
 	const bool	is_cgb : 1;

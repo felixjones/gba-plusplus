@@ -14,7 +14,7 @@ template <class ReprType = int, int Exponent = 0>
 class fixed_point {
 	static_assert( std::is_fundamental<ReprType>::value, "ReprType must be a fundamental type" );
 	static_assert( std::is_integral<ReprType>::value, "ReprType must be a integral type" );
-	static_assert( sizeof( ReprType ) < sizeof( std::uintmax_t ), "ReprType should not be the largest size" );
+	static_assert( sizeof( ReprType ) <= sizeof( std::uintmax_t ), "ReprType too big" );
 	
 public:
 	using repr_type = ReprType;
@@ -33,16 +33,16 @@ public:
 	constexpr fixed_point() noexcept : m_value( 0 ) {}
 
 	template <class S, typename std::enable_if<std::is_integral<S>::value, int>::type Dummy = 0>
-	explicit constexpr fixed_point( S s ) noexcept : m_value( s * ( 1 << Exponent ) ) {}
+	constexpr fixed_point( S s ) noexcept : m_value( s * ( 1 << Exponent ) ) {}
 
 	template <class S, typename std::enable_if<std::is_floating_point<S>::value, int>::type Dummy = 0>
 	explicit constexpr fixed_point( S s ) noexcept : m_value( static_cast< repr_type >( s * ( 1 << Exponent ) ) ) {}
 
 	template <class FromReprType, int FromExponent>
-	explicit constexpr fixed_point( const fixed_point<FromReprType, FromExponent>& rhs ) noexcept : m_value( Exponent > FromExponent ? rhs.data() * ( 1 << ( Exponent - FromExponent ) ) : rhs.data() / ( 1 << ( FromExponent - Exponent ) ) ) {}
+	constexpr fixed_point( const fixed_point<FromReprType, FromExponent>& rhs ) noexcept : m_value( Exponent > FromExponent ? rhs.data() * ( 1 << ( Exponent - FromExponent ) ) : rhs.data() / ( 1 << ( FromExponent - Exponent ) ) ) {}
 
 	template <class S, typename std::enable_if<std::is_integral<S>::value, int>::type Dummy = 0>
-	explicit constexpr operator S() const noexcept {
+	constexpr operator S() const noexcept {
 		return m_value / ( 1 << Exponent );
 	}
 
@@ -238,22 +238,22 @@ constexpr auto operator/( fixed_point<AReprType, AExponent> a, fixed_point<BRepr
 	return fixed_promoted::from_data( div_promote( a ).data() / fixed_promoted( b ).data() );
 }
 
-template <class LhsReprType, int LhsExponent, class Integer>
+template <class LhsReprType, int LhsExponent, class Integer, typename = typename std::enable_if<std::is_integral<Integer>::value>::type>
 constexpr auto operator*( const fixed_point<LhsReprType, LhsExponent>& lhs, const Integer& rhs ) noexcept {
 	return fixed_point<LhsReprType, LhsExponent>::from_data( lhs.data() * rhs );
 }
 
-template <class LhsReprType, int LhsExponent, class Integer>
+template <class LhsReprType, int LhsExponent, class Integer, typename = typename std::enable_if<std::is_integral<Integer>::value>::type>
 constexpr auto operator/( const fixed_point<LhsReprType, LhsExponent>& lhs, const Integer& rhs ) noexcept {
 	return fixed_point<LhsReprType, LhsExponent>::from_data( lhs.data() / rhs );
 }
 
-template <class Integer, class RhsReprType, int RhsExponent>
+template <class Integer, class RhsReprType, int RhsExponent, typename = typename std::enable_if<std::is_integral<Integer>::value>::type>
 constexpr auto operator*( const Integer& lhs, const fixed_point<RhsReprType, RhsExponent>& rhs ) noexcept {
 	return fixed_point<RhsReprType, RhsExponent>::from_data( lhs * rhs.data() );
 }
 
-template <class Integer, class RhsReprType, int RhsExponent>
+template <class Integer, class RhsReprType, int RhsExponent, typename = typename std::enable_if<std::is_integral<Integer>::value>::type>
 constexpr auto operator/( const Integer& lhs, const fixed_point<RhsReprType, RhsExponent>& rhs ) noexcept {
 	return fixed_point<RhsReprType, RhsExponent>::from_data( lhs / rhs.data() );
 }
