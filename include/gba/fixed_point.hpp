@@ -30,13 +30,13 @@ public:
 		return a;
 	}
 
-	constexpr fixed_point() noexcept : m_value( 0 ) {}
+	explicit constexpr fixed_point() noexcept : m_value( 0 ) {}
 
 	template <class S, typename std::enable_if<std::is_integral<S>::value, int>::type Dummy = 0>
-	constexpr fixed_point( S s ) noexcept : m_value( s * ( 1 << Exponent ) ) {}
+	explicit constexpr fixed_point( S s ) noexcept : m_value( s * ( 1 << Exponent ) ) {}
 
 	template <class S, typename std::enable_if<std::is_floating_point<S>::value, int>::type Dummy = 0>
-	explicit constexpr fixed_point( S s ) noexcept : m_value( static_cast< repr_type >( s * ( 1 << Exponent ) ) ) {}
+	explicit constexpr fixed_point( S s ) noexcept : m_value( static_cast<repr_type>( s * ( 1 << Exponent ) ) ) {}
 
 	template <class FromReprType, int FromExponent>
 	constexpr fixed_point( const fixed_point<FromReprType, FromExponent>& rhs ) noexcept : m_value( Exponent > FromExponent ? rhs.data() * ( 1 << ( Exponent - FromExponent ) ) : rhs.data() / ( 1 << ( FromExponent - Exponent ) ) ) {}
@@ -205,22 +205,24 @@ fixed_point<ReprType, Exponent>& operator/=( fixed_point<ReprType, Exponent>& lh
 	return lhs;
 }
 
-template <class Lhs, class Rhs>
+template <class Lhs, class Rhs, typename std::enable_if<std::is_arithmetic<Rhs>::value>::type * = nullptr>
 constexpr auto operator+( const Lhs& lhs, const Rhs& rhs ) noexcept {
-	if constexpr ( std::is_arithmetic<Rhs>::value ) {
-		return lhs + Lhs( rhs );
-	} else {
-		return Rhs( lhs ) + rhs;
-	}
+	return lhs + Lhs( rhs );
 }
 
-template <class Lhs, class Rhs>
+template <class Lhs, class Rhs, typename std::enable_if<!std::is_arithmetic<Rhs>::value>::type * = nullptr>
+constexpr auto operator+( const Lhs& lhs, const Rhs& rhs ) noexcept {
+	return Rhs( lhs ) + rhs;
+}
+
+template <class Lhs, class Rhs, typename std::enable_if<std::is_arithmetic<Rhs>::value>::type * = nullptr>
 constexpr auto operator-( const Lhs& lhs, const Rhs& rhs ) noexcept {
-	if constexpr ( std::is_arithmetic<Rhs>::value ) {
-		return lhs - Lhs( rhs );
-	} else {
-		return Rhs( lhs ) - rhs;
-	}
+	return lhs - Lhs( rhs );
+}
+
+template <class Lhs, class Rhs, typename std::enable_if<!std::is_arithmetic<Rhs>::value>::type * = nullptr>
+constexpr auto operator-( const Lhs& lhs, const Rhs& rhs ) noexcept {
+	return Rhs( lhs ) - rhs;
 }
 
 template <class AReprType, int AExponent, class BReprType, int BExponent>
@@ -268,48 +270,6 @@ template <class LhsReprType, int Exponent, class Rhs>
 fixed_point<LhsReprType, Exponent>& operator-=( fixed_point<LhsReprType, Exponent>& lhs, const Rhs& rhs ) noexcept {
 	lhs -= fixed_point<LhsReprType, Exponent>( rhs );
 	return lhs;
-}
-
-namespace detail {
-
-	template <class ReprType>
-	constexpr ReprType sqrt_bit( ReprType n, ReprType bit ) noexcept {
-		if ( bit > n ) {
-			return sqrt_bit<ReprType>( n, bit >> 2 );
-		} else {
-			return bit;
-		}
-	}
-
-	template <class ReprType>
-	constexpr auto sqrt_bit( ReprType n ) noexcept {
-		return sqrt_bit<ReprType>( n, ReprType( 1 ) << ( ( ( sizeof( ReprType ) * 8 - 1 ) + std::is_signed<ReprType>::value ) - 2 ) );
-	}
-
-	template <class ReprType>
-	constexpr ReprType sqrt_solve3( ReprType n, ReprType bit, ReprType result ) noexcept {
-		if ( bit != 0 ) {
-			if ( n >= result + bit ) {
-				return sqrt_solve3<ReprType>( static_cast< ReprType >( n - ( result + bit ) ), bit >> 2, static_cast< ReprType >( ( result >> 1 ) + bit ) );
-			} else {
-				return sqrt_solve3<ReprType>( n, bit >> 2, result >> 1 );
-			}
-		} else {
-			return result;
-		}
-	}
-
-	template <class ReprType>
-	constexpr auto sqrt_solve1( ReprType n ) noexcept {
-		return sqrt_solve3<ReprType>( n, sqrt_bit<ReprType>( n ), 0 );
-	}
-
-} // detail
-
-template <class ReprType, int Exponent>
-constexpr auto sqrt( const fixed_point<ReprType, Exponent>& x ) noexcept {
-	using widened_type = fixed_point<wider_promote<ReprType>, Exponent * 2>;
-	return fixed_point<ReprType, Exponent>::from_data( static_cast< ReprType >( detail::sqrt_solve1( widened_type( x ).data() ) ) );
 }
 
 } // gba

@@ -12,7 +12,7 @@
 #include <gba/int_type.hpp>
 #include <gba/interrupt.hpp>
 #include <gba/interrupt_handler.hpp>
-#include <gba/mat3x2.hpp>
+#include <gba/mat2.hpp>
 #include <gba/math.hpp>
 #include <gba/memmap.hpp>
 #include <gba/sized_bool.hpp>
@@ -50,8 +50,11 @@ namespace io {
 	using background3_x = omemmap<gba::make_fixed<20, 8>, 0x04000038>;
 	using background3_y = omemmap<gba::make_fixed<20, 8>, 0x0400003C>;
 
-	using background2_mat3x2 = omemmap<gba::mat3x2<gba::make_fixed<8, 8>, gba::make_fixed<20, 8>>, 0x04000020>;
-	using background3_mat3x2 = omemmap<gba::mat3x2<gba::make_fixed<8, 8>, gba::make_fixed<20, 8>>, 0x04000030>;
+	using background2_matrix = omemmap<gba::mat2<gba::make_fixed<8, 8>>, 0x04000020>;
+	using background2_origin = omemmap<gba::vec2<gba::make_fixed<20, 8>>, 0x04000028>;
+
+	using background3_matrix = omemmap<gba::mat2<gba::make_fixed<8, 8>>, 0x04000030>;
+	using background3_origin = omemmap<gba::vec2<gba::make_fixed<20, 8>>, 0x04000038>;
 
 	using interrupt_master_enable = iomemmap<gba::bool32, 0x04000208>;
 	using interrupt_mask_enable = iomemmap<gba::interrupt, 0x4000200>;

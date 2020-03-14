@@ -9,7 +9,6 @@
 
 namespace gba {
 
-// TODO : Kill this and use mat2x2
 template <typename MType, typename VType = MType>
 struct mat3x2 {
 	using size_type = uint32;
