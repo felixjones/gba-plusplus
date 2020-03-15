@@ -30,13 +30,13 @@ public:
 		return a;
 	}
 
-	explicit constexpr fixed_point() noexcept : m_value( 0 ) {}
+	constexpr fixed_point() noexcept : m_value( 0 ) {}
 
 	template <class S, typename std::enable_if<std::is_integral<S>::value, int>::type Dummy = 0>
-	explicit constexpr fixed_point( S s ) noexcept : m_value( s * ( 1 << Exponent ) ) {}
+	constexpr fixed_point( S s ) noexcept : m_value( s * ( 1 << Exponent ) ) {}
 
 	template <class S, typename std::enable_if<std::is_floating_point<S>::value, int>::type Dummy = 0>
-	explicit constexpr fixed_point( S s ) noexcept : m_value( static_cast<repr_type>( s * ( 1 << Exponent ) ) ) {}
+	constexpr fixed_point( S s ) noexcept : m_value( static_cast<repr_type>( s * ( 1 << Exponent ) ) ) {}
 
 	template <class FromReprType, int FromExponent>
 	constexpr fixed_point( const fixed_point<FromReprType, FromExponent>& rhs ) noexcept : m_value( Exponent > FromExponent ? rhs.data() * ( 1 << ( Exponent - FromExponent ) ) : rhs.data() / ( 1 << ( FromExponent - Exponent ) ) ) {}
@@ -205,24 +205,24 @@ fixed_point<ReprType, Exponent>& operator/=( fixed_point<ReprType, Exponent>& lh
 	return lhs;
 }
 
-template <class Lhs, class Rhs, typename std::enable_if<std::is_arithmetic<Rhs>::value>::type * = nullptr>
-constexpr auto operator+( const Lhs& lhs, const Rhs& rhs ) noexcept {
-	return lhs + Lhs( rhs );
+template <class LReprType, int LExponent, class Rhs, typename std::enable_if<std::is_arithmetic<Rhs>::value>::type * = nullptr>
+constexpr auto operator+( const fixed_point<LReprType, LExponent>& lhs, const Rhs& rhs ) noexcept {
+	return lhs + fixed_point<LReprType, LExponent>( rhs );
 }
 
-template <class Lhs, class Rhs, typename std::enable_if<!std::is_arithmetic<Rhs>::value>::type * = nullptr>
-constexpr auto operator+( const Lhs& lhs, const Rhs& rhs ) noexcept {
-	return Rhs( lhs ) + rhs;
+template <class Lhs, class RReprType, int RExponent, typename std::enable_if<std::is_arithmetic<Lhs>::value>::type * = nullptr>
+constexpr auto operator+( const Lhs& lhs, const fixed_point<RReprType, RExponent>& rhs ) noexcept {
+	return fixed_point<RReprType, RExponent>( lhs ) + rhs;
 }
 
-template <class Lhs, class Rhs, typename std::enable_if<std::is_arithmetic<Rhs>::value>::type * = nullptr>
-constexpr auto operator-( const Lhs& lhs, const Rhs& rhs ) noexcept {
-	return lhs - Lhs( rhs );
+template <class LReprType, int LExponent, class Rhs, typename std::enable_if<std::is_arithmetic<Rhs>::value>::type * = nullptr>
+constexpr auto operator-( const fixed_point<LReprType, LExponent>& lhs, const Rhs& rhs ) noexcept {
+	return lhs - fixed_point<LReprType, LExponent>( rhs );
 }
 
-template <class Lhs, class Rhs, typename std::enable_if<!std::is_arithmetic<Rhs>::value>::type * = nullptr>
-constexpr auto operator-( const Lhs& lhs, const Rhs& rhs ) noexcept {
-	return Rhs( lhs ) - rhs;
+template <class Lhs, class RReprType, int RExponent, typename std::enable_if<std::is_arithmetic<Lhs>::value>::type * = nullptr>
+constexpr auto operator-( const Lhs& lhs, const fixed_point<RReprType, RExponent>& rhs ) noexcept {
+	return fixed_point<RReprType, RExponent>( lhs ) - rhs;
 }
 
 template <class AReprType, int AExponent, class BReprType, int BExponent>

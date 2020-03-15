@@ -10,6 +10,7 @@ namespace gba {
 
 template <typename Type, unsigned Address>
 class memmap {
+	static_assert( sizeof( Type ) <= 8, "Type is too big." );
 public:
 	using type = Type;
 	static const auto address = Address;
@@ -25,7 +26,7 @@ private:
 	using uint_type = typename uint_sized_type<sizeof( Type )>::type;
 
 public:
-	static inline Type read() noexcept {
+	static Type read() noexcept {
 		return *( volatile const Type * )Address;
 	}
 };
@@ -36,7 +37,7 @@ private:
 	using uint_type = typename uint_sized_type<sizeof( Type )>::type;
 
 public:
-	static inline Type read() noexcept {
+	static Type read() noexcept {
 		const uint_type data = *( volatile const uint_type * )Address;
 		Type value {};
 		std::memcpy( &value, &data, sizeof( Type ) );
@@ -54,7 +55,7 @@ private:
 	using uint_type = typename uint_sized_type<sizeof( Type )>::type;
 
 public:
-	static inline void write( const Type& value ) noexcept {
+	static void write( const Type& value ) noexcept {
 		*( volatile Type * )Address = value;
 	}
 };
@@ -65,7 +66,7 @@ private:
 	using uint_type = typename uint_sized_type<sizeof( Type )>::type;
 
 public:
-	static inline void write( const Type& value ) noexcept {
+	static void write( const Type& value ) noexcept {
 		uint_type data {};
 		std::memcpy( &data, &value, sizeof( Type ) );
 		*( volatile uint_type * )Address = data;

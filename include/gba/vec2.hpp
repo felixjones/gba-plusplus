@@ -17,16 +17,16 @@ struct vec2 {
 	value_type	x;
 	value_type	y;
 
-	constexpr vec2() noexcept : x( 0 ), y( 0 ) {}
+	constexpr vec2() noexcept : x {}, y {} {}
 
 	template <typename OType>
-	constexpr vec2( OType scalar ) noexcept : x( static_cast<value_type>( scalar ) ), y( static_cast<value_type>( scalar ) ) {}
+	constexpr vec2( OType scalar ) noexcept : x( scalar ), y( scalar ) {}
 
 	template <typename A, typename B>
-	constexpr vec2( A ix, B iy ) noexcept : x( static_cast<value_type>( ix ) ), y( static_cast<value_type>( iy ) ) {}
+	constexpr vec2( A ix, B iy ) noexcept : x( ix ), y( iy ) {}
 
 	template <typename OType>
-	constexpr vec2( const vec2<OType>& other ) noexcept : x( static_cast<value_type>( other.x ) ), y( static_cast<value_type>( other.y ) ) {}
+	constexpr vec2( const vec2<OType>& other ) noexcept : x( other.x ), y( other.y ) {}
 
 	constexpr auto& operator []( size_type i ) noexcept {
 		assert( i >= 0 && i < 2 );

@@ -3,11 +3,13 @@
 
 #include <gba/background_control.hpp>
 #include <gba/bios.hpp>
+#include <gba/blending.hpp>
 #include <gba/bool.hpp>
 #include <gba/const.hpp>
 #include <gba/display_control.hpp>
 #include <gba/display_status.hpp>
 #include <gba/fixed_point.hpp>
+#include <gba/frac.hpp>
 #include <gba/int.hpp>
 #include <gba/int_type.hpp>
 #include <gba/interrupt.hpp>
@@ -60,9 +62,6 @@ namespace io {
 	using background3_matrix = omemmap<gba::mat2<gba::make_fixed<8, 8>>, 0x04000030>;
 	using background3_offset = omemmap<gba::vec2<gba::make_fixed<20, 8>>, 0x04000038>;
 
-	using background2_mat3x2 = omemmap<gba::mat3x2<gba::make_fixed<8, 8>, gba::make_fixed<20, 8>>, 0x04000020>;
-	using background3_mat3x2 = omemmap<gba::mat3x2<gba::make_fixed<8, 8>, gba::make_fixed<20, 8>>, 0x04000030>;
-
 	using window0_hdim = omemmap<gba::dim<gba::uint8>, 0x04000040>;
 	using window1_hdim = omemmap<gba::dim<gba::uint8>, 0x04000042>;
 
@@ -76,6 +75,10 @@ namespace io {
 	using window1_outside_control = iomemmap<gba::window_control, 0x0400004B>;
 
 	using mosaic_control = omemmap<gba::mosaic_control, 0x0400004C>;
+
+	using blend_control = iomemmap<gba::blend_control, 0x04000050>;
+	using blend_alpha = iomemmap<gba::blend_alpha, 0x04000052>;
+	using blend_gamma = iomemmap<gba::frac<uint8, 5>, 0x04000052>;
 
 	using key_status = imemmap<gba::keys, 0x04000130>;
 

@@ -145,9 +145,19 @@ constexpr auto sin( const fixed_point<ReprType, Exponent>& radian ) noexcept {
 	return detail::sin_bam16( detail::radian_to_bam16( radian ) );
 }
 
+template <class S, typename std::enable_if<std::is_floating_point<S>::value, int>::type Dummy = 0>
+constexpr auto sin( const S radian ) noexcept {
+	return detail::sin_bam16( detail::radian_to_bam16( make_ufixed<13, 19>( radian ) ) );
+}
+
 template <class ReprType, int Exponent>
 constexpr auto cos( const fixed_point<ReprType, Exponent>& radian ) noexcept {
 	return detail::sin_bam16( detail::radian_to_bam16( radian ) + 0x2000 );
+}
+
+template <class S, typename std::enable_if<std::is_floating_point<S>::value, int>::type Dummy = 0>
+constexpr auto cos( const S radian ) noexcept {
+	return detail::sin_bam16( detail::radian_to_bam16( make_ufixed<13, 19>( radian ) ) + 0x2000 );
 }
 
 } // math

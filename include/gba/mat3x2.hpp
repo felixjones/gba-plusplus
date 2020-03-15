@@ -169,7 +169,7 @@ constexpr auto operator *( S s, const mat3x2<MType, VType>& m ) noexcept {
 
 template <typename MType, typename VType>
 constexpr auto operator *( const mat3x2<MType, VType>& m, const vec3<VType>& v ) noexcept {
-	return vec3<VType>(
+	return vec2<VType>(
 		m.ab[0] * v.x + m.cd[0] * v.y + m.xy[0] * v.z,
 		m.ab[1] * v.x + m.cd[1] * v.y + m.xy[1] * v.z);
 }
