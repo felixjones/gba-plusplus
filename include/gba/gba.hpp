@@ -78,7 +78,7 @@ namespace io {
 
 	using blend_control = iomemmap<gba::blend_control, 0x04000050>;
 	using blend_alpha = iomemmap<gba::blend_alpha, 0x04000052>;
-	using blend_gamma = iomemmap<gba::frac<uint8, 5>, 0x04000052>;
+	using blend_gamma = omemmap<gba::frac<uint16, 5>, 0x04000054>;
 
 	using key_status = imemmap<gba::keys, 0x04000130>;
 

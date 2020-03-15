@@ -49,6 +49,11 @@ public:
 	template <class FromReprType, int FromExponent>
 	constexpr frac( const frac<FromReprType, FromExponent>& s ) noexcept : m_value( ( s.data() * unit ) / ( ( 1 << FromExponent ) - 1 ) ) {}
 
+	template <class ToReprType, int ToExponent>
+	explicit constexpr operator fixed_point<ToReprType, ToExponent>() const noexcept {
+		return fixed_point<ToReprType, ToExponent>::from_data( ( m_value << ToExponent ) / unit );
+	}
+
 	template <class S, typename std::enable_if<std::is_floating_point<S>::value, int>::type Dummy = 0>
 	explicit constexpr operator S() const noexcept {
 		return m_value / static_cast<S>( unit );

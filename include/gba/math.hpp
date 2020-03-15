@@ -9,7 +9,22 @@
 namespace gba {
 namespace math {
 
-static constexpr auto pi = fixed_point<int32, 28>( 3.14159265358979323846264338327950288 );
+template <unsigned Exponent>
+struct constants {
+	static constexpr auto e = fixed_point<int32, Exponent>( 2.7182818284590452354 );
+	static constexpr auto log2e = fixed_point<int32, Exponent>( 1.4426950408889634074 );
+	static constexpr auto log10e = fixed_point<int32, Exponent>( 0.43429448190325182765 );
+	static constexpr auto ln2 = fixed_point<int32, Exponent>( 0.693147180559945309417 );
+	static constexpr auto ln10 = fixed_point<int32, Exponent>( 2.30258509299404568402 );
+	static constexpr auto pi = fixed_point<int32, Exponent>( 3.14159265358979323846 );
+	static constexpr auto pi_2 = fixed_point<int32, Exponent>( 1.57079632679489661923 );
+	static constexpr auto pi_4 = fixed_point<int32, Exponent>( 0.78539816339744830962 );
+	static constexpr auto i_pi = fixed_point<int32, Exponent>( 0.31830988618379067154 );
+	static constexpr auto i2_pi = fixed_point<int32, Exponent>( 0.63661977236758134308 );
+	static constexpr auto i2_sqrtpi = fixed_point<int32, Exponent>( 1.12837916709551257390 );
+	static constexpr auto sqrt2 = fixed_point<int32, Exponent>( 1.41421356237309504880 );
+	static constexpr auto sqrt1_2 = fixed_point<int32, Exponent>( 0.70710678118654752440 );
+};
 
 // Count trailing zeros
 template <typename Type>
