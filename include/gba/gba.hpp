@@ -3,6 +3,7 @@
 
 #include <gba/background_control.hpp>
 #include <gba/bios.hpp>
+#include <gba/bit.hpp>
 #include <gba/blending.hpp>
 #include <gba/bool.hpp>
 #include <gba/const.hpp>
@@ -16,11 +17,13 @@
 #include <gba/interrupt_handler.hpp>
 #include <gba/keypad.hpp>
 #include <gba/mat2.hpp>
-#include <gba/mat3x2.hpp>
+// #include <gba/mat3x2.hpp>
+#include <gba/mat4x3.hpp>
 #include <gba/math.hpp>
 #include <gba/memmap.hpp>
 #include <gba/mosaic.hpp>
 #include <gba/sized_bool.hpp>
+#include <gba/tile.hpp>
 #include <gba/vec2.hpp>
 #include <gba/vec3.hpp>
 #include <gba/window.hpp>

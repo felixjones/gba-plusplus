@@ -4,6 +4,7 @@
 #include <cassert>
 
 #include <gba/int.hpp>
+#include <gba/math.hpp>
 
 namespace gba {
 
@@ -390,6 +391,36 @@ template <typename A, typename B>
 constexpr auto operator ||( const vec3<A>& a, const vec3<B>& b ) noexcept {
 	return vec3<bool>( a.x || b.x, a.y || b.y, a.z || b.z );
 }
+
+namespace math {
+
+template <typename V>
+constexpr auto length( const vec3<V>& v ) noexcept {
+	return sqrt( dot( v, v ) );
+}
+
+template <typename A, typename B>
+constexpr auto distance( const vec3<A>& p0, const vec3<B>& p1 ) noexcept {
+	return length( p1 - p0 );
+}
+
+template <typename A, typename B>
+constexpr auto dot( const vec3<A>& a, const vec3<B>& b ) noexcept {
+	const auto c = a * b;
+	return c.x + c.y + c.z;
+}
+
+template <typename A, typename B>
+constexpr auto cross( const vec3<A>& x, const vec3<B>& y ) noexcept {
+	return vec3<A>( x.y * y.z - y.y * x.z, x.z * y.x - y.z * x.x, x.x * y.y - y.x * x.y );
+}
+
+template <typename V>
+constexpr auto normalize( const vec3<V>& v ) noexcept {
+	return v / sqrt( dot( v, v ) );
+}
+
+} // math
 
 } // gba
 

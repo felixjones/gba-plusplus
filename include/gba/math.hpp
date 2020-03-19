@@ -1,102 +1,32 @@
 #ifndef GBAXX_MATH_HPP
 #define GBAXX_MATH_HPP
 
+#include <cmath>
 #include <type_traits>
 
 #include <gba/int.hpp>
 #include <gba/fixed_point.hpp>
+#include <gba/frac.hpp>
 
 namespace gba {
 namespace math {
 
 template <unsigned Exponent>
 struct constants {
-	static constexpr auto e = fixed_point<int32, Exponent>( 2.7182818284590452354 );
-	static constexpr auto log2e = fixed_point<int32, Exponent>( 1.4426950408889634074 );
-	static constexpr auto log10e = fixed_point<int32, Exponent>( 0.43429448190325182765 );
-	static constexpr auto ln2 = fixed_point<int32, Exponent>( 0.693147180559945309417 );
-	static constexpr auto ln10 = fixed_point<int32, Exponent>( 2.30258509299404568402 );
-	static constexpr auto pi = fixed_point<int32, Exponent>( 3.14159265358979323846 );
-	static constexpr auto pi_2 = fixed_point<int32, Exponent>( 1.57079632679489661923 );
-	static constexpr auto pi_4 = fixed_point<int32, Exponent>( 0.78539816339744830962 );
-	static constexpr auto i_pi = fixed_point<int32, Exponent>( 0.31830988618379067154 );
-	static constexpr auto i2_pi = fixed_point<int32, Exponent>( 0.63661977236758134308 );
-	static constexpr auto i2_sqrtpi = fixed_point<int32, Exponent>( 1.12837916709551257390 );
-	static constexpr auto sqrt2 = fixed_point<int32, Exponent>( 1.41421356237309504880 );
-	static constexpr auto sqrt1_2 = fixed_point<int32, Exponent>( 0.70710678118654752440 );
+	static constexpr auto e          = fixed_point<uint32, Exponent>( 2.7182818284590452354 );
+	static constexpr auto log2e      = fixed_point<uint32, Exponent>( 1.4426950408889634074 );
+	static constexpr auto log10e     = fixed_point<uint32, Exponent>( 0.43429448190325182765 );
+	static constexpr auto pi         = fixed_point<uint32, Exponent>( 3.1415926535897932385 );
+	static constexpr auto inv_pi     = fixed_point<uint32, Exponent>( 0.31830988618379067154 );
+	static constexpr auto inv_sqrtpi = fixed_point<uint32, Exponent>( 0.56418958354775628695 );
+	static constexpr auto ln2        = fixed_point<uint32, Exponent>( 0.69314718055994530942 );
+	static constexpr auto ln10       = fixed_point<uint32, Exponent>( 2.3025850929940456840 );
+	static constexpr auto sqrt2      = fixed_point<uint32, Exponent>( 1.4142135623730950488 );
+	static constexpr auto sqrt3      = fixed_point<uint32, Exponent>( 1.7320508075688772935 );
+	static constexpr auto inv_sqrt3  = fixed_point<uint32, Exponent>( 0.57735026918962576451 );
+	static constexpr auto egmma      = fixed_point<uint32, Exponent>( 0.57721566490153286061 );
+	static constexpr auto phi        = fixed_point<uint32, Exponent>( 1.6180339887498948482 );
 };
-
-// Count trailing zeros
-template <typename Type>
-constexpr typename std::enable_if<std::is_integral<Type>::value && sizeof( Type ) == 8, int>::type
-ctz( Type n ) noexcept {
-	return __builtin_ctzll( n );
-}
-
-template <typename Type>
-constexpr typename std::enable_if<std::is_integral<Type>::value && sizeof( Type ) < 8, int>::type
-ctz( Type n ) noexcept {
-	return __builtin_ctz( n );
-}
-
-// Count leading zeros
-template <typename Type>
-constexpr typename std::enable_if<std::is_integral<Type>::value && sizeof( Type ) == 8, int>::type
-clz( Type n ) noexcept {
-	return __builtin_clzll( n );
-}
-
-template <typename Type>
-constexpr typename std::enable_if<std::is_integral<Type>::value && sizeof( Type ) < 8, int>::type
-clz( Type n ) noexcept {
-	return __builtin_clz( n );
-}
-
-template <typename Type>
-constexpr typename std::enable_if<std::is_integral<Type>::value && sizeof( Type ) == 8, Type>::type
-ceil2( Type n ) noexcept {
-	--n;
-	n = __builtin_clzll( n );
-	return 1 << ( 64 - n );
-}
-
-template <typename Type>
-constexpr typename std::enable_if<std::is_integral<Type>::value && sizeof( Type ) < 8, Type>::type
-ceil2( Type n ) noexcept {
-	--n;
-	n = __builtin_clz( n );
-	return 1 << ( 32 - n );
-}
-
-template <typename Type>
-constexpr typename std::enable_if<std::is_integral<Type>::value && sizeof( Type ) == 8, Type>::type
-floor2( Type n ) noexcept {
-	n = __builtin_clzll( n );
-	return 1 << ( 63 - n );
-}
-
-template <typename Type>
-constexpr typename std::enable_if<std::is_integral<Type>::value && sizeof( Type ) < 8, Type>::type
-floor2( Type n ) noexcept {
-	n = __builtin_clz( n );
-	return 1 << ( 31 - n );
-}
-
-// Rotate left
-template <typename Type>
-constexpr typename std::enable_if<std::is_integral<Type>::value, Type>::type
-rotl( Type n, unsigned s ) noexcept {
-	typename std::make_unsigned<Type>::type un = n;
-	return ( un << s ) | ( un >> ( ( sizeof( un ) * 8 ) - s ) );
-}
-
-// Rotate right
-template <typename Type>
-constexpr typename std::enable_if<std::is_integral<Type>::value, Type>::type
-rotr( Type n, unsigned s ) noexcept {
-	typename std::make_unsigned<Type>::type un = n;
-	return ( un >> s ) | ( un << ( ( sizeof( un ) * 8 ) - s ) );
-}
 
 namespace detail {
 
@@ -149,10 +79,21 @@ namespace detail {
 
 } // detail
 
+template <class T>
+constexpr auto sqrt( T x ) noexcept -> typename std::enable_if<std::is_integral<T>::value && !std::is_same<bool, T>::value, fixed_point<T, sizeof( T ) * 4>>::type {
+	using wider_type = typename std::make_signed<wider_promote<T>>::type;
+	return fixed_point<T, sizeof( T ) * 4>::from_data( static_cast<T>( detail::sqrt_solve1( wider_type( x ) << ( sizeof( T ) * 8 ) ) ) );
+}
+
+template <class T>
+constexpr auto sqrt( T x ) noexcept -> typename std::enable_if<std::is_floating_point<T>::value, T>::type {
+	return std::sqrt( x );
+}
+
 template <class ReprType, int Exponent>
 constexpr auto sqrt( const fixed_point<ReprType, Exponent>& x ) noexcept {
 	using widened_type = fixed_point<wider_promote<ReprType>, Exponent * 2>;
-	return fixed_point<ReprType, Exponent>::from_data( static_cast< ReprType >( detail::sqrt_solve1( widened_type( x ).data() ) ) );
+	return fixed_point<ReprType, Exponent>::from_data( static_cast<ReprType>( detail::sqrt_solve1( widened_type( x ).data() ) ) );
 }
 
 template <class ReprType, int Exponent>
@@ -173,6 +114,16 @@ constexpr auto cos( const fixed_point<ReprType, Exponent>& radian ) noexcept {
 template <class S, typename std::enable_if<std::is_floating_point<S>::value, int>::type Dummy = 0>
 constexpr auto cos( const S radian ) noexcept {
 	return detail::sin_bam16( detail::radian_to_bam16( make_ufixed<13, 19>( radian ) ) + 0x2000 );
+}
+
+template <class AT, class BT, class ReprType, int Exponent>
+constexpr auto mix( const AT& a, const BT& b, const fixed_point<ReprType, Exponent>& scale ) noexcept {
+	return a * ( fixed_point<ReprType, Exponent>( 1 ) - scale ) + b * scale;
+}
+
+template <class AT, class BT, class ReprType, int Exponent>
+constexpr auto mix( const AT& a, const BT& b, const frac<ReprType, Exponent>& scale ) noexcept {
+	return a * ( frac<ReprType, Exponent>( 1 ) - scale ) + b * scale;
 }
 
 } // math

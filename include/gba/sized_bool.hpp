@@ -5,7 +5,7 @@
 #include <limits>
 
 #include <gba/int_type.hpp>
-#include <gba/math.hpp>
+#include <gba/bit.hpp>
 
 namespace gba {
 
@@ -24,11 +24,11 @@ protected:
 
 // TODO : Make volatile compatible
 template <unsigned int Size>
-class sized_bool : std::conditional<Size != math::floor2( Size ), sized_bool_padding<Size - math::floor2( Size )>, sized_bool_no_padding>::type {
+class sized_bool : std::conditional<Size != bit_floor( Size ), sized_bool_padding<Size - bit_floor( Size )>, sized_bool_no_padding>::type {
 	static_assert( Size > 0, "sized_bool Size cannot be zero" );
 	static_assert( Size < 16, "sized_bool Size must be less than 16" );
 public:
-	using value_type = typename uint_sized_type<math::floor2( Size )>::type;
+	using value_type = typename uint_sized_type<bit_floor( Size )>::type;
 
 	constexpr sized_bool() {}
 
