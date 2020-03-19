@@ -170,27 +170,27 @@ constexpr auto operator *( S s, const mat3x2<MType, VType>& m ) noexcept {
 template <typename MType, typename VType>
 constexpr auto operator *( const mat3x2<MType, VType>& m, const vec3<VType>& v ) noexcept {
 	return vec2<VType>(
-		m.ab[0] * v.x + m.cd[0] * v.y + m.xy[0] * v.z,
-		m.ab[1] * v.x + m.cd[1] * v.y + m.xy[1] * v.z);
+		m.ab.x * v.x + m.cd.x * v.y + m.xy.x * v.z,
+		m.ab.y * v.x + m.cd.y * v.y + m.xy.y * v.z);
 }
 
 template <typename MType, typename VType>
 constexpr auto operator *( const vec2<VType>& v, const mat3x2<MType, VType>& m ) noexcept {
 	return vec3<VType>(
-		v.x * m.ab[0] + v.y * m.ab[1],
-		v.x * m.cd[0] + v.y * m.cd[1],
-		v.x * m.xy[0] + v.y * m.xy[1]);
+		v.x * m.ab.x + v.y * m.ab.y,
+		v.x * m.cd.x + v.y * m.cd.y,
+		v.x * m.xy.x + v.y * m.xy.y);
 }
 
 template <typename AM, typename AV, typename BM, typename BV>
 constexpr auto operator *( const mat3x2<AM, AV>& m1, const mat3x2<BM, BV>& m2 ) noexcept {
 	return mat3x2<AM, AV>(
-		m1.ab[0] * m2.ab[0] + m1.cd[0] * m2.ab[1] /*+ m1.xy[0] * m2.ab[2]*/,
-		m1.ab[1] * m2.ab[0] + m1.cd[1] * m2.ab[1] /*+ m1.xy[1] * m2.ab[2]*/,
-		m1.ab[0] * m2.cd[0] + m1.cd[0] * m2.cd[1] /*+ m1.xy[0] * m2.cd[2]*/,
-		m1.ab[1] * m2.cd[0] + m1.cd[1] * m2.cd[1] /*+ m1.xy[1] * m2.cd[2]*/,
-		m1.ab[0] * m2.xy[0] + m1.cd[0] * m2.xy[1] + m1.xy[0] /** m2.xy[2]*/,
-		m1.ab[1] * m2.xy[0] + m1.cd[1] * m2.xy[1] + m1.xy[1] /** m2.xy[2]*/);
+		m1.ab.x * m2.ab.x + m1.cd.x * m2.ab.y /*+ m1.xy.x * m2.ab.z*/,
+		m1.ab.y * m2.ab.x + m1.cd.y * m2.ab.y /*+ m1.xy.y * m2.ab.z*/,
+		m1.ab.x * m2.cd.x + m1.cd.x * m2.cd.y /*+ m1.xy.x * m2.cd.z*/,
+		m1.ab.y * m2.cd.x + m1.cd.y * m2.cd.y /*+ m1.xy.y * m2.cd.z*/,
+		m1.ab.x * m2.xy.x + m1.cd.x * m2.xy.y + m1.xy.x /** m2.xy.z*/,
+		m1.ab.y * m2.xy.x + m1.cd.y * m2.xy.y + m1.xy.y /** m2.xy.z*/);
 }
 
 template <typename MType, typename VType, typename S>

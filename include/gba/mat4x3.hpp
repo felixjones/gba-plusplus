@@ -24,14 +24,56 @@ struct mat4x3 {
 	template <typename E = Type, typename C = Type, typename U = Type>
 	static constexpr auto lookAt( const vec3<E>& eye, const vec3<C>& center, const vec3<U>& up ) noexcept {
 		const auto f = math::normalize( center - eye );
-		const auto s = math::normalize( math::cross( f, up ) );
-		const auto u = math::cross( s, f );
+		const auto s = math::cross( up, f );
+		const auto u = math::cross( f, s );
 
 		return mat4x3<Type>(
-			s.x, u.x, -f.x,
-			s.y, u.y, -f.y,
-			s.z, u.z, -f.z,
-			-math::dot( s, eye ), -math::dot( u, eye ), math::dot( f, eye )
+			s.x, u.x, f.x,
+			s.y, u.y, f.y,
+			s.z, u.z, f.z,
+			eye.x, eye.y, eye.z
+		);
+	}
+
+	template <typename R, typename V>
+	static constexpr mat4x3<Type> rotate( const R radian, const vec3<V>& axis ) noexcept {
+		const auto c = math::cos( radian );
+		const auto s = math::sin( radian );
+
+		const auto temp = axis * ( 1 - c );
+
+		const auto abc = vec3<Type> { c + temp.x * axis.x, temp.x * axis.y + s * axis.z, temp.x * axis.z - s * axis.y };
+		const auto def = vec3<Type> { temp.y * axis.x - s * axis.z, c + temp.y * axis.y, temp.y * axis.z + s * axis.x };
+		const auto ghi = vec3<Type> { temp.z * axis.x + s * axis.y, temp.z * axis.y - s * axis.x, c + temp.z * axis.z };
+
+		constexpr auto iAbc = vec3<Type> { 1, 0, 0 };
+		constexpr auto iDef = vec3<Type> { 0, 1, 0 };
+		constexpr auto iGhi = vec3<Type> { 0, 0, 1 };
+
+		return mat4x3<Type>(
+			iAbc * abc.x + iDef * abc.y + iGhi * abc.z,
+			iAbc * def.x + iDef * def.y + iGhi * def.z,
+			iAbc * ghi.x + iDef * ghi.y + iGhi * ghi.z,
+			vec3<Type> { 0, 0, 0 }
+			);
+	}
+
+	template <typename M, typename R, typename V>
+	static constexpr mat4x3<Type> rotate( const mat4x3<M>& m, const R radian, const vec3<V>& axis ) noexcept {
+		const auto c = math::cos( radian );
+		const auto s = math::sin( radian );
+
+		const auto temp = axis * ( 1 - c );
+
+		const auto abc = vec3<Type> { c + temp.x * axis.x, temp.x * axis.y + s * axis.z, temp.x * axis.z - s * axis.y };
+		const auto def = vec3<Type> { temp.y * axis.x - s * axis.z, c + temp.y * axis.y, temp.y * axis.z + s * axis.x };
+		const auto ghi = vec3<Type> { temp.z * axis.x + s * axis.y, temp.z * axis.y - s * axis.x, c + temp.z * axis.z };
+
+		return mat4x3<Type>(
+			m.abc * abc.x + m.def * abc.y + m.ghi * abc.z,
+			m.abc * def.x + m.def * def.y + m.ghi * def.z,
+			m.abc * ghi.x + m.def * ghi.y + m.ghi * ghi.z,
+			m.xyz
 		);
 	}
 
@@ -242,34 +284,34 @@ constexpr auto operator *( S s, const mat4x3<OType>& m ) noexcept {
 template <typename OType, typename VType>
 constexpr auto operator *( const mat4x3<OType>& m, const vec3<VType>& v ) noexcept {
 	return vec3<VType>(
-		m.abc[0] * v.x + m.def[0] * v.y + m.ghi[0] * v.z,
-		m.abc[1] * v.x + m.def[1] * v.y + m.ghi[1] * v.z,
-		m.abc[2] * v.x + m.def[2] * v.y + m.ghi[2] * v.z);
+		m.abc.x * v.x + m.def.x * v.y + m.ghi.x * v.z,
+		m.abc.y * v.x + m.def.y * v.y + m.ghi.y * v.z,
+		m.abc.z * v.x + m.def.z * v.y + m.ghi.z * v.z);
 }
 
 template <typename OType, typename VType>
 constexpr auto operator *( const vec3<VType>& v, const mat4x3<OType>& m ) noexcept {
 	return vec3<VType>(
-		v.x * m.abc[0] + v.y * m.abc[1] + v.z * m.abc[2],
-		v.x * m.def[0] + v.y * m.def[1] + v.z * m.def[2],
-		v.x * m.ghi[0] + v.y * m.ghi[1] + v.z * m.ghi[2]);
+		v.x * m.abc.x + v.y * m.abc.y + v.z * m.abc.z,
+		v.x * m.def.x + v.y * m.def.y + v.z * m.def.z,
+		v.x * m.ghi.x + v.y * m.ghi.y + v.z * m.ghi.z);
 }
 
 template <typename AT, typename BT>
 constexpr auto operator *( const mat4x3<AT>& m1, const mat4x3<BT>& m2 ) noexcept {
 	return mat4x3<AT>(
-		m1.abc[0] * m2.abc[0] + m1.def[0] * m2.abc[1] + m1.ghi[0] * m2.abc[2] /*+ m1.xyz[0] * m2.abc[3]*/,
-		m1.abc[1] * m2.abc[0] + m1.def[1] * m2.abc[1] + m1.ghi[1] * m2.abc[2] /*+ m1.xyz[1] * m2.abc[3]*/,
-		m1.abc[2] * m2.abc[0] + m1.def[2] * m2.abc[1] + m1.ghi[2] * m2.abc[2] /*+ m1.xyz[2] * m2.abc[3]*/,
-		m1.abc[0] * m2.def[0] + m1.def[0] * m2.def[1] + m1.ghi[0] * m2.def[2] /*+ m1.xyz[0] * m2.def[3]*/,
-		m1.abc[1] * m2.def[0] + m1.def[1] * m2.def[1] + m1.ghi[1] * m2.def[2] /*+ m1.xyz[1] * m2.def[3]*/,
-		m1.abc[2] * m2.def[0] + m1.def[2] * m2.def[1] + m1.ghi[2] * m2.def[2] /*+ m1.xyz[2] * m2.def[3]*/,
-		m1.abc[0] * m2.ghi[0] + m1.def[0] * m2.ghi[1] + m1.ghi[0] * m2.ghi[2] /*+ m1.xyz[0] * m2.ghi[3]*/,
-		m1.abc[1] * m2.ghi[0] + m1.def[1] * m2.ghi[1] + m1.ghi[1] * m2.ghi[2] /*+ m1.xyz[1] * m2.ghi[3]*/,
-		m1.abc[2] * m2.ghi[0] + m1.def[2] * m2.ghi[1] + m1.ghi[2] * m2.ghi[2] /*+ m1.xyz[2] * m2.ghi[3]*/,
-		m1.abc[0] * m2.xyz[0] + m1.def[0] * m2.xyz[1] + m1.ghi[0] * m2.xyz[2] + m1.xyz[0] /** m2.xyz[3]*/,
-		m1.abc[1] * m2.xyz[0] + m1.def[1] * m2.xyz[1] + m1.ghi[1] * m2.xyz[2] + m1.xyz[1] /** m2.xyz[3]*/,
-		m1.abc[2] * m2.xyz[0] + m1.def[2] * m2.xyz[1] + m1.ghi[2] * m2.xyz[2] + m1.xyz[2] /** m2.xyz[3]*/);
+		m1.abc.x * m2.abc.x + m1.def.x * m2.abc.y + m1.ghi.x * m2.abc.z /*+ m1.xyz.x * m2.abc.w*/,
+		m1.abc.y * m2.abc.x + m1.def.y * m2.abc.y + m1.ghi.y * m2.abc.z /*+ m1.xyz.y * m2.abc.w*/,
+		m1.abc.z * m2.abc.x + m1.def.z * m2.abc.y + m1.ghi.z * m2.abc.z /*+ m1.xyz.z * m2.abc.w*/,
+		m1.abc.x * m2.def.x + m1.def.x * m2.def.y + m1.ghi.x * m2.def.z /*+ m1.xyz.x * m2.def.w*/,
+		m1.abc.y * m2.def.x + m1.def.y * m2.def.y + m1.ghi.y * m2.def.z /*+ m1.xyz.y * m2.def.w*/,
+		m1.abc.z * m2.def.x + m1.def.z * m2.def.y + m1.ghi.z * m2.def.z /*+ m1.xyz.z * m2.def.w*/,
+		m1.abc.x * m2.ghi.x + m1.def.x * m2.ghi.y + m1.ghi.x * m2.ghi.z /*+ m1.xyz.x * m2.ghi.w*/,
+		m1.abc.y * m2.ghi.x + m1.def.y * m2.ghi.y + m1.ghi.y * m2.ghi.z /*+ m1.xyz.y * m2.ghi.w*/,
+		m1.abc.z * m2.ghi.x + m1.def.z * m2.ghi.y + m1.ghi.z * m2.ghi.z /*+ m1.xyz.z * m2.ghi.w*/,
+		m1.abc.x * m2.xyz.x + m1.def.x * m2.xyz.y + m1.ghi.x * m2.xyz.z + m1.xyz.x /** m2.xyz.w*/,
+		m1.abc.y * m2.xyz.x + m1.def.y * m2.xyz.y + m1.ghi.y * m2.xyz.z + m1.xyz.y /** m2.xyz.w*/,
+		m1.abc.z * m2.xyz.x + m1.def.z * m2.xyz.y + m1.ghi.z * m2.xyz.z + m1.xyz.z /** m2.xyz.w*/);
 }
 
 template <typename OType, typename S>

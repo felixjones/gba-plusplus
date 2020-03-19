@@ -179,24 +179,24 @@ constexpr auto operator *( S s, const mat2<OType>& m ) noexcept {
 template <typename OType, typename VType>
 constexpr auto operator *( const mat2<OType>& m, const vec2<VType>& v ) noexcept {
 	return vec2<VType>(
-		m.ab[0] * v.x + m.cd[0] * v.y,
-		m.ab[1] * v.x + m.cd[1] * v.y);
+		m.ab.x * v.x + m.cd.x * v.y,
+		m.ab.y * v.x + m.cd.y * v.y);
 }
 
 template <typename OType, typename VType>
 constexpr auto operator *( const vec2<VType>& v, const mat2<OType>& m ) noexcept {
 	return vec2<VType>(
-		v.x * m.ab[0] + v.y * m.ab[1],
-		v.x * m.cd[0] + v.y * m.cd[1]);
+		v.x * m.ab.x + v.y * m.ab.y,
+		v.x * m.cd.x + v.y * m.cd.y);
 }
 
 template <typename AT, typename BT>
 constexpr auto operator *( const mat2<AT>& m1, const mat2<BT>& m2 ) noexcept {
 	return mat2<AT>(
-		m1.ab[0] * m2.ab[0] + m1.cd[0] * m2.ab[1],
-		m1.ab[1] * m2.ab[0] + m1.cd[1] * m2.ab[1],
-		m1.ab[0] * m2.cd[0] + m1.cd[0] * m2.cd[1],
-		m1.ab[1] * m2.cd[0] + m1.cd[1] * m2.cd[1]);
+		m1.ab.x * m2.ab.x + m1.cd.x * m2.ab.y,
+		m1.ab.y * m2.ab.x + m1.cd.y * m2.ab.y,
+		m1.ab.x * m2.cd.x + m1.cd.x * m2.cd.y,
+		m1.ab.y * m2.cd.x + m1.cd.y * m2.cd.y);
 }
 
 template <typename OType, typename S>

@@ -98,6 +98,10 @@ public:
 		return m_bitmask & key::button::L;
 	}
 
+	constexpr operator bool() const noexcept {
+		return ( m_bitmask & 0x3ff ) != 0;
+	}
+
 private:
 	uint16	m_bitmask;
 

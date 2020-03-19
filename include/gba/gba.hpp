@@ -17,7 +17,7 @@
 #include <gba/interrupt_handler.hpp>
 #include <gba/keypad.hpp>
 #include <gba/mat2.hpp>
-// #include <gba/mat3x2.hpp>
+#include <gba/mat3.hpp>
 #include <gba/mat4x3.hpp>
 #include <gba/math.hpp>
 #include <gba/memmap.hpp>
