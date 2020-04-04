@@ -2,7 +2,9 @@
 #define GBAXX_VEC2_HPP
 
 #include <cassert>
+#include <type_traits>
 
+#include <gba/bios.hpp>
 #include <gba/int.hpp>
 #include <gba/math.hpp>
 
@@ -372,7 +374,12 @@ constexpr auto dot( const vec2<A>& a, const vec2<B>& b ) noexcept {
 
 template <typename V>
 constexpr auto length( const vec2<V>& v ) noexcept {
-	return sqrt( dot( v, v ) );
+	const auto d = dot( v, v );
+	if ( __builtin_constant_p( v ) ) {
+		return math::sqrt( d );
+	} else {
+		return bios::sqrt( d );
+	}
 }
 
 template <typename A, typename B>

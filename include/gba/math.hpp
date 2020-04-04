@@ -80,14 +80,16 @@ namespace detail {
 } // detail
 
 template <class T>
-constexpr auto sqrt( T x ) noexcept -> typename std::enable_if<std::is_integral<T>::value && !std::is_same<bool, T>::value, fixed_point<T, sizeof( T ) * 4>>::type {
-	using wider_type = typename std::make_signed<wider_promote<T>>::type;
-	return fixed_point<T, sizeof( T ) * 4>::from_data( static_cast<T>( detail::sqrt_solve1( wider_type( x ) << ( sizeof( T ) * 8 ) ) ) );
+constexpr auto sqrt( T x ) noexcept -> typename std::enable_if<std::is_floating_point<T>::value, T>::type {
+	return std::sqrt( x );
 }
 
 template <class T>
-constexpr auto sqrt( T x ) noexcept -> typename std::enable_if<std::is_floating_point<T>::value, T>::type {
-	return std::sqrt( x );
+constexpr auto sqrt( T x ) noexcept -> typename std::enable_if<std::is_integral<T>::value && !std::is_same<bool, T>::value, T>::type {
+	using wider_type = typename std::make_signed<wider_promote<T>>::type;
+
+	const auto result = detail::sqrt_solve1( wider_type( x ) << ( sizeof( T ) * 8 ) );
+	return static_cast<T>( result ) >> ( sizeof( T ) * 4 );
 }
 
 template <class ReprType, int Exponent>

@@ -50,7 +50,7 @@ template <typename Type, unsigned Address, typename Fundamental = void>
 class omemmap;
 
 template <typename Type, unsigned Address>
-class omemmap<Type, Address, typename std::enable_if<std::is_fundamental<Type>::value>::type> : public virtual memmap<Type, Address> {
+class omemmap<Type, Address, typename std::enable_if<std::is_fundamental<Type>::value && !std::is_const<Type>::value>::type> : public virtual memmap<Type, Address> {
 private:
 	using uint_type = typename uint_sized_type<sizeof( Type )>::type;
 
@@ -61,7 +61,7 @@ public:
 };
 
 template <typename Type, unsigned Address>
-class omemmap<Type, Address, typename std::enable_if<!std::is_fundamental<Type>::value>::type> : public virtual memmap<Type, Address> {
+class omemmap<Type, Address, typename std::enable_if<!std::is_fundamental<Type>::value && !std::is_const<Type>::value>::type> : public virtual memmap<Type, Address> {
 private:
 	using uint_type = typename uint_sized_type<sizeof( Type )>::type;
 

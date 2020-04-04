@@ -3,6 +3,7 @@
 
 #include <cassert>
 
+#include <gba/bios.hpp>
 #include <gba/int.hpp>
 #include <gba/math.hpp>
 
@@ -409,8 +410,13 @@ constexpr auto cross( const vec3<A>& x, const vec3<B>& y ) noexcept {
 }
 
 template <typename V>
-constexpr auto length( const vec3<V>& v ) noexcept {
-	return sqrt( dot( v, v ) );
+constexpr auto length( const vec2<V>& v ) noexcept {
+	const auto d = dot( v, v );
+	if ( __builtin_constant_p( v ) ) {
+		return math::sqrt( d );
+	} else {
+		return bios::sqrt( d );
+	}
 }
 
 template <typename A, typename B>
