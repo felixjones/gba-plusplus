@@ -55,7 +55,7 @@ struct mat4x3 {
 			iAbc * def.x + iDef * def.y + iGhi * def.z,
 			iAbc * ghi.x + iDef * ghi.y + iGhi * ghi.z,
 			vec3<Type> { 0, 0, 0 }
-			);
+		);
 	}
 
 	template <typename M, typename R, typename V>

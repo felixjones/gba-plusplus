@@ -6,6 +6,7 @@
 #include <gba/bit.hpp>
 #include <gba/blending.hpp>
 #include <gba/bool.hpp>
+#include <gba/bool_type.hpp>
 #include <gba/const.hpp>
 #include <gba/display_control.hpp>
 #include <gba/display_status.hpp>
@@ -22,7 +23,6 @@
 #include <gba/math.hpp>
 #include <gba/memmap.hpp>
 #include <gba/mosaic.hpp>
-#include <gba/sized_bool.hpp>
 #include <gba/tile.hpp>
 #include <gba/vec2.hpp>
 #include <gba/vec3.hpp>
@@ -86,13 +86,16 @@ namespace io {
 	using key_status = imemmap<gba::keys, 0x04000130>;
 
 	using interrupt_master_enable = iomemmap<gba::bool32, 0x04000208>;
-	using interrupt_mask_enable = iomemmap<gba::interrupt, 0x4000200>;
-	using interrupt_flags = iomemmap<gba::interrupt, 0x4000202>;
+	using interrupt_mask_enable = iomemmap<gba::interrupt, 0x04000200>;
+	using interrupt_flags = iomemmap<gba::interrupt, 0x04000202>;
 } // io
 
 namespace undocumented {
 namespace io {
-	using display_control_green_swap = iomemmap<bool16, 0x04000002>;
+	using display_control_green_swap = iomemmap<gba::bool16, 0x04000002>;
+
+	using post_flag = iomemmap<gba::bool8, 0x04000300>;
+	using halt_control = iomemmap<gba::bool_type<8, 7>, 0x04000301>;
 } // io
 } // undocumented
 } // gba

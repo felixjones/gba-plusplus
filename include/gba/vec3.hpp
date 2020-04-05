@@ -410,7 +410,7 @@ constexpr auto cross( const vec3<A>& x, const vec3<B>& y ) noexcept {
 }
 
 template <typename V>
-constexpr auto length( const vec2<V>& v ) noexcept {
+constexpr auto length( const vec3<V>& v ) noexcept {
 	const auto d = dot( v, v );
 	if ( __builtin_constant_p( v ) ) {
 		return math::sqrt( d );

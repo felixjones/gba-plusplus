@@ -62,7 +62,7 @@ namespace detail {
 		return sqrt_solve3<ReprType>( n, sqrt_bit<ReprType>( n ), 0 );
 	}
 
-	constexpr auto sin_bam16( int16 bam ) {
+	constexpr auto sin_bam16( int16 bam ) noexcept {
 		auto x = bam << 17;
 		if ( ( x ^ ( x << 1 ) ) < 0 ) {
 			x = ( 1 << 31 ) - x;
@@ -72,7 +72,7 @@ namespace detail {
 	}
 
 	template <class ReprType, int Exponent>
-	constexpr int16 radian_to_bam16( const fixed_point<ReprType, Exponent>& radian ) {
+	constexpr int16 radian_to_bam16( const fixed_point<ReprType, Exponent>& radian ) noexcept {
 		constexpr auto radTo16 = make_ufixed<13, 19>( 16384.0 / 3.14159265358979323846264338327950288 );
 		return static_cast<int16>( radian * radTo16 );
 	}
