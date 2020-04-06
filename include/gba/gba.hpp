@@ -11,7 +11,6 @@
 #include <gba/display_control.hpp>
 #include <gba/display_status.hpp>
 #include <gba/fixed_point.hpp>
-#include <gba/frac.hpp>
 #include <gba/int.hpp>
 #include <gba/int_type.hpp>
 #include <gba/interrupt.hpp>
@@ -81,7 +80,7 @@ namespace io {
 
 	using blend_control = iomemmap<gba::blend_control, 0x04000050>;
 	using blend_alpha = iomemmap<gba::blend_alpha, 0x04000052>;
-	using blend_gamma = omemmap<gba::frac<uint16, 5>, 0x04000054>;
+	using blend_gamma = omemmap<gba::fixed_point<uint16, 4>, 0x04000054>;
 
 	using key_status = imemmap<gba::keys, 0x04000130>;
 
@@ -95,7 +94,7 @@ namespace io {
 	using display_control_green_swap = iomemmap<gba::bool16, 0x04000002>;
 
 	using post_flag = iomemmap<gba::bool8, 0x04000300>;
-	using halt_control = iomemmap<gba::bool_type<8, 7>, 0x04000301>;
+	using halt_control = omemmap<gba::bool_type<8, 7>, 0x04000301>;
 } // io
 } // undocumented
 } // gba

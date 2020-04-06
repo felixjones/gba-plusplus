@@ -6,7 +6,6 @@
 
 #include <gba/int.hpp>
 #include <gba/fixed_point.hpp>
-#include <gba/frac.hpp>
 
 namespace gba {
 namespace math {
@@ -86,7 +85,7 @@ constexpr auto sqrt( T x ) noexcept -> typename std::enable_if<std::is_floating_
 
 template <class T>
 constexpr auto sqrt( T x ) noexcept -> typename std::enable_if<std::is_integral<T>::value && !std::is_same<bool, T>::value, T>::type {
-	using wider_type = typename std::make_signed<wider_promote<T>>::type;
+	using wider_type = typename std::make_signed<gba::detail::wider_promote<T>>::type;
 
 	const auto result = detail::sqrt_solve1( wider_type( x ) << ( sizeof( T ) * 8 ) );
 	return static_cast<T>( result ) >> ( sizeof( T ) * 4 );
@@ -94,7 +93,7 @@ constexpr auto sqrt( T x ) noexcept -> typename std::enable_if<std::is_integral<
 
 template <class ReprType, int Exponent>
 constexpr auto sqrt( const fixed_point<ReprType, Exponent>& x ) noexcept {
-	using widened_type = fixed_point<wider_promote<ReprType>, Exponent * 2>;
+	using widened_type = fixed_point<gba::detail::wider_promote<ReprType>, Exponent * 2>;
 	return fixed_point<ReprType, Exponent>::from_data( static_cast<ReprType>( detail::sqrt_solve1( widened_type( x ).data() ) ) );
 }
 
@@ -121,11 +120,6 @@ constexpr auto cos( const S radian ) noexcept {
 template <class AT, class BT, class ReprType, int Exponent>
 constexpr auto mix( const AT& a, const BT& b, const fixed_point<ReprType, Exponent>& scale ) noexcept {
 	return a * ( fixed_point<ReprType, Exponent>( 1 ) - scale ) + b * scale;
-}
-
-template <class AT, class BT, class ReprType, int Exponent>
-constexpr auto mix( const AT& a, const BT& b, const frac<ReprType, Exponent>& scale ) noexcept {
-	return a * ( frac<ReprType, Exponent>( 1 ) - scale ) + b * scale;
 }
 
 } // math

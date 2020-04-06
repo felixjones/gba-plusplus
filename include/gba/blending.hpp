@@ -1,7 +1,7 @@
 #ifndef GBAXX_BLENDING_HPP
 #define GBAXX_BLENDING_HPP
 
-#include <gba/frac.hpp>
+#include <gba/fixed_point.hpp>
 #include <gba/int.hpp>
 
 namespace gba {
@@ -27,8 +27,8 @@ struct blend_control {
 };
 
 struct blend_alpha {
-	frac<uint8, 5>	src;
-	frac<uint8, 5>	dst;
+	fixed_point<uint8, 4>	src;
+	fixed_point<uint8, 4>	dst;
 };
 
 } // gba

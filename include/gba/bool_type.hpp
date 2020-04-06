@@ -20,7 +20,7 @@ namespace detail {
 } // detail
 
 template <unsigned int BitSize, unsigned int BitIndex = 0>
-class bool_type : std::conditional<( BitIndex ) / 8 == 0, detail::boolean_zero_padding, detail::boolean_padding<BitIndex / 8>>::type {
+class bool_type : std::conditional<BitIndex / 8 == 0, detail::boolean_zero_padding, detail::boolean_padding<BitIndex / 8>>::type {
     static_assert( BitIndex < BitSize, "bool_type BitIndex must be less than BitSize" );
 
     using uint_type = typename uint_type<BitSize - ( ( BitIndex / 8 ) * 8 )>::type;

@@ -33,22 +33,22 @@ public:
 	constexpr fixed_point() noexcept : m_value( 0 ) {}
 
 	template <class S, typename std::enable_if<std::is_integral<S>::value, int>::type Dummy = 0>
-	constexpr fixed_point( S s ) noexcept : m_value( s * ( 1 << Exponent ) ) {}
+	constexpr fixed_point( S s ) noexcept : m_value( static_cast<repr_type>( s ) * ( 1ULL << Exponent ) ) {}
 
 	template <class S, typename std::enable_if<std::is_floating_point<S>::value, int>::type Dummy = 0>
-	constexpr fixed_point( S s ) noexcept : m_value( static_cast<repr_type>( s * ( 1 << Exponent ) ) ) {}
+	constexpr fixed_point( S s ) noexcept : m_value( static_cast<repr_type>( s * ( 1ULL << Exponent ) ) ) {}
 
 	template <class FromReprType, int FromExponent>
-	constexpr fixed_point( const fixed_point<FromReprType, FromExponent>& rhs ) noexcept : m_value( Exponent > FromExponent ? rhs.data() * ( 1 << ( Exponent - FromExponent ) ) : rhs.data() / ( 1 << ( FromExponent - Exponent ) ) ) {}
+	constexpr fixed_point( const fixed_point<FromReprType, FromExponent>& rhs ) noexcept : m_value( Exponent > FromExponent ? static_cast<repr_type>( rhs.data() ) * ( 1ULL << ( Exponent - FromExponent ) ) : static_cast<repr_type>( rhs.data() ) / ( 1ULL << ( FromExponent - Exponent ) ) ) {}
 
 	template <class S, typename std::enable_if<std::is_integral<S>::value, int>::type Dummy = 0>
 	constexpr operator S() const noexcept {
-		return m_value / ( 1 << Exponent );
+		return m_value / ( 1ULL << Exponent );
 	}
 
 	template <class S, typename std::enable_if<std::is_floating_point<S>::value, int>::type Dummy = 0>
 	explicit constexpr operator S() const noexcept {
-		return m_value / static_cast<S>( 1 << Exponent );
+		return m_value / static_cast<S>( 1ULL << Exponent );
 	}
 
 	explicit constexpr operator bool() const noexcept {
@@ -92,11 +92,11 @@ template <class ReprType, int Exponent>
 struct std::numeric_limits<gba::fixed_point<ReprType, Exponent>> : public std::numeric_limits<ReprType> {
 
 	static constexpr auto min() {
-		return std::numeric_limits<ReprType>::min() * ( 1 << Exponent );
+		return std::numeric_limits<ReprType>::min() * ( 1ULL << Exponent );
 	}
 
 	static constexpr auto max() {
-		return std::numeric_limits<ReprType>::max() * ( 1 << Exponent );
+		return std::numeric_limits<ReprType>::max() * ( 1ULL << Exponent );
 	}
 
 	static constexpr auto lowest() {
@@ -106,59 +106,68 @@ struct std::numeric_limits<gba::fixed_point<ReprType, Exponent>> : public std::n
 };
 
 namespace gba {
+namespace detail {
 
-template<class T, class U>
-using wider = typename std::conditional<sizeof( T ) >= sizeof( U ), T, U>::type;
+	template<class T, class U>
+	using wider = typename std::conditional<sizeof( T ) >= sizeof( U ), T, U>::type;
 
-template <class T>
-using wider_promote = typename std::conditional<std::is_signed<T>::value, typename int_sized_type<sizeof( T ) + 1>::type, typename uint_sized_type<sizeof( T ) + 1>::type>::type;
+	template <class T>
+	using wider_promote = typename std::conditional<std::is_signed<T>::value, typename int_sized_type<sizeof( T ) + 1>::type, typename uint_sized_type<sizeof( T ) + 1>::type>::type;
+
+} // detail
 
 template <class FixedA, class FixedB>
 using fixed_promote = 
 	typename std::conditional<std::is_signed<typename FixedA::repr_type>::value || std::is_signed<typename FixedB::repr_type>::value,
 		fixed_point<
-			typename std::make_signed<wider<typename FixedA::repr_type, typename FixedB::repr_type>>::type,
-			( sizeof( wider<typename FixedA::repr_type, typename FixedB::repr_type> ) * 8 ) - std::max( sizeof( typename FixedA::repr_type ) * 8 - FixedA::exponent, sizeof( typename FixedB::repr_type ) * 8 - FixedB::exponent )
+			typename std::make_signed<detail::wider<typename FixedA::repr_type, typename FixedB::repr_type>>::type,
+			( sizeof( detail::wider<typename FixedA::repr_type, typename FixedB::repr_type> ) * 8 ) - std::max( sizeof( typename FixedA::repr_type ) * 8 - FixedA::exponent, sizeof( typename FixedB::repr_type ) * 8 - FixedB::exponent )
 		>,
 		fixed_point<
-			typename std::make_unsigned<wider<typename FixedA::repr_type, typename FixedB::repr_type>>::type,
-			( sizeof( wider<typename FixedA::repr_type, typename FixedB::repr_type> ) * 8 ) - std::max( FixedA::integer_digits, FixedB::integer_digits )
+			typename std::make_unsigned<detail::wider<typename FixedA::repr_type, typename FixedB::repr_type>>::type,
+			( sizeof( detail::wider<typename FixedA::repr_type, typename FixedB::repr_type> ) * 8 ) - std::max( FixedA::integer_digits, FixedB::integer_digits )
 		>
 	>::type;
 
-template <class ReprType, int Exponent>
-constexpr bool operator==( const fixed_point<ReprType, Exponent>& lhs, const fixed_point<ReprType, Exponent>& rhs ) noexcept {
-	typedef fixed_promote<fixed_point<ReprType, Exponent>, fixed_point<ReprType, Exponent>> fixed_promoted;
+template <class AReprType, int AExponent, class BReprType, int BExponent>
+constexpr bool operator==( const fixed_point<AReprType, AExponent>& lhs, const fixed_point<BReprType, BExponent>& rhs ) noexcept {
+	using fixed_promoted = fixed_promote<fixed_point<AReprType, AExponent>, fixed_point<BReprType, BExponent>>;
+
 	return fixed_promoted( lhs ).data() == fixed_promoted( rhs ).data();
 }
 
-template <class ReprType, int Exponent>
-constexpr bool operator!=( const fixed_point<ReprType, Exponent>& lhs, const fixed_point<ReprType, Exponent>& rhs ) noexcept {
-	typedef fixed_promote<fixed_point<ReprType, Exponent>, fixed_point<ReprType, Exponent>> fixed_promoted;
+template <class AReprType, int AExponent, class BReprType, int BExponent>
+constexpr bool operator!=( const fixed_point<AReprType, AExponent>& lhs, const fixed_point<BReprType, BExponent>& rhs ) noexcept {
+	using fixed_promoted = fixed_promote<fixed_point<AReprType, AExponent>, fixed_point<BReprType, BExponent>>;
+
 	return fixed_promoted( lhs ).data() != fixed_promoted( rhs ).data();
 }
 
-template <class ReprType, int Exponent>
-constexpr bool operator<( const fixed_point<ReprType, Exponent>& lhs, const fixed_point<ReprType, Exponent>& rhs ) noexcept {
-	typedef fixed_promote<fixed_point<ReprType, Exponent>, fixed_point<ReprType, Exponent>> fixed_promoted;
+template <class AReprType, int AExponent, class BReprType, int BExponent>
+constexpr bool operator<( const fixed_point<AReprType, AExponent>& lhs, const fixed_point<BReprType, BExponent>& rhs ) noexcept {
+	using fixed_promoted = fixed_promote<fixed_point<AReprType, AExponent>, fixed_point<BReprType, BExponent>>;
+
 	return fixed_promoted( lhs ).data() < fixed_promoted( rhs ).data();
 }
 
-template <class ReprType, int Exponent>
-constexpr bool operator>( const fixed_point<ReprType, Exponent>& lhs, const fixed_point<ReprType, Exponent>& rhs ) noexcept {
-	typedef fixed_promote<fixed_point<ReprType, Exponent>, fixed_point<ReprType, Exponent>> fixed_promoted;
+template <class AReprType, int AExponent, class BReprType, int BExponent>
+constexpr bool operator>( const fixed_point<AReprType, AExponent>& lhs, const fixed_point<BReprType, BExponent>& rhs ) noexcept {
+	using fixed_promoted = fixed_promote<fixed_point<AReprType, AExponent>, fixed_point<BReprType, BExponent>>;
+
 	return fixed_promoted( lhs ).data() > fixed_promoted( rhs ).data();
 }
 
-template <class ReprType, int Exponent>
-constexpr bool operator<=( const fixed_point<ReprType, Exponent>& lhs, const fixed_point<ReprType, Exponent>& rhs ) noexcept {
-	typedef fixed_promote<fixed_point<ReprType, Exponent>, fixed_point<ReprType, Exponent>> fixed_promoted;
+template <class AReprType, int AExponent, class BReprType, int BExponent>
+constexpr bool operator<=( const fixed_point<AReprType, AExponent>& lhs, const fixed_point<BReprType, BExponent>& rhs ) noexcept {
+	using fixed_promoted = fixed_promote<fixed_point<AReprType, AExponent>, fixed_point<BReprType, BExponent>>;
+
 	return fixed_promoted( lhs ).data() <= fixed_promoted( rhs ).data();
 }
 
-template <class ReprType, int Exponent>
-constexpr bool operator>=( const fixed_point<ReprType, Exponent>& lhs, const fixed_point<ReprType, Exponent>& rhs ) noexcept {
-	typedef fixed_promote<fixed_point<ReprType, Exponent>, fixed_point<ReprType, Exponent>> fixed_promoted;
+template <class AReprType, int AExponent, class BReprType, int BExponent>
+constexpr bool operator>=( const fixed_point<AReprType, AExponent>& lhs, const fixed_point<BReprType, BExponent>& rhs ) noexcept {
+	using fixed_promoted = fixed_promote<fixed_point<AReprType, AExponent>, fixed_point<BReprType, BExponent>>;
+
 	return fixed_promoted( lhs ).data() >= fixed_promoted( rhs ).data();
 }
 
@@ -168,40 +177,44 @@ constexpr fixed_point<ReprType, Exponent> operator-( const fixed_point<ReprType,
 }
 
 template <class AReprType, int AExponent, class BReprType, int BExponent>
-constexpr auto operator+( fixed_point<AReprType, AExponent> a, fixed_point<BReprType, BExponent> b ) -> fixed_promote<decltype( a ), decltype( b )> {
-	typedef fixed_promote<decltype( a ), decltype( b )> fixed_promoted;
+constexpr auto operator+( fixed_point<AReprType, AExponent> a, fixed_point<BReprType, BExponent> b ) noexcept -> fixed_promote<decltype( a ), decltype( b )> {
+	using fixed_promoted = fixed_promote<fixed_point<AReprType, AExponent>, fixed_point<BReprType, BExponent>>;
+
 	return fixed_promoted::from_data( fixed_promoted( a ).data() + fixed_promoted( b ).data() );
 }
 
 template <class AReprType, int AExponent, class BReprType, int BExponent>
-constexpr auto operator-( fixed_point<AReprType, AExponent> a, fixed_point<BReprType, BExponent> b ) -> fixed_promote<decltype( a ), decltype( b )> {
-	typedef fixed_promote<decltype( a ), decltype( b )> fixed_promoted;
+constexpr auto operator-( fixed_point<AReprType, AExponent> a, fixed_point<BReprType, BExponent> b ) noexcept -> fixed_promote<decltype( a ), decltype( b )> {
+	using fixed_promoted = fixed_promote<fixed_point<AReprType, AExponent>, fixed_point<BReprType, BExponent>>;
+
 	return fixed_promoted::from_data( fixed_promoted( a ).data() - fixed_promoted( b ).data() );
 }
 
-template <class ReprType, int Exponent>
-fixed_point<ReprType, Exponent>& operator+=( fixed_point<ReprType, Exponent>& lhs, const fixed_point<ReprType, Exponent>& rhs ) noexcept {
-	lhs.data() += fixed_point<ReprType, Exponent>( rhs ).data();
+template <class AReprType, int AExponent, class BReprType, int BExponent>
+fixed_point<AReprType, AExponent>& operator+=( fixed_point<AReprType, AExponent>& lhs, const fixed_point<BReprType, BExponent>& rhs ) noexcept {
+	lhs.data() += fixed_point<AReprType, AExponent>( rhs ).data();
 	return lhs;
 }
 
-template <class ReprType, int Exponent>
-fixed_point<ReprType, Exponent>& operator-=( fixed_point<ReprType, Exponent>& lhs, const fixed_point<ReprType, Exponent>& rhs ) noexcept {
-	lhs.data() -= fixed_point<ReprType, Exponent>( rhs ).data();
+template <class AReprType, int AExponent, class BReprType, int BExponent>
+fixed_point<AReprType, AExponent>& operator-=( fixed_point<AReprType, AExponent>& lhs, const fixed_point<BReprType, BExponent>& rhs ) noexcept {
+	lhs.data() -= fixed_point<AReprType, AExponent>( rhs ).data();
 	return lhs;
 }
 
-template <class ReprType, int Exponent>
-fixed_point<ReprType, Exponent>& operator*=( fixed_point<ReprType, Exponent>& lhs, const fixed_point<ReprType, Exponent>& rhs ) noexcept {
-	typedef wider_promote<ReprType> wider_repr_type;
-	lhs.data() = static_cast<ReprType>( ( static_cast<wider_repr_type>( lhs.data() ) * static_cast<wider_repr_type>( rhs.data() ) ) >> Exponent );
+template <class AReprType, int AExponent, class BReprType, int BExponent>
+fixed_point<AReprType, AExponent>& operator*=( fixed_point<AReprType, AExponent>& lhs, const fixed_point<BReprType, BExponent>& rhs ) noexcept {
+	using wider_repr_type = detail::wider_promote<AReprType>;
+
+	lhs.data() = static_cast<AReprType>( ( static_cast<wider_repr_type>( lhs.data() ) * static_cast<wider_repr_type>( rhs.data() ) ) >> AExponent );
 	return lhs;
 }
 
-template <class ReprType, int Exponent>
-fixed_point<ReprType, Exponent>& operator/=( fixed_point<ReprType, Exponent>& lhs, const fixed_point<ReprType, Exponent>& rhs ) noexcept {
-	typedef fixed_point<wider_promote<ReprType>, Exponent << 1> div_promote;
-	lhs.data() = static_cast< ReprType >( div_promote( lhs ).data() / rhs.data() );
+template <class AReprType, int AExponent, class BReprType, int BExponent>
+fixed_point<AReprType, AExponent>& operator/=( fixed_point<AReprType, AExponent>& lhs, const fixed_point<BReprType, BExponent>& rhs ) noexcept {
+	using div_promote = fixed_point<detail::wider_promote<AReprType>, AExponent * 2>;
+
+	lhs.data() = static_cast<AReprType>( div_promote( lhs ).data() / rhs.data() );
 	return lhs;
 }
 
@@ -227,16 +240,17 @@ constexpr auto operator-( const Lhs& lhs, const fixed_point<RReprType, RExponent
 
 template <class AReprType, int AExponent, class BReprType, int BExponent>
 constexpr auto operator*( fixed_point<AReprType, AExponent> a, fixed_point<BReprType, BExponent> b ) -> fixed_promote<decltype( a ), decltype( b )> {
-	typedef fixed_promote<decltype( a ), decltype( b )> fixed_promoted;
-	typedef fixed_promote<fixed_point<wider_promote<AReprType>, AExponent>, fixed_point<wider_promote<BReprType>, BExponent>> mul_promoted;
-	return fixed_promoted::from_data( ( mul_promoted( a ).data() * mul_promoted( b ).data() ) / ( 1 << mul_promoted::exponent ) );
+	using fixed_promoted = fixed_promote<decltype( a ), decltype( b )>;
+	using mul_promoted = fixed_promote<fixed_point<detail::wider_promote<AReprType>, AExponent>, fixed_point<detail::wider_promote<BReprType>, BExponent>>;
+
+	return fixed_promoted::from_data( ( mul_promoted( a ).data() * mul_promoted( b ).data() ) / ( 1ULL << mul_promoted::exponent ) );
 }
 
 template <class AReprType, int AExponent, class BReprType, int BExponent>
 constexpr auto operator/( fixed_point<AReprType, AExponent> a, fixed_point<BReprType, BExponent> b ) -> fixed_promote<decltype( a ), decltype( b )> {
-	typedef fixed_promote<decltype( a ), decltype( b )> fixed_promoted;
-	typedef wider_promote<typename fixed_promoted::repr_type> wider_repr_type;
-	typedef fixed_point<wider_repr_type, fixed_promoted::exponent << 1> div_promote;
+	using fixed_promoted = fixed_promote<decltype( a ), decltype( b )>;
+	using div_promote = fixed_point<detail::wider_promote<typename fixed_promoted::repr_type>, fixed_promoted::exponent << 1>;
+
 	return fixed_promoted::from_data( div_promote( a ).data() / fixed_promoted( b ).data() );
 }
 
@@ -247,7 +261,9 @@ constexpr auto operator*( const fixed_point<LhsReprType, LhsExponent>& lhs, cons
 
 template <class LhsReprType, int LhsExponent, class Integer, typename = typename std::enable_if<std::is_integral<Integer>::value>::type>
 constexpr auto operator/( const fixed_point<LhsReprType, LhsExponent>& lhs, const Integer& rhs ) noexcept {
-	return fixed_point<LhsReprType, LhsExponent>::from_data( lhs.data() / rhs );
+	using fixed_type = fixed_point<LhsReprType, LhsExponent>;
+
+	return fixed_type::from_data( lhs.data() / rhs );
 }
 
 template <class Integer, class RhsReprType, int RhsExponent, typename = typename std::enable_if<std::is_integral<Integer>::value>::type>
@@ -257,7 +273,10 @@ constexpr auto operator*( const Integer& lhs, const fixed_point<RhsReprType, Rhs
 
 template <class Integer, class RhsReprType, int RhsExponent, typename = typename std::enable_if<std::is_integral<Integer>::value>::type>
 constexpr auto operator/( const Integer& lhs, const fixed_point<RhsReprType, RhsExponent>& rhs ) noexcept {
-	return fixed_point<RhsReprType, RhsExponent>::from_data( lhs / rhs.data() );
+	using fixed_type = fixed_point<RhsReprType, RhsExponent>;
+	using wider_type = fixed_point<detail::wider_promote<typename fixed_type::repr_type>, RhsExponent * 2>;
+
+	return fixed_type::from_data( wider_type( lhs ).data() / rhs.data() );
 }
 
 template <class LhsReprType, int Exponent, class Rhs>

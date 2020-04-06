@@ -13,7 +13,7 @@ class memmap {
 	static_assert( sizeof( Type ) <= 8, "Type is too big." );
 public:
 	using type = Type;
-	static const auto address = Address;
+	static constexpr auto address = Address;
 };
 
 // Read only memory mapped
