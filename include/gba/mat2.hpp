@@ -201,17 +201,17 @@ constexpr auto operator *( const mat2<AT>& m1, const mat2<BT>& m2 ) noexcept {
 
 template <typename OType, typename S>
 constexpr auto operator /( const mat2<OType>& m, S s ) noexcept {
-	return mat2<OType>( m.ab / s, m.cd / s, m.xy / s );
+	return mat2<OType>( m.ab / s, m.cd / s );
 }
 
 template <typename S, typename OType>
 constexpr auto operator /( S s, const mat2<OType>& m ) noexcept {
-	return mat2<OType>( s / m.ab, s / m.cd, s / m.xy );
+	return mat2<OType>( s / m.ab, s / m.cd );
 }
 
 template <typename AT, typename BT>
 constexpr auto operator ==( const mat2<AT>& m1, const mat2<BT>& m2 ) noexcept {
-	return m1.ab == m2.ab && m1.cd == m2.cd && m1.xy == m2.xy;
+	return m1.ab == m2.ab && m1.cd == m2.cd;
 }
 
 template <typename AT, typename BT>

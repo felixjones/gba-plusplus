@@ -6,6 +6,7 @@
 
 #include <gba/int.hpp>
 #include <gba/fixed_point.hpp>
+#include <gba/type_promotion.hpp>
 
 namespace gba {
 namespace math {
@@ -70,7 +71,7 @@ namespace detail {
 		return fixed_point<int, 12>::from_data( x * ( 0x18000 - ( ( x * x ) >> 11 ) ) >> 17 );
 	}
 
-	template <class ReprType, int Exponent>
+	template <typename ReprType, unsigned Exponent>
 	constexpr int16 radian_to_bam16( const fixed_point<ReprType, Exponent>& radian ) noexcept {
 		constexpr auto radTo16 = make_ufixed<13, 19>( 16384.0 / 3.14159265358979323846264338327950288 );
 		return static_cast<int16>( radian * radTo16 );
@@ -85,19 +86,19 @@ constexpr auto sqrt( T x ) noexcept -> typename std::enable_if<std::is_floating_
 
 template <class T>
 constexpr auto sqrt( T x ) noexcept -> typename std::enable_if<std::is_integral<T>::value && !std::is_same<bool, T>::value, T>::type {
-	using wider_type = typename std::make_signed<gba::detail::wider_promote<T>>::type;
+	using wider_type = typename std::make_signed<promote::make_wider<T>>::type;
 
 	const auto result = detail::sqrt_solve1( wider_type( x ) << ( sizeof( T ) * 8 ) );
 	return static_cast<T>( result ) >> ( sizeof( T ) * 4 );
 }
 
-template <class ReprType, int Exponent>
+template <typename ReprType, unsigned Exponent>
 constexpr auto sqrt( const fixed_point<ReprType, Exponent>& x ) noexcept {
-	using widened_type = fixed_point<gba::detail::wider_promote<ReprType>, Exponent * 2>;
+	using widened_type = fixed_point<promote::make_wider<ReprType>, Exponent * 2>;
 	return fixed_point<ReprType, Exponent>::from_data( static_cast<ReprType>( detail::sqrt_solve1( widened_type( x ).data() ) ) );
 }
 
-template <class ReprType, int Exponent>
+template <typename ReprType, unsigned Exponent>
 constexpr auto sin( const fixed_point<ReprType, Exponent>& radian ) noexcept {
 	return detail::sin_bam16( detail::radian_to_bam16( radian ) );
 }
@@ -107,7 +108,7 @@ constexpr auto sin( const S radian ) noexcept {
 	return detail::sin_bam16( detail::radian_to_bam16( make_ufixed<13, 19>( radian ) ) );
 }
 
-template <class ReprType, int Exponent>
+template <typename ReprType, unsigned Exponent>
 constexpr auto cos( const fixed_point<ReprType, Exponent>& radian ) noexcept {
 	return detail::sin_bam16( detail::radian_to_bam16( radian ) + 0x2000 );
 }
@@ -117,7 +118,7 @@ constexpr auto cos( const S radian ) noexcept {
 	return detail::sin_bam16( detail::radian_to_bam16( make_ufixed<13, 19>( radian ) ) + 0x2000 );
 }
 
-template <class AT, class BT, class ReprType, int Exponent>
+template <class AT, class BT, typename ReprType, unsigned Exponent>
 constexpr auto mix( const AT& a, const BT& b, const fixed_point<ReprType, Exponent>& scale ) noexcept {
 	return a * ( fixed_point<ReprType, Exponent>( 1 ) - scale ) + b * scale;
 }

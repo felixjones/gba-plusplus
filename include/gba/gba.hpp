@@ -23,6 +23,7 @@
 #include <gba/memmap.hpp>
 #include <gba/mosaic.hpp>
 #include <gba/tile.hpp>
+#include <gba/type_promotion.hpp>
 #include <gba/vec2.hpp>
 #include <gba/vec3.hpp>
 #include <gba/window.hpp>
