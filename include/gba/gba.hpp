@@ -22,6 +22,7 @@
 #include <gba/math.hpp>
 #include <gba/memmap.hpp>
 #include <gba/mosaic.hpp>
+#include <gba/printstream.hpp>
 #include <gba/tile.hpp>
 #include <gba/type_promotion.hpp>
 #include <gba/vec2.hpp>

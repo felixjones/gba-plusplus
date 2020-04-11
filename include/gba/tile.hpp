@@ -5,7 +5,7 @@
 
 namespace gba {
 
-struct [[gnu::packed]] tile_attribute {
+struct tile_attribute {
 	uint16	tile_id : 10;
 	bool	h_flip : 1,
 			v_flip : 1;
