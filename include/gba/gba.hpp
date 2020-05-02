@@ -24,6 +24,7 @@
 #include <gba/mosaic.hpp>
 #include <gba/printstream.hpp>
 #include <gba/tile.hpp>
+#include <gba/timer_control.hpp>
 #include <gba/type_promotion.hpp>
 #include <gba/vec2.hpp>
 #include <gba/vec3.hpp>
@@ -89,6 +90,22 @@ namespace io {
 	using interrupt_master_enable = iomemmap<gba::bool32, 0x04000208>;
 	using interrupt_mask_enable = iomemmap<gba::interrupt, 0x04000200>;
 	using interrupt_flags = iomemmap<gba::interrupt, 0x04000202>;
+
+	using timer0_start = omemmap<uint16, 0x04000100>;
+	using timer0_counter = imemmap<uint16, 0x04000100>;
+	using timer0_control = iomemmap<timer_control, 0x04000102>;
+
+	using timer1_start = omemmap<uint16, 0x04000104>;
+	using timer1_counter = imemmap<uint16, 0x04000104>;
+	using timer1_control = iomemmap<timer_control, 0x04000106>;
+
+	using timer2_start = omemmap<uint16, 0x04000108>;
+	using timer2_counter = imemmap<uint16, 0x04000108>;
+	using timer2_control = iomemmap<timer_control, 0x0400010A>;
+
+	using timer3_start = omemmap<uint16, 0x0400010C>;
+	using timer3_counter = imemmap<uint16, 0x0400010C>;
+	using timer3_control = iomemmap<timer_control, 0x0400010E>;
 } // io
 
 namespace undocumented {

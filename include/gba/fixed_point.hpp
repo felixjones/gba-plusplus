@@ -351,7 +351,6 @@ constexpr auto operator *( FloatType a, const fixed_point<ReprType, ExpBits>& b 
 
 // div operators
 
-
 template <typename LhsReprType, unsigned LhsExpBits, typename RhsReprType, unsigned RhsExpBits>
 constexpr auto operator /( const fixed_point<LhsReprType, LhsExpBits>& a, const fixed_point<RhsReprType, RhsExpBits>& b ) noexcept {
 	using lhs_type = fixed_point<LhsReprType, LhsExpBits>;

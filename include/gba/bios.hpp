@@ -98,14 +98,14 @@ inline auto sqrt( T x ) noexcept -> typename std::enable_if<std::is_integral<T>:
 #endif
 }
 
-template <class ReprType, int Exponent>
-auto sqrt( const fixed_point<ReprType, Exponent>& x ) noexcept {
-	using exp_even_type = fixed_point<uint32, Exponent - ( Exponent % 2 )>;
+template <typename ReprType, unsigned ExpBits>
+auto sqrt( const fixed_point<ReprType, ExpBits>& x ) noexcept {
+	using exp_even_type = fixed_point<uint32, ExpBits - ( ExpBits % 2 )>;
 	using exp_half_type = fixed_point<uint32, exp_even_type::exponent / 2>;
 
 	const auto resultData = sqrt( exp_even_type( x ).data() );
 	const auto resultFixed = exp_half_type::from_data( resultData );
-	return fixed_point<ReprType, Exponent>( resultFixed );
+	return fixed_point<ReprType, ExpBits>( resultFixed );
 }
 
 } // bios
