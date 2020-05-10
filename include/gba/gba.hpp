@@ -22,6 +22,7 @@
 #include <gba/math.hpp>
 #include <gba/memmap.hpp>
 #include <gba/mosaic.hpp>
+#include <gba/oam.hpp>
 #include <gba/printstream.hpp>
 #include <gba/tile.hpp>
 #include <gba/timer_control.hpp>

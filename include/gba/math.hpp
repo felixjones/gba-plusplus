@@ -123,6 +123,13 @@ constexpr auto mix( const AT& a, const BT& b, const fixed_point<ReprType, Expone
 	return a * ( fixed_point<ReprType, Exponent>( 1 ) - scale ) + b * scale;
 }
 
+template <typename ReprType, unsigned Exponent>
+constexpr auto abs( const fixed_point<ReprType, Exponent>& x ) noexcept -> typename std::enable_if<std::is_signed<ReprType>::value, fixed_point<typename std::make_unsigned<ReprType>::type, Exponent>>::type {
+	using fixed_type = fixed_point<typename std::make_unsigned<ReprType>::type, Exponent>;
+
+	return fixed_type::from_data( x.data() < 0 ? -x.data() : x.data() );
+}
+
 } // math
 } // gba
 

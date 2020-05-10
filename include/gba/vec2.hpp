@@ -20,6 +20,14 @@ struct vec2 {
 	value_type	x;
 	value_type	y;
 
+	template <typename V>
+	static constexpr vec2<Type> reciprocal( const vec2<V>& v ) noexcept {
+		return vec2<Type>(
+			V::reciprocal( v.x ),
+			V::reciprocal( v.y )
+		);
+	}
+
 	constexpr vec2() noexcept : x {}, y {} {}
 
 	template <typename OType>

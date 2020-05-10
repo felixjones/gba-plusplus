@@ -18,6 +18,25 @@ struct mat2 {
 	vec2<Type>	ab;
 	vec2<Type>	cd;
 
+	template <typename M>
+	static constexpr mat2<Type> reciprocal( const mat2<M>& m ) noexcept {
+		return mat2<Type>(
+			vec2<M>::reciprocal( m.ab ),
+			vec2<M>::reciprocal( m.cd )
+		);
+	}
+
+	template <typename R>
+	static constexpr mat2<Type> rotate( const R radian ) noexcept {
+		const auto c = math::cos( radian );
+		const auto s = math::sin( radian );
+
+		return mat2<Type>(
+			c, -s,
+			s, c
+		);
+	}
+
 	constexpr mat2() noexcept : ab( { 1, 0 } ), cd( { 0, 1 } ) {}
 
 	template <typename M>

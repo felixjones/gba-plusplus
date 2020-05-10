@@ -6,6 +6,7 @@
 
 #include <gba/fixed_point.hpp>
 #include <gba/int.hpp>
+#include <gba/int_type.hpp>
 
 namespace gba {
 namespace bios {
@@ -107,6 +108,202 @@ auto sqrt( const fixed_point<ReprType, ExpBits>& x ) noexcept {
 	const auto resultFixed = exp_half_type::from_data( resultData );
 	return fixed_point<ReprType, ExpBits>( resultFixed );
 }
+
+
+
+
+
+
+namespace detail {
+
+	struct length_mode {
+		uint32	word_count : 21,
+				: 3,
+				fixed_source_address : 1,
+				: 1,
+				datasize : 1;
+	};
+
+	template <typename Source, typename Dest>
+	[[gnu::naked]]
+	void cpu_fast_set( const Source * src, Dest * dst, length_mode lengthMode ) {
+#if defined( __thumb__ )
+		__asm__ volatile (
+			"swi %0\n\t" 
+			"bx lr\n\t"
+				: : "g"( 0xC )
+		);
+#else
+		__asm__ volatile (
+			"swi %0 << 16\n\t" 
+			"bx lr\n\t"
+				: : "g"( 0xC )
+		);
+#endif
+	}
+
+	template <typename Source>
+	[[gnu::naked]]
+	void cpu_fast_set( const Source * src, uintptr dst, length_mode lengthMode ) {
+#if defined( __thumb__ )
+		__asm__ volatile (
+			"swi %0\n\t" 
+			"bx lr\n\t"
+				: : "g"( 0xC )
+		);
+#else
+		__asm__ volatile (
+			"swi %0 << 16\n\t" 
+			"bx lr\n\t"
+				: : "g"( 0xC )
+		);
+#endif
+	}
+
+	template <typename Source, typename Dest>
+	[[gnu::naked]]
+	void cpu_set( const Source * src, Dest * dst, length_mode lengthMode ) {
+#if defined( __thumb__ )
+		__asm__ volatile (
+			"swi %0\n\t" 
+			"bx lr\n\t"
+				: : "g"( 0xB )
+		);
+#else
+		__asm__ volatile (
+			"swi %0 << 16\n\t" 
+			"bx lr\n\t"
+				: : "g"( 0xB )
+		);
+#endif
+	}
+
+	template <typename Source>
+	[[gnu::naked]]
+	void cpu_set( const Source * src, uintptr dst, length_mode lengthMode ) {
+#if defined( __thumb__ )
+		__asm__ volatile (
+			"swi %0\n\t" 
+			"bx lr\n\t"
+				: : "g"( 0xB )
+		);
+#else
+		__asm__ volatile (
+			"swi %0 << 16\n\t" 
+			"bx lr\n\t"
+				: : "g"( 0xB )
+		);
+#endif
+	}
+
+	class cpu_set_shared {
+	public:
+		constexpr cpu_set_shared( const length_mode& setting ) noexcept : m_setting( setting ) {}
+
+		template <typename Source, typename Dest>
+		auto& invoke( const Source * src, Dest * dst ) const noexcept {
+			cpu_set( src, dst, m_setting );
+			return *this;
+		}
+
+		template <typename Source>
+		auto& invoke( const Source * src, uintptr dst ) const noexcept {
+			cpu_set( src, dst, m_setting );
+			return *this;
+		}
+
+		template <typename Source, typename Dest>
+		void operator()( const Source * src, Dest * dst ) const noexcept {
+			invoke( src, dst );
+		}
+
+		template <typename Source>
+		void operator()( const Source * src, uintptr dst ) const noexcept {
+			invoke( src, dst );
+		}
+
+	protected:
+		const length_mode	m_setting;
+
+	};
+
+} // detail
+
+class cpu_copy16 : public detail::cpu_set_shared {
+public:
+	constexpr cpu_copy16( uint32 wordcount ) noexcept : detail::cpu_set_shared( { wordcount, false, false } ) {}
+};
+
+class cpu_copy32 : public detail::cpu_set_shared {
+public:
+	constexpr cpu_copy32( uint32 wordcount ) noexcept : detail::cpu_set_shared( { wordcount, false, true } ) {}
+};
+
+class cpu_copy32x8 : public detail::cpu_set_shared {
+public:
+	constexpr cpu_copy32x8( uint32 wordcount ) noexcept : detail::cpu_set_shared( { wordcount, false, true } ) {}
+
+	template <typename Source, typename Dest>
+	auto& invoke( const Source * src, Dest * dst ) const noexcept {
+		detail::cpu_fast_set( src, dst, m_setting );
+		return *this;
+	}
+
+	template <typename Source>
+	auto& invoke( const Source * src, uintptr dst ) const noexcept {
+		detail::cpu_fast_set( src, dst, m_setting );
+		return *this;
+	}
+
+	template <typename Source, typename Dest>
+	void operator()( const Source * src, Dest * dst ) const noexcept {
+		invoke( src, dst );
+	}
+
+	template <typename Source>
+	void operator()( const Source * src, uintptr dst ) const noexcept {
+		invoke( src, dst );
+	}
+
+};
+
+class cpu_set16 : public detail::cpu_set_shared {
+public:
+	constexpr cpu_set16( uint32 wordcount ) noexcept : detail::cpu_set_shared( { wordcount, true, false } ) {}
+};
+
+class cpu_set32 : public detail::cpu_set_shared {
+public:
+	constexpr cpu_set32( uint32 wordcount ) noexcept : detail::cpu_set_shared( { wordcount, true, true } ) {}
+};
+
+class cpu_set32x8 : public detail::cpu_set_shared {
+public:
+	constexpr cpu_set32x8( uint32 wordcount ) noexcept : detail::cpu_set_shared( { wordcount, true, true } ) {}
+
+	template <typename Source, typename Dest>
+	auto& invoke( const Source * src, Dest * dst ) const noexcept {
+		detail::cpu_fast_set( src, dst, m_setting );
+		return *this;
+	}
+
+	template <typename Source>
+	auto& invoke( const Source * src, uintptr dst ) const noexcept {
+		detail::cpu_fast_set( src, dst, m_setting );
+		return *this;
+	}
+
+	template <typename Source, typename Dest>
+	void operator()( const Source * src, Dest * dst ) const noexcept {
+		invoke( src, dst );
+	}
+
+	template <typename Source>
+	void operator()( const Source * src, uintptr dst ) const noexcept {
+		invoke( src, dst );
+	}
+
+};
 
 } // bios
 } // gba

@@ -21,6 +21,16 @@ struct mat4x3 {
 	vec3<Type>	ghi;
 	vec3<Type>	xyz;
 
+	template <typename L = Type, typename R = Type, typename B = Type, typename T = Type>
+	static constexpr auto ortho( L left, R right, B bottom, T top ) {
+		return mat4x3(
+			static_cast<value_type>( 2 ) / ( right - left ), 0, 0,
+			0, static_cast<value_type>( 2 ) / ( top - bottom ), 0,
+			0, 0, -static_cast<value_type>( 1 ),
+			-static_cast<value_type>( ( right + left ) / ( right - left ) ), -static_cast<value_type>( ( top + bottom ) / ( top - bottom ) ), 0
+		);
+	}
+
 	template <typename E = Type, typename C = Type, typename U = Type>
 	static constexpr auto lookAt( const vec3<E>& eye, const vec3<C>& center, const vec3<U>& up ) noexcept {
 		const auto f = math::normalize( center - eye );
@@ -32,6 +42,45 @@ struct mat4x3 {
 			s.y, u.y, f.y,
 			s.z, u.z, f.z,
 			eye.x, eye.y, eye.z
+		);
+	}
+
+	template <typename R>
+	static constexpr mat4x3<Type> rotateX( const R radian ) noexcept {
+		const auto c = math::cos( radian );
+		const auto s = math::sin( radian );
+
+		return mat4x3<Type>(
+			1, 0, 0,
+			0, c, -s,
+			0, s, c,
+			0, 0, 0
+		);
+	}
+
+	template <typename R>
+	static constexpr mat4x3<Type> rotateY( const R radian ) noexcept {
+		const auto c = math::cos( radian );
+		const auto s = math::sin( radian );
+
+		return mat4x3<Type>(
+			c, 0, s,
+			0, 1, 0,
+			-s, 0, c,
+			0, 0, 0
+		);
+	}
+
+	template <typename R>
+	static constexpr mat4x3<Type> rotateZ( const R radian ) noexcept {
+		const auto c = math::cos( radian );
+		const auto s = math::sin( radian );
+
+		return mat4x3<Type>(
+			c, -s, 0,
+			s, c, 0,
+			0, 0, 1,
+			0, 0, 0
 		);
 	}
 
@@ -75,6 +124,21 @@ struct mat4x3 {
 			m.abc * ghi.x + m.def * ghi.y + m.ghi * ghi.z,
 			m.xyz
 		);
+	}
+
+	template <typename V>
+	static constexpr mat4x3<Type> translate( const vec3<V>& vector ) noexcept {
+		return mat4x3<Type>(
+			vec3<Type> { 1, 0, 0 },
+			vec3<Type> { 0, 1, 0 },
+			vec3<Type> { 0, 0, 1 },
+			vector
+		);
+	}
+
+	template <typename M, typename V>
+	static constexpr mat4x3<Type> translate( const mat4x3<M>& m, const vec3<V>& vector ) noexcept {
+		return translate( vector ) * m;
 	}
 
 	constexpr mat4x3() noexcept : 
@@ -284,9 +348,9 @@ constexpr auto operator *( S s, const mat4x3<OType>& m ) noexcept {
 template <typename OType, typename VType>
 constexpr auto operator *( const mat4x3<OType>& m, const vec3<VType>& v ) noexcept {
 	return vec3<VType>(
-		m.abc.x * v.x + m.def.x * v.y + m.ghi.x * v.z,
-		m.abc.y * v.x + m.def.y * v.y + m.ghi.y * v.z,
-		m.abc.z * v.x + m.def.z * v.y + m.ghi.z * v.z);
+		m.abc.x * v.x + m.def.x * v.y + m.ghi.x * v.z + m.xyz.x,
+		m.abc.y * v.x + m.def.y * v.y + m.ghi.y * v.z + m.xyz.y,
+		m.abc.z * v.x + m.def.z * v.y + m.ghi.z * v.z + m.xyz.z);
 }
 
 template <typename OType, typename VType>

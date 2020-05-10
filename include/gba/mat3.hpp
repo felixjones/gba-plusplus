@@ -19,6 +19,42 @@ struct mat3 {
 	vec3<Type>	def;
 	vec3<Type>	ghi;
 
+	template <typename R>
+	static constexpr mat3<Type> rotateX( const R radian ) noexcept {
+		const auto c = math::cos( radian );
+		const auto s = math::sin( radian );
+
+		return mat3<Type>(
+			1, 0, 0,
+			0, c, s,
+			0, -s, c
+		);
+	}
+
+	template <typename R>
+	static constexpr mat3<Type> rotateY( const R radian ) noexcept {
+		const auto c = math::cos( radian );
+		const auto s = math::sin( radian );
+
+		return mat3<Type>(
+			c, 0, -s,
+			0, 1, 0,
+			s, 0, c
+		);
+	}
+
+	template <typename R>
+	static constexpr mat3<Type> rotateZ( const R radian ) noexcept {
+		const auto c = math::cos( radian );
+		const auto s = math::sin( radian );
+
+		return mat3<Type>(
+			c, -s, 0,
+			s, c, 0,
+			0, 0, 1
+		);
+	}
+
 	constexpr mat3() noexcept : abc( { 1, 0, 0 } ), def( { 0, 1, 0 } ), ghi( { 0, 0, 1 } ) {}
 
 	template <typename M>
