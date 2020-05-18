@@ -18,7 +18,7 @@
 #include <gba/keypad.hpp>
 #include <gba/mat2.hpp>
 #include <gba/mat3.hpp>
-#include <gba/mat4x3.hpp>
+#include <gba/mat4.hpp>
 #include <gba/math.hpp>
 #include <gba/memmap.hpp>
 #include <gba/mosaic.hpp>
@@ -29,6 +29,7 @@
 #include <gba/type_promotion.hpp>
 #include <gba/vec2.hpp>
 #include <gba/vec3.hpp>
+#include <gba/vec4.hpp>
 #include <gba/window.hpp>
 
 namespace gba {

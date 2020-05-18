@@ -21,7 +21,30 @@ struct mat4x3 {
 	vec3<Type>	ghi;
 	vec3<Type>	xyz;
 
-	template <typename L = Type, typename R = Type, typename B = Type, typename T = Type>
+	/*
+	vec<4, T, Q> tmp = vec<4, T, Q>(obj, static_cast<T>(1));
+		tmp = model * tmp;
+		tmp = proj * tmp;
+
+		tmp /= tmp.w;
+		tmp.x = tmp.x * static_cast<T>(0.5) + static_cast<T>(0.5);
+		tmp.y = tmp.y * static_cast<T>(0.5) + static_cast<T>(0.5);
+
+		tmp[0] = tmp[0] * T(viewport[2]) + T(viewport[0]);
+		tmp[1] = tmp[1] * T(viewport[3]) + T(viewport[1]);
+
+		return vec<3, T, Q>(tmp);
+		*/
+
+	template <typename VType, typename MType, typename PType, typename L, typename R, typename B, typename T>
+	static constexpr auto project( const vec3<VType>& obj, const mat4x3<MType>& model, const mat4x3<PType>& proj, L left, R right, B bottom, T top ) {
+		auto tmp = model * obj;
+		tmp = proj * tmp;
+
+		tmp /= 
+	}
+
+	template <typename L, typename R, typename B, typename T>
 	static constexpr auto ortho( L left, R right, B bottom, T top ) {
 		return mat4x3(
 			static_cast<value_type>( 2 ) / ( right - left ), 0, 0,
@@ -38,9 +61,9 @@ struct mat4x3 {
 		const auto u = math::cross( f, s );
 
 		return mat4x3<Type>(
-			s.x, u.x, f.x,
-			s.y, u.y, f.y,
-			s.z, u.z, f.z,
+			s.x, s.y, s.z,
+			u.x, u.y, u.z,
+			f.x, f.y, f.z,
 			eye.x, eye.y, eye.z
 		);
 	}

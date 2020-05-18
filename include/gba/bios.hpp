@@ -109,17 +109,12 @@ auto sqrt( const fixed_point<ReprType, ExpBits>& x ) noexcept {
 	return fixed_point<ReprType, ExpBits>( resultFixed );
 }
 
-
-
-
-
-
 namespace detail {
 
 	struct length_mode {
 		uint32	word_count : 21,
-				: 3,
-				fixed_source_address : 1,
+				: 3;
+		bool	fixed_source_address : 1,
 				: 1,
 				datasize : 1;
 	};
@@ -213,17 +208,45 @@ namespace detail {
 		}
 
 		template <typename Source, typename Dest>
-		void operator()( const Source * src, Dest * dst ) const noexcept {
-			invoke( src, dst );
+		auto& operator()( const Source * src, Dest * dst ) const noexcept {
+			return invoke( src, dst );
 		}
 
 		template <typename Source>
-		void operator()( const Source * src, uintptr dst ) const noexcept {
-			invoke( src, dst );
+		auto& operator()( const Source * src, uintptr dst ) const noexcept {
+			return invoke( src, dst );
 		}
 
 	protected:
 		const length_mode	m_setting;
+
+	};
+
+	class cpu_fast_set_shared : public detail::cpu_set_shared {
+	public:
+		constexpr cpu_fast_set_shared( const length_mode& setting ) noexcept : cpu_set_shared( setting ) {}
+
+		template <typename Source, typename Dest>
+		auto& invoke( const Source * src, Dest * dst ) const noexcept {
+			detail::cpu_fast_set( src, dst, m_setting );
+			return *this;
+		}
+
+		template <typename Source>
+		auto& invoke( const Source * src, uintptr dst ) const noexcept {
+			detail::cpu_fast_set( src, dst, m_setting );
+			return *this;
+		}
+
+		template <typename Source, typename Dest>
+		auto& operator()( const Source * src, Dest * dst ) const noexcept {
+			return invoke( src, dst );
+		}
+
+		template <typename Source>
+		auto& operator()( const Source * src, uintptr dst ) const noexcept {
+			return invoke( src, dst );
+		}
 
 	};
 
@@ -239,32 +262,9 @@ public:
 	constexpr cpu_copy32( uint32 wordcount ) noexcept : detail::cpu_set_shared( { wordcount, false, true } ) {}
 };
 
-class cpu_copy32x8 : public detail::cpu_set_shared {
+class cpu_copy32x8 : public detail::cpu_fast_set_shared {
 public:
-	constexpr cpu_copy32x8( uint32 wordcount ) noexcept : detail::cpu_set_shared( { wordcount, false, true } ) {}
-
-	template <typename Source, typename Dest>
-	auto& invoke( const Source * src, Dest * dst ) const noexcept {
-		detail::cpu_fast_set( src, dst, m_setting );
-		return *this;
-	}
-
-	template <typename Source>
-	auto& invoke( const Source * src, uintptr dst ) const noexcept {
-		detail::cpu_fast_set( src, dst, m_setting );
-		return *this;
-	}
-
-	template <typename Source, typename Dest>
-	void operator()( const Source * src, Dest * dst ) const noexcept {
-		invoke( src, dst );
-	}
-
-	template <typename Source>
-	void operator()( const Source * src, uintptr dst ) const noexcept {
-		invoke( src, dst );
-	}
-
+	constexpr cpu_copy32x8( uint32 wordcount ) noexcept : detail::cpu_fast_set_shared( { wordcount, false, true } ) {}
 };
 
 class cpu_set16 : public detail::cpu_set_shared {
@@ -277,32 +277,9 @@ public:
 	constexpr cpu_set32( uint32 wordcount ) noexcept : detail::cpu_set_shared( { wordcount, true, true } ) {}
 };
 
-class cpu_set32x8 : public detail::cpu_set_shared {
+class cpu_set32x8 : public detail::cpu_fast_set_shared {
 public:
-	constexpr cpu_set32x8( uint32 wordcount ) noexcept : detail::cpu_set_shared( { wordcount, true, true } ) {}
-
-	template <typename Source, typename Dest>
-	auto& invoke( const Source * src, Dest * dst ) const noexcept {
-		detail::cpu_fast_set( src, dst, m_setting );
-		return *this;
-	}
-
-	template <typename Source>
-	auto& invoke( const Source * src, uintptr dst ) const noexcept {
-		detail::cpu_fast_set( src, dst, m_setting );
-		return *this;
-	}
-
-	template <typename Source, typename Dest>
-	void operator()( const Source * src, Dest * dst ) const noexcept {
-		invoke( src, dst );
-	}
-
-	template <typename Source>
-	void operator()( const Source * src, uintptr dst ) const noexcept {
-		invoke( src, dst );
-	}
-
+	constexpr cpu_set32x8( uint32 wordcount ) noexcept : detail::cpu_fast_set_shared( { wordcount, true, true } ) {}
 };
 
 } // bios

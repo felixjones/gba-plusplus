@@ -68,7 +68,7 @@ namespace detail {
 			x = ( 1 << 31 ) - x;
 		}
 		x = x >> 17;
-		return fixed_point<int, 12>::from_data( x * ( 0x18000 - ( ( x * x ) >> 11 ) ) >> 17 );
+		return fixed_point<int32, 12>::from_data( x * ( 0x18000 - ( ( x * x ) >> 11 ) ) >> 17 );
 	}
 
 	template <typename ReprType, unsigned Exponent>
@@ -103,7 +103,7 @@ constexpr auto sin( const fixed_point<ReprType, Exponent>& radian ) noexcept {
 	return detail::sin_bam16( detail::radian_to_bam16( radian ) );
 }
 
-template <class S, typename std::enable_if<std::is_floating_point<S>::value, int>::type Dummy = 0>
+template <class S, typename std::enable_if<std::is_arithmetic<S>::value, int>::type Dummy = 0>
 constexpr auto sin( const S radian ) noexcept {
 	return detail::sin_bam16( detail::radian_to_bam16( make_ufixed<13, 19>( radian ) ) );
 }
@@ -113,7 +113,7 @@ constexpr auto cos( const fixed_point<ReprType, Exponent>& radian ) noexcept {
 	return detail::sin_bam16( detail::radian_to_bam16( radian ) + 0x2000 );
 }
 
-template <class S, typename std::enable_if<std::is_floating_point<S>::value, int>::type Dummy = 0>
+template <class S, typename std::enable_if<std::is_arithmetic<S>::value, int>::type Dummy = 0>
 constexpr auto cos( const S radian ) noexcept {
 	return detail::sin_bam16( detail::radian_to_bam16( make_ufixed<13, 19>( radian ) ) + 0x2000 );
 }

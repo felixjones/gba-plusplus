@@ -54,14 +54,14 @@ protected:
 
 	template <typename RhsReprType, unsigned RhsExpBits>
 	static constexpr auto to_value( const fixed_point<RhsReprType, RhsExpBits>& x ) noexcept -> typename std::enable_if<std::is_signed<RhsReprType>::value && ( RhsExpBits < exponent ), repr_type>::type {
-		constexpr auto mul = static_cast<repr_type>( 1ULL <<  ( exponent - fixed_point<RhsReprType, RhsExpBits>::exponent ) );
+		constexpr auto mul = static_cast<repr_type>( 1ULL << ( exponent - fixed_point<RhsReprType, RhsExpBits>::exponent ) );
 
 		return static_cast<repr_type>( x.data() ) * mul;
 	}
 
 	template <typename RhsReprType, unsigned RhsExpBits>
 	static constexpr auto to_value( const fixed_point<RhsReprType, RhsExpBits>& x ) noexcept -> typename std::enable_if<std::is_signed<RhsReprType>::value && ( RhsExpBits > exponent ), repr_type>::type {
-		constexpr auto div = static_cast<repr_type>( 1ULL <<  ( fixed_point<RhsReprType, RhsExpBits>::exponent - exponent ) );
+		constexpr auto div = static_cast<repr_type>( 1ULL << ( fixed_point<RhsReprType, RhsExpBits>::exponent - exponent ) );
 
 		return static_cast<repr_type>( x.data() / div );
 	}
