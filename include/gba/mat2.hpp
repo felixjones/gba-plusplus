@@ -18,7 +18,7 @@ struct mat2 {
 	vec2<Type>	ab;
 	vec2<Type>	cd;
 
-	template <typename M>
+	template <typename M = Type>
 	static constexpr mat2<Type> reciprocal( const mat2<M>& m ) noexcept {
 		return mat2<Type>(
 			vec2<M>::reciprocal( m.ab ),
@@ -35,6 +35,19 @@ struct mat2 {
 			c, -s,
 			s, c
 		);
+	}
+
+
+	template <typename M = Type>
+	static constexpr auto inverse( const mat2<M>& m ) noexcept {
+		const auto idet = 1 / ( m.ab.x * m.cd.y - m.cd.x * m.ab.y );
+
+		return mat2<M> {
+			m.cd.y * idet,
+			-m.ab.y * idet,
+			-m.cd.x * idet,
+			m.ab.x * idet
+		};
 	}
 
 	constexpr mat2() noexcept : ab( { 1, 0 } ), cd( { 0, 1 } ) {}

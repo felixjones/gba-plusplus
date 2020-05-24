@@ -4,7 +4,7 @@
 namespace gba {
 
 template <class Type>
-constexpr Type make( void( *f )( Type& ) ) {
+constexpr Type make( void( *f )( Type& ) ) noexcept {
 	Type value {};
 	f( value );
 	return value;

@@ -55,6 +55,15 @@ struct mat3 {
 		);
 	}
 
+	template <typename V = Type>
+	static constexpr auto translate( const vec3<V>& vector ) noexcept {
+		return mat3<Type>(
+			1, 0, 0,
+			0, 1, 0,
+			vector.x, vector.y, vector.z
+		);
+	}
+
 	constexpr mat3() noexcept : abc( { 1, 0, 0 } ), def( { 0, 1, 0 } ), ghi( { 0, 0, 1 } ) {}
 
 	template <typename M>
