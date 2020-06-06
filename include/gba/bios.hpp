@@ -6,12 +6,137 @@
 
 #include <gba/fixed_point.hpp>
 #include <gba/int.hpp>
+#include <gba/interrupt.hpp>
 #include <gba/int_type.hpp>
 
 namespace gba {
 namespace bios {
 
-inline void vblank_intr_wait() {
+[[noreturn]]
+inline void soft_reset() noexcept {
+#if defined( __thumb__ )
+	__asm__ volatile (
+		"swi %0\n\t"
+			: : "g"( 0x0 )
+	);
+#else
+	__asm__ volatile (
+		"swi %0 << 16\n\t"
+			: : "g"( 0x0 )
+	);
+#endif
+}
+
+struct reset_flags {
+	bool	ewram : 1,
+			iwram : 1,
+			palette : 1,
+			vram : 1,
+			oam : 1,
+			serial_io : 1,
+			sound : 1,
+			others : 1;
+};
+
+[[gnu::naked]]
+inline void register_ram_reset( reset_flags flags ) noexcept {
+#if defined( __thumb__ )
+	__asm__ volatile (
+		"swi %0\n\t"
+		"bx lr\n\t"
+			: : "g"( 0x1 )
+	);
+#else
+	__asm__ volatile (
+		"swi %0 << 16\n\t"
+		"bx lr\n\t"
+			: : "g"( 0x1 )
+	);
+#endif
+}
+
+namespace undocumented {
+
+	[[noreturn]]
+	inline void hard_reset() noexcept {
+#if defined( __thumb__ )
+		__asm__ volatile (
+			"swi %0\n\t"
+				: : "g"( 0x26 )
+		);
+#else
+		__asm__ volatile (
+			"swi %0 << 16\n\t"
+				: : "g"( 0x26 )
+		);
+#endif
+	}
+
+	[[gnu::naked]]
+	inline uint32 get_bios_checksum() noexcept {
+#if defined( __thumb__ )
+		__asm__ volatile (
+			"swi %0\n\t"
+			"bx lr\n\t"
+				: : "g"( 0x26 ) : "r0"
+		);
+#else
+		__asm__ volatile (
+			"swi %0 << 16\n\t"
+			"bx lr\n\t"
+				: : "g"( 0x26 ) : "r0"
+		);
+#endif
+	}
+
+} // undocumented
+
+inline void halt() noexcept {
+#if defined( __thumb__ )
+	__asm__ volatile (
+		"swi %0\n\t"
+			: : "g"( 0x2 )
+		);
+#else
+	__asm__ volatile (
+		"swi %0 << 16\n\t"
+			: : "g"( 0x2 )
+		);
+#endif
+}
+
+inline void stop() noexcept {
+#if defined( __thumb__ )
+	__asm__ volatile (
+		"swi %0\n\t"
+			: : "g"( 0x3 )
+		);
+#else
+	__asm__ volatile (
+		"swi %0 << 16\n\t"
+			: : "g"( 0x3 )
+		);
+#endif
+}
+
+[[gnu::naked]]
+inline void intr_wait( bool clearFlags, interrupt flags ) noexcept {
+#if defined( __thumb__ )
+	__asm__ volatile (
+		"swi %0\n\t" 
+		"bx lr\n\t"
+			: : "g"( 0xC )
+		);
+#else
+	__asm__ volatile (
+		"swi %0 << 16\n\t" 
+		"bx lr\n\t"
+			: : "g"( 0xC )
+		);
+#endif
+}
+
+inline void vblank_intr_wait() noexcept {
 #if defined( __thumb__ )
 	__asm__ volatile (
 		"swi %0\n\t"
@@ -22,6 +147,20 @@ inline void vblank_intr_wait() {
 		"swi %0 << 16\n\t"
 			: : "g"( 0x5 ) : "r0", "r1"
 	);
+#endif
+}
+
+inline void sleep() noexcept {
+#if defined( __thumb__ )
+	__asm__ volatile (
+		"swi %0\n\t"
+			: : "g"( 0x7 )
+		);
+#else
+	__asm__ volatile (
+		"swi %0 << 16\n\t"
+			: : "g"( 0x7 )
+		);
 #endif
 }
 

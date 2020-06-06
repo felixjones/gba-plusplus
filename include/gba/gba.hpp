@@ -10,6 +10,7 @@
 #include <gba/const.hpp>
 #include <gba/display_control.hpp>
 #include <gba/display_status.hpp>
+#include <gba/dma_control.hpp>
 #include <gba/fixed_point.hpp>
 #include <gba/int.hpp>
 #include <gba/int_type.hpp>
@@ -108,6 +109,27 @@ namespace io {
 	using timer3_start = omemmap<uint16, 0x0400010C>;
 	using timer3_counter = imemmap<uint16, 0x0400010C>;
 	using timer3_control = iomemmap<timer_control, 0x0400010E>;
+
+	using dma0_address_source = omemmap<uintptr, 0x040000B0>;
+	using dma0_address_destination = omemmap<uintptr, 0x040000B4>;
+	using dma0_count = omemmap<uint16, 0x040000B8>;
+	using dma0_control = iomemmap<dma_control, 0x040000BA>;
+
+	using dma1_address_source = omemmap<uintptr, 0x040000BC>;
+	using dma1_address_destination = omemmap<uintptr, 0x040000C0>;
+	using dma1_count = omemmap<uint16, 0x040000C4>;
+	using dma1_control = iomemmap<dma_control, 0x040000C6>;
+
+	using dma2_address_source = omemmap<uintptr, 0x040000C8>;
+	using dma2_address_destination = omemmap<uintptr, 0x040000CC>;
+	using dma2_count = omemmap<uint16, 0x040000D0>;
+	using dma2_control = iomemmap<dma_control, 0x040000D2>;
+
+	using dma3_address_source = omemmap<uintptr, 0x040000D4>;
+	using dma3_address_destination = omemmap<uintptr, 0x040000D8>;
+	using dma3_count = omemmap<uint16, 0x040000DC>;
+	using dma3_control = iomemmap<dma_control, 0x040000DE>;
+
 } // io
 
 namespace undocumented {
