@@ -34,7 +34,8 @@
 #include <gba/window.hpp>
 
 namespace gba {
-namespace io {
+
+struct io {
 	using display_control = iomemmap<gba::display_control, 0x04000000>;
 
 	using display_status = iomemmap<gba::display_status, 0x04000004>;
@@ -130,15 +131,17 @@ namespace io {
 	using dma3_count = omemmap<uint16, 0x040000DC>;
 	using dma3_control = iomemmap<dma_control, 0x040000DE>;
 
-} // io
+};
 
 namespace undocumented {
-namespace io {
+
+struct io {
 	using display_control_green_swap = iomemmap<gba::bool16, 0x04000002>;
 
 	using post_flag = iomemmap<gba::bool8, 0x04000300>;
 	using halt_control = omemmap<gba::bool_type<8, 7>, 0x04000301>;
-} // io
+};
+
 } // undocumented
 } // gba
 
