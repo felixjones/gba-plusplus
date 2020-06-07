@@ -1,12 +1,17 @@
-## gba++
+# gba++
 
-### Modern Header-only C++ library for Game Boy Advance
+Modern Header-only C++ library for Game Boy Advance
 
-## Philosophy
+# Status
 
-Where possible, try to keep some compatibility with [libgba](https://github.com/devkitPro/libgba).
+This library is currently in the design & implementation phase.    
+The first version, `0.0.1`, will be considered ready when we are functionally equivalent to [Tonclib](https://www.coranac.com/man/tonclib/modules.htm).
 
-The user manages memory (no static EWRAM/IWRAM allocations).
+# Philosophy
+
+Where possible, try to keep some compatibility with [libgba](https://github.com/devkitPro/libgba) and [Tonclib](https://www.coranac.com/man/tonclib/main.htm).
+
+The user/toolchain manages memory (no static EWRAM/IWRAM allocations).
 
 Interfaces to memory mapped types do not have state. Direct changes to memory should always be reflected in gba++ types.
 
@@ -14,13 +19,11 @@ Not a game engine.
 
 No "tools". Just code.
 
-STL used only where it makes "perfect" sense.
+STL used where it makes "perfect" sense.
 
 Do as much as possible at compile-time.
 
 Cool things are separate library projects (SRAM, SD file system, RTC time, dynamic libraries, Nitro types). 
-
-Types that reflect GBA hardware (24bit integers, fixed and frac decimals).
 
 Some helpful, optional utilities (VRAM allocators, general allocators, perspective 3D matrices).
 
@@ -30,7 +33,7 @@ Do not stop the user from doing what they explicitly ask (addressing VRAM as Mod
 
 The user decides if a header is compiled as ARM or Thumb.
 
-## Style
+# Style
 
 Pretty much [Boost style](https://github.com/boostorg/geometry/wiki/Guidelines-for-Developers) but without the concern for 80 column IDEs.
 
@@ -38,40 +41,35 @@ Everything is within a `gba::` namespace.
 
 Use gba++ types `gba::int16 gba::uint16` and keep volatile as a separate keyword.
 
-## Sample code
+# Example style
+
+Note: This is not functioning code.
 
 ```C++
 #include <gba/gba.hpp>
 
-#define EVER ;;
-
-typedef gba::color mode3_line[240];
-
-static auto& DISPCNT = gba::io::display::control;
-static auto& mode3_memory = ( mode3_line * )0x6000000;
+using namespace gba;
 
 int main( int argc, char * argv[] ) {
-	DISPCNT.write( gba::display::control { .mode = 3, .background_layer2 = true } );
+	interrupt_handler::set( nullptr ); // empty IRQ handler
+	
+	io::display_status::write( display_status { .emit_vblank = true } );
+	io::interrupt_mask_enable::write( interrupt { .vblank = true } );
+	io::interrupt_master_enable::write( true );
 
-	mode3_memory[80][120] = gba::color { .red = 31, .green =  0, .blue =  0 };
-	mode3_memory[80][136] = gba::color { .red =  0, .green = 31, .blue =  0 };
-	mode3_memory[96][120] = gba::color { .red =  0, .green =  0, .blue = 31 };
-
-	for ( EVER ) {}
+	while ( true ) {
+		const auto keys = key_state( io::key_status::read() );
+		if ( keys.button_a() ) {
+			// Do something
+		}
+		
+		bios::vblank_intr_wait();
+	}
+	
 	return 0;
 }
 ```
 
-## Things to consider
+# What License?
 
-### What License?
-
-Gravitating towards [Apache License 2.0](https://choosealicense.com/licenses/apache-2.0/) but this needs thought.
-
-### Fixed point implementation?
-
-Probably a thousand ways to do various fixed point operations.
-
-GBA hardware should be kept in mind at all times.
-
-Maybe also have a `fixed_fast` type that sacrifices accuracy and checks?
+This is still under consideration. For now, the code is under [WTFPL](http://www.wtfpl.net/) with no intensions on keeping it.
