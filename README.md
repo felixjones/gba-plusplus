@@ -17,7 +17,7 @@ Note: This is not functioning code.
 using namespace gba;
 
 int main( int argc, char * argv[] ) {
-	interrupt_handler::set( nullptr ); // empty IRQ handler
+	interrupt_handler::set( nullptr ); // gba-toolchain empty IRQ handler, can be replaced with libgba/tonclib IRQ
 	
 	io::display_status::write( display_status { .emit_vblank = true } );
 	io::interrupt_mask_enable::write( interrupt { .vblank = true } );
