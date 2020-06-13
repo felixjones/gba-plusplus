@@ -638,7 +638,7 @@ namespace undocumented {
 	/// 0xBAAE187F | 0xBAAE1880
 	/// These values are calculated by summing the BIOS as 4096 32bit integers
 	/// @return uint32 checksum
-	[[gnu::naked]]
+	[[gnu::naked, gnu::pure]]
 	inline uint32 get_bios_checksum() noexcept {
 #if defined( __thumb__ )
 		__asm__ volatile (
