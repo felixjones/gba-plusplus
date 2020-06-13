@@ -130,6 +130,11 @@ constexpr auto abs( const fixed_point<ReprType, Exponent>& x ) noexcept -> typen
 	return fixed_type::from_data( x.data() < 0 ? -x.data() : x.data() );
 }
 
+template <typename ReprType, unsigned Exponent>
+constexpr auto abs( const fixed_point<ReprType, Exponent>& x ) noexcept -> typename std::enable_if<std::is_unsigned<ReprType>::value, fixed_point<ReprType, Exponent>>::type {
+	return x;
+}
+
 } // math
 } // gba
 

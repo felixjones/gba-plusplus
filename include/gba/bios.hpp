@@ -9,6 +9,7 @@
 #include <gba/int.hpp>
 #include <gba/interrupt.hpp>
 #include <gba/int_type.hpp>
+#include <gba/math.hpp>
 
 /// @defgroup bios BIOS
 /// @brief Various functions implemented in the GBA BIOS
@@ -164,7 +165,8 @@ inline void vblank_intr_wait() noexcept {
 /// @param a numerator
 /// @param b denominator
 /// @return std::tuple containing the results of: `a / b`, `a % b` and `std::abs( a / b )`
-inline std::tuple<int32, int32, uint32> div( volatile int32 a, volatile int32 b ) noexcept {
+[[gnu::pure]]
+inline std::tuple<int32, int32, uint32> div( int32 a, int32 b ) noexcept {
 	assert( b != 0 );
 
 	volatile uint32 c;
@@ -199,7 +201,8 @@ inline std::tuple<int32, int32, uint32> div( volatile int32 a, volatile int32 b 
 /// @param a denominator
 /// @param b numerator
 /// @return std::tuple containing the results of: `b / a`, `b % a` and `std::abs( b / a )`
-inline std::tuple<int32, int32, uint32> div_arm( volatile int32 a, volatile int32 b ) noexcept {
+[[gnu::pure]]
+inline std::tuple<int32, int32, uint32> div_arm( int32 a, int32 b ) noexcept {
 	volatile uint32 c;
 
 #if defined( __thumb__ )
@@ -227,26 +230,44 @@ inline std::tuple<int32, int32, uint32> div_arm( volatile int32 a, volatile int3
 	return std::make_tuple( a, b, c );
 }
 
+namespace detail {
+
+	[[gnu::naked, gnu::pure]]
+	inline uint32 sqrt( uint32 x ) noexcept {
+#if defined( __thumb__ )
+		__asm__ volatile (
+			"swi %0\n\t" 
+			"bx lr\n\t"
+				: : "g"( 0x8 ) : "r0"
+		);
+#else
+		__asm__ volatile (
+			"swi %0 << 16\n\t" 
+			"bx lr\n\t"
+				: : "g"( 0x8 ) : "r0"
+		);
+#endif
+	}
+
+} // detail
+
 /// @ingroup bios_math
 /// @brief Returns the integer square root of x
-/// @param x integer
+/// @param x unsigned integer
 /// @return square root of x
 template <class T>
-[[gnu::naked]]
-inline auto sqrt( T x ) noexcept -> typename std::enable_if<std::is_integral<T>::value && !std::is_same<bool, T>::value, T>::type {
-#if defined( __thumb__ )
-	__asm__ volatile (
-		"swi %0\n\t" 
-		"bx lr\n\t"
-			: : "g"( 0x8 ) : "r0"
-	);
-#else
-	__asm__ volatile (
-		"swi %0 << 16\n\t" 
-		"bx lr\n\t"
-			: : "g"( 0x8 ) : "r0"
-	);
-#endif
+inline auto sqrt( T x ) noexcept -> typename std::enable_if<std::is_unsigned<T>::value && std::is_integral<T>::value && !std::is_same<bool, T>::value, T>::type {
+	return detail::sqrt( static_cast<uint32>( x ) );
+}
+
+/// @ingroup bios_math
+/// @brief Returns the integer square root of x
+/// @param x signed integer
+/// @return square root of x or 0 if x < 0
+template <class T>
+inline auto sqrt( T x ) noexcept -> typename std::enable_if<std::is_signed<T>::value && std::is_integral<T>::value && !std::is_same<bool, T>::value, T>::type {
+	if ( x < 0 ) return 0;
+	return detail::sqrt( static_cast<uint32>( x ) );
 }
 
 /// @ingroup bios_math
@@ -258,9 +279,90 @@ auto sqrt( const fixed_point<ReprType, ExpBits>& x ) noexcept {
 	using exp_even_type = fixed_point<uint32, ExpBits - ( ExpBits % 2 )>;
 	using exp_half_type = fixed_point<uint32, exp_even_type::exponent / 2>;
 
-	const auto resultData = sqrt( exp_even_type( x ).data() );
+	const auto resultData = detail::sqrt( exp_even_type( x ).data() );
 	const auto resultFixed = exp_half_type::from_data( resultData );
 	return fixed_point<ReprType, ExpBits>( resultFixed );
+}
+
+namespace detail {
+
+	[[gnu::naked, gnu::pure]]
+	int32 arc_tan( int32 x ) noexcept {
+	#if defined( __thumb__ )
+		__asm__ volatile (
+			"swi %0\n\t" 
+			"bx lr\n\t"
+				: : "g"( 0x9 ) : "r0"
+		);
+	#else
+		__asm__ volatile (
+			"swi %0 << 16\n\t" 
+			"bx lr\n\t"
+				: : "g"( 0x9 ) : "r0"
+		);
+	#endif
+	}
+
+	[[gnu::naked, gnu::pure]]
+	uint32 arc_tan2( int32 x, int32 y ) noexcept {
+#if defined( __thumb__ )
+		__asm__ volatile (
+			"swi %0\n\t" 
+			"bx lr\n\t"
+				: : "g"( 0xA ) : "r0"
+		);
+#else
+		__asm__ volatile (
+			"swi %0 << 16\n\t" 
+			"bx lr\n\t"
+				: : "g"( 0xA ) : "r0"
+		);
+#endif
+	}
+
+} // detail
+
+/// @ingroup bios_math
+/// @brief Returns the principal value of the arc tangent of x, expressed in radians
+/// @param x gba::fixed_point
+/// @return arctan of x
+template <typename ReprType, unsigned ExpBits>
+auto arc_tan( const fixed_point<ReprType, ExpBits>& x ) noexcept {
+	using fixed_type = fixed_point<ReprType, ExpBits>;
+	using fixed14_type = fixed_point<int32, 14>;
+
+	constexpr auto halfPi = math::constants<fixed14_type::exponent>::pi / 2;
+
+	const auto resultData = detail::arc_tan( fixed14_type( x ).data() );
+	const auto resultFixed = fixed14_type::from_data( resultData ); // -1 .. 1
+	return static_cast<fixed_type>( resultFixed * halfPi ); // -pi/2 .. +pi/2
+}
+
+/// @ingroup bios_math
+/// @brief Returns the principal value of the arc tangent of x, expressed in radians
+/// @param x gba::fixed_point
+/// @return arctan of x
+template <typename LhsReprType, unsigned LhsExpBits, typename RhsReprType, unsigned RhsExpBits>
+auto arc_tan2( const fixed_point<LhsReprType, LhsExpBits>& x, const fixed_point<RhsReprType, RhsExpBits>& y ) noexcept {
+	using lhs_type = fixed_point<LhsReprType, LhsExpBits>;
+	using rhs_type = fixed_point<RhsReprType, RhsExpBits>;
+	using repr_type = promote::integer<LhsReprType, RhsReprType>;
+
+	constexpr auto exponent = ( sizeof( repr_type ) * 8 ) - ( std::is_signed<repr_type>::value ?
+		std::max( sizeof( LhsReprType ) * 8 - LhsExpBits, sizeof( RhsReprType ) * 8 - RhsExpBits ) :
+		std::max( lhs_type::integer_digits, rhs_type::integer_digits ) );
+
+	using fixed14_type = fixed_point<repr_type, 14>;
+	using fixed16_type = fixed_point<repr_type, 16>;
+	using fixed_type = fixed_point<typename std::make_unsigned<repr_type>::type, exponent>;
+
+	constexpr auto two_pi = math::constants<fixed16_type::exponent>::pi * 2;
+
+	const auto a = fixed14_type( x ).data();
+	const auto b = fixed14_type( y ).data();
+	const auto resultData = detail::arc_tan2( a, b );
+	const auto resultFixed = fixed16_type::from_data( resultData ); // 0 .. 1
+	return static_cast<fixed_type>( resultFixed * two_pi ); // 0 .. 2pi
 }
 
 namespace detail {
