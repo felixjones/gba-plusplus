@@ -2,9 +2,11 @@
 #define GBAXX_BIOS_HPP
 
 #include <cassert>
+#include <cstring>
 #include <tuple>
 #include <type_traits>
 
+#include <gba/bios_asm.hpp>
 #include <gba/fixed_point.hpp>
 #include <gba/int.hpp>
 #include <gba/interrupt.hpp>
@@ -25,17 +27,7 @@ namespace bios {
 /// @brief Reinitialises the system
 [[noreturn]]
 inline void soft_reset() noexcept {
-#if defined( __thumb__ )
-	__asm__ volatile (
-		"swi %0\n\t"
-			: : "g"( 0x0 )
-	);
-#else
-	__asm__ volatile (
-		"swi %0 << 16\n\t"
-			: : "g"( 0x0 )
-	);
-#endif
+	swi::soft_reset();
 }
 
 /// @ingroup bios_reset
@@ -54,21 +46,10 @@ struct reset_flags {
 /// @ingroup bios_reset
 /// @brief Resets the registers or RAM specified in the given flags
 /// @param flags Bit field of registers or RAM to be reset
-[[gnu::naked]]
 inline void register_ram_reset( reset_flags flags ) noexcept {
-#if defined( __thumb__ )
-	__asm__ volatile (
-		"swi %0\n\t"
-		"bx lr\n\t"
-			: : "g"( 0x1 )
-	);
-#else
-	__asm__ volatile (
-		"swi %0 << 16\n\t"
-		"bx lr\n\t"
-			: : "g"( 0x1 )
-	);
-#endif
+	uint_sized_type<sizeof( flags )>::type a;
+	std::memcpy( &a, &flags, sizeof( flags ) );
+	swi::register_ram_reset( a );
 }
 
 /// @defgroup bios_halt Halt functions
@@ -81,17 +62,7 @@ inline void register_ram_reset( reset_flags flags ) noexcept {
 /// gba::bios::halt ignores the gba::io::interrupt_master_enable register and only watches the
 /// gba::io::interrupt_mask_enable and gba::io::interrupt_flags for a raised interrupt
 inline void halt() noexcept {
-#if defined( __thumb__ )
-	__asm__ volatile (
-		"swi %0\n\t"
-			: : "g"( 0x2 )
-		);
-#else
-	__asm__ volatile (
-		"swi %0 << 16\n\t"
-			: : "g"( 0x2 )
-		);
-#endif
+	swi::halt();
 }
 
 /// @ingroup bios_halt
@@ -102,17 +73,7 @@ inline void halt() noexcept {
 /// * gba::interrupt::keypad
 /// * gba::interrupt::game_pak
 inline void stop() noexcept {
-#if defined( __thumb__ )
-	__asm__ volatile (
-		"swi %0\n\t"
-			: : "g"( 0x3 )
-		);
-#else
-	__asm__ volatile (
-		"swi %0 << 16\n\t"
-			: : "g"( 0x3 )
-		);
-#endif
+	swi::stop();
 }
 
 /// @ingroup bios_halt
@@ -121,37 +82,19 @@ inline void stop() noexcept {
 /// This forces the gba::io::interrupt_master_enable to true
 /// @param clearFlags Clear any previously set interrupt flags
 /// @param flags Interrupt flags to wait on
-[[gnu::naked]]
 inline void intr_wait( bool clearFlags, interrupt flags ) noexcept {
-#if defined( __thumb__ )
-	__asm__ volatile (
-		"swi %0\n\t" 
-		"bx lr\n\t"
-			: : "g"( 0xC )
-		);
-#else
-	__asm__ volatile (
-		"swi %0 << 16\n\t" 
-		"bx lr\n\t"
-			: : "g"( 0xC )
-		);
-#endif
+	uint_sized_type<sizeof( clearFlags )>::type a;
+	uint_sized_type<sizeof( flags )>::type b;
+
+	std::memcpy( &a, &clearFlags, sizeof( clearFlags ) );
+	std::memcpy( &b, &flags, sizeof( flags ) );
+	swi::intr_wait( a, b );
 }
 
 /// @ingroup bios_halt
 /// @brief Calls gba::bios::intr_wait() with the gba::interrupt::vblank flag set
 inline void vblank_intr_wait() noexcept {
-#if defined( __thumb__ )
-	__asm__ volatile (
-		"swi %0\n\t"
-			: : "g"( 0x5 ) : "r0", "r1"
-	);
-#else
-	__asm__ volatile (
-		"swi %0 << 16\n\t"
-			: : "g"( 0x5 ) : "r0", "r1"
-	);
-#endif
+	swi::vblank_intr_wait();
 }
 
 /// @defgroup bios_math Math functions
@@ -165,35 +108,10 @@ inline void vblank_intr_wait() noexcept {
 /// @param a numerator
 /// @param b denominator
 /// @return std::tuple containing the results of: `a / b`, `a % b` and `std::abs( a / b )`
-[[gnu::pure]]
+[[gnu::const]]
 inline std::tuple<int32, int32, uint32> div( int32 a, int32 b ) noexcept {
-	assert( b != 0 );
-
-	volatile uint32 c;
-
-#if defined( __thumb__ )
-	__asm__ volatile (
-		"mov r0, %4\n\t"
-		"mov r1, %5\n\t"
-		"swi %3\n\t"
-		"mov %0, r0\n\t"
-		"mov %1, r1\n\t"
-		"mov %2, r3\n\t"
-			: "=r"( a ), "=r"( b ), "=r"( c ) : "g"( 0x6 ), "r"( a ), "r"( b ) : "r0", "r1", "r3"
-	);
-#else
-	__asm__ volatile (
-		"mov r0, %4\n\t"
-		"mov r1, %5\n\t"
-		"swi %3 << 16\n\t"
-		"mov %0, r0\n\t"
-		"mov %1, r1\n\t"
-		"mov %2, r3\n\t"
-			: "=r"( a ), "=r"( b ), "=r"( c ) : "g"( 0x6 ), "r"( a ), "r"( b ) : "r0", "r1", "r3"
-	);
-#endif
-
-	return std::make_tuple( a, b, c );
+	const auto result = swi::div( a, b );
+	return std::make_tuple( result.r0, result.r1, result.r2 );
 }
 
 /// @ingroup bios_math
@@ -201,63 +119,20 @@ inline std::tuple<int32, int32, uint32> div( int32 a, int32 b ) noexcept {
 /// @param a denominator
 /// @param b numerator
 /// @return std::tuple containing the results of: `b / a`, `b % a` and `std::abs( b / a )`
-[[gnu::pure]]
+[[gnu::const]]
 inline std::tuple<int32, int32, uint32> div_arm( int32 a, int32 b ) noexcept {
-	volatile uint32 c;
-
-#if defined( __thumb__ )
-	__asm__ volatile (
-		"mov r0, %5\n\t"
-		"mov r1, %4\n\t"
-		"swi %3\n\t"
-		"mov %0, r0\n\t"
-		"mov %1, r1\n\t"
-		"mov %2, r3\n\t"
-			: "=r"( a ), "=r"( b ), "=r"( c ) : "g"( 0x7 ), "r"( a ), "r"( b ) : "r0", "r1", "r3"
-	);
-#else
-	__asm__ volatile (
-		"mov r0, %5\n\t"
-		"mov r1, %4\n\t"
-		"swi %3 << 16\n\t"
-		"mov %0, r0\n\t"
-		"mov %1, r1\n\t"
-		"mov %2, r3\n\t"
-			: "=r"( a ), "=r"( b ), "=r"( c ) : "g"( 0x7 ), "r"( a ), "r"( b ) : "r0", "r1", "r3"
-	);
-#endif
-
-	return std::make_tuple( a, b, c );
+	const auto result = swi::div_arm( a, b );
+	return std::make_tuple( result.r0, result.r1, result.r2 );
 }
-
-namespace detail {
-
-	[[gnu::naked, gnu::pure]]
-	inline uint32 sqrt( uint32 x ) noexcept {
-#if defined( __thumb__ )
-		__asm__ volatile (
-			"swi %0\n\t" 
-			"bx lr\n\t"
-				: : "g"( 0x8 ) : "r0"
-		);
-#else
-		__asm__ volatile (
-			"swi %0 << 16\n\t" 
-			"bx lr\n\t"
-				: : "g"( 0x8 ) : "r0"
-		);
-#endif
-	}
-
-} // detail
 
 /// @ingroup bios_math
 /// @brief Returns the integer square root of x
 /// @param x unsigned integer
 /// @return square root of x
 template <class T>
-inline auto sqrt( T x ) noexcept -> typename std::enable_if<std::is_unsigned<T>::value && std::is_integral<T>::value && !std::is_same<bool, T>::value, T>::type {
-	return detail::sqrt( static_cast<uint32>( x ) );
+[[gnu::const]]
+auto sqrt( T x ) noexcept -> typename std::enable_if<std::is_unsigned<T>::value && std::is_integral<T>::value && !std::is_same<bool, T>::value, T>::type {
+	return swi::sqrt( static_cast<uint32>( x ) );
 }
 
 /// @ingroup bios_math
@@ -265,9 +140,10 @@ inline auto sqrt( T x ) noexcept -> typename std::enable_if<std::is_unsigned<T>:
 /// @param x signed integer
 /// @return square root of x or 0 if x < 0
 template <class T>
-inline auto sqrt( T x ) noexcept -> typename std::enable_if<std::is_signed<T>::value && std::is_integral<T>::value && !std::is_same<bool, T>::value, T>::type {
+[[gnu::const]]
+auto sqrt( T x ) noexcept -> typename std::enable_if<std::is_signed<T>::value && std::is_integral<T>::value && !std::is_same<bool, T>::value, T>::type {
 	if ( x < 0 ) return 0;
-	return detail::sqrt( static_cast<uint32>( x ) );
+	return swi::sqrt( static_cast<uint32>( x ) );
 }
 
 /// @ingroup bios_math
@@ -275,65 +151,29 @@ inline auto sqrt( T x ) noexcept -> typename std::enable_if<std::is_signed<T>::v
 /// @param x gba::fixed_point
 /// @return square root of x
 template <typename ReprType, unsigned ExpBits>
+[[gnu::const]]
 auto sqrt( const fixed_point<ReprType, ExpBits>& x ) noexcept {
 	using exp_even_type = fixed_point<uint32, ExpBits - ( ExpBits % 2 )>;
 	using exp_half_type = fixed_point<uint32, exp_even_type::exponent / 2>;
 
-	const auto resultData = detail::sqrt( exp_even_type( x ).data() );
+	const auto resultData = swi::sqrt( exp_even_type( x ).data() );
 	const auto resultFixed = exp_half_type::from_data( resultData );
 	return fixed_point<ReprType, ExpBits>( resultFixed );
 }
-
-namespace detail {
-
-	[[gnu::naked, gnu::pure]]
-	int32 arc_tan( int32 x ) noexcept {
-	#if defined( __thumb__ )
-		__asm__ volatile (
-			"swi %0\n\t" 
-			"bx lr\n\t"
-				: : "g"( 0x9 ) : "r0"
-		);
-	#else
-		__asm__ volatile (
-			"swi %0 << 16\n\t" 
-			"bx lr\n\t"
-				: : "g"( 0x9 ) : "r0"
-		);
-	#endif
-	}
-
-	[[gnu::naked, gnu::pure]]
-	uint32 arc_tan2( int32 x, int32 y ) noexcept {
-#if defined( __thumb__ )
-		__asm__ volatile (
-			"swi %0\n\t" 
-			"bx lr\n\t"
-				: : "g"( 0xA ) : "r0"
-		);
-#else
-		__asm__ volatile (
-			"swi %0 << 16\n\t" 
-			"bx lr\n\t"
-				: : "g"( 0xA ) : "r0"
-		);
-#endif
-	}
-
-} // detail
 
 /// @ingroup bios_math
 /// @brief Returns the principal value of the arc tangent of x, expressed in radians
 /// @param x gba::fixed_point
 /// @return arctan of x
 template <typename ReprType, unsigned ExpBits>
+[[gnu::const]]
 auto arc_tan( const fixed_point<ReprType, ExpBits>& x ) noexcept {
 	using fixed_type = fixed_point<ReprType, ExpBits>;
 	using fixed14_type = fixed_point<int32, 14>;
 
 	constexpr auto halfPi = math::constants<fixed14_type::exponent>::pi / 2;
 
-	const auto resultData = detail::arc_tan( fixed14_type( x ).data() );
+	const auto resultData = swi::arc_tan( fixed14_type( x ).data() );
 	const auto resultFixed = fixed14_type::from_data( resultData ); // -1 .. 1
 	return static_cast<fixed_type>( resultFixed * halfPi ); // -pi/2 .. +pi/2
 }
@@ -343,6 +183,7 @@ auto arc_tan( const fixed_point<ReprType, ExpBits>& x ) noexcept {
 /// @param x gba::fixed_point
 /// @return arctan of x
 template <typename LhsReprType, unsigned LhsExpBits, typename RhsReprType, unsigned RhsExpBits>
+[[gnu::const]]
 auto arc_tan2( const fixed_point<LhsReprType, LhsExpBits>& x, const fixed_point<RhsReprType, RhsExpBits>& y ) noexcept {
 	using lhs_type = fixed_point<LhsReprType, LhsExpBits>;
 	using rhs_type = fixed_point<RhsReprType, RhsExpBits>;
@@ -360,7 +201,7 @@ auto arc_tan2( const fixed_point<LhsReprType, LhsExpBits>& x, const fixed_point<
 
 	const auto a = fixed14_type( x ).data();
 	const auto b = fixed14_type( y ).data();
-	const auto resultData = detail::arc_tan2( a, b );
+	const auto resultData = swi::arc_tan2( a, b );
 	const auto resultFixed = fixed16_type::from_data( resultData ); // 0 .. 1
 	return static_cast<fixed_type>( resultFixed * two_pi ); // 0 .. 2pi
 }
@@ -375,78 +216,6 @@ namespace detail {
 				datasize : 1;
 	};
 
-	template <typename Source, typename Dest>
-	[[gnu::naked]]
-	void cpu_fast_set( const Source * src, Dest * dst, length_mode lengthMode ) {
-#if defined( __thumb__ )
-		__asm__ volatile (
-			"swi %0\n\t" 
-			"bx lr\n\t"
-				: : "g"( 0xC )
-		);
-#else
-		__asm__ volatile (
-			"swi %0 << 16\n\t" 
-			"bx lr\n\t"
-				: : "g"( 0xC )
-		);
-#endif
-	}
-
-	template <typename Source>
-	[[gnu::naked]]
-	void cpu_fast_set( const Source * src, uintptr dst, length_mode lengthMode ) {
-#if defined( __thumb__ )
-		__asm__ volatile (
-			"swi %0\n\t" 
-			"bx lr\n\t"
-				: : "g"( 0xC )
-		);
-#else
-		__asm__ volatile (
-			"swi %0 << 16\n\t" 
-			"bx lr\n\t"
-				: : "g"( 0xC )
-		);
-#endif
-	}
-
-	template <typename Source, typename Dest>
-	[[gnu::naked]]
-	void cpu_set( const Source * src, Dest * dst, length_mode lengthMode ) {
-#if defined( __thumb__ )
-		__asm__ volatile (
-			"swi %0\n\t" 
-			"bx lr\n\t"
-				: : "g"( 0xB )
-		);
-#else
-		__asm__ volatile (
-			"swi %0 << 16\n\t" 
-			"bx lr\n\t"
-				: : "g"( 0xB )
-		);
-#endif
-	}
-
-	template <typename Source>
-	[[gnu::naked]]
-	void cpu_set( const Source * src, uintptr dst, length_mode lengthMode ) {
-#if defined( __thumb__ )
-		__asm__ volatile (
-			"swi %0\n\t" 
-			"bx lr\n\t"
-				: : "g"( 0xB )
-		);
-#else
-		__asm__ volatile (
-			"swi %0 << 16\n\t" 
-			"bx lr\n\t"
-				: : "g"( 0xB )
-		);
-#endif
-	}
-
 	class cpu_set_shared {
 	public:
 		constexpr cpu_set_shared( const length_mode& setting ) noexcept : m_setting( setting ) {}
@@ -457,7 +226,15 @@ namespace detail {
 		/// @return *this reference
 		template <typename Source, typename Dest>
 		auto& invoke( const Source * src, Dest * dst ) const noexcept {
-			cpu_set( src, dst, m_setting );
+			uint_sized_type<sizeof( src )>::type a;
+			uint_sized_type<sizeof( dst )>::type b;
+			uint_sized_type<sizeof( m_setting )>::type c;
+
+			std::memcpy( &a, &src, sizeof( src ) );
+			std::memcpy( &b, &dst, sizeof( dst ) );
+			std::memcpy( &c, &m_setting, sizeof( m_setting ) );
+			swi::cpu_set( a, b, c );
+
 			return *this;
 		}
 
@@ -467,7 +244,15 @@ namespace detail {
 		/// @return *this reference
 		template <typename Source>
 		auto& invoke( const Source * src, uintptr dst ) const noexcept {
-			cpu_set( src, dst, m_setting );
+			uint_sized_type<sizeof( src )>::type a;
+			uint_sized_type<sizeof( dst )>::type b;
+			uint_sized_type<sizeof( m_setting )>::type c;
+
+			std::memcpy( &a, &src, sizeof( src ) );
+			std::memcpy( &b, &dst, sizeof( dst ) );
+			std::memcpy( &c, &m_setting, sizeof( m_setting ) );
+			swi::cpu_set( a, b, c );
+
 			return *this;
 		}
 
@@ -504,7 +289,15 @@ namespace detail {
 		/// @return *this reference
 		template <typename Source, typename Dest>
 		auto& invoke( const Source * src, Dest * dst ) const noexcept {
-			detail::cpu_fast_set( src, dst, m_setting );
+			uint_sized_type<sizeof( src )>::type a;
+			uint_sized_type<sizeof( dst )>::type b;
+			uint_sized_type<sizeof( m_setting )>::type c;
+
+			std::memcpy( &a, &src, sizeof( src ) );
+			std::memcpy( &b, &dst, sizeof( dst ) );
+			std::memcpy( &c, &m_setting, sizeof( m_setting ) );
+			swi::cpu_fast_set( a, b, c );
+
 			return *this;
 		}
 
@@ -514,7 +307,15 @@ namespace detail {
 		/// @return *this reference
 		template <typename Source>
 		auto& invoke( const Source * src, uintptr dst ) const noexcept {
-			detail::cpu_fast_set( src, dst, m_setting );
+			uint_sized_type<sizeof( src )>::type a;
+			uint_sized_type<sizeof( dst )>::type b;
+			uint_sized_type<sizeof( m_setting )>::type c;
+
+			std::memcpy( &a, &src, sizeof( src ) );
+			std::memcpy( &b, &dst, sizeof( dst ) );
+			std::memcpy( &c, &m_setting, sizeof( m_setting ) );
+			swi::cpu_fast_set( a, b, c );
+
 			return *this;
 		}
 
@@ -616,17 +417,7 @@ namespace undocumented {
 	/// @brief Reboots the device
 	[[noreturn]]
 	inline void hard_reset() noexcept {
-#if defined( __thumb__ )
-		__asm__ volatile (
-			"swi %0\n\t"
-			: : "g"( 0x26 )
-			);
-#else
-		__asm__ volatile (
-			"swi %0 << 16\n\t"
-			: : "g"( 0x26 )
-			);
-#endif
+		swi::undocumented::hard_reset();
 	}
 
 	/// @ingroup bios_undocumented
@@ -638,21 +429,9 @@ namespace undocumented {
 	/// 0xBAAE187F | 0xBAAE1880
 	/// These values are calculated by summing the BIOS as 4096 32bit integers
 	/// @return uint32 checksum
-	[[gnu::naked, gnu::pure]]
+	[[gnu::const]]
 	inline uint32 get_bios_checksum() noexcept {
-#if defined( __thumb__ )
-		__asm__ volatile (
-			"swi %0\n\t"
-			"bx lr\n\t"
-			: : "g"( 0x26 ) : "r0"
-			);
-#else
-		__asm__ volatile (
-			"swi %0 << 16\n\t"
-			"bx lr\n\t"
-			: : "g"( 0x26 ) : "r0"
-			);
-#endif
+		return swi::undocumented::get_bios_checksum();
 	}
 
 } // undocumented
