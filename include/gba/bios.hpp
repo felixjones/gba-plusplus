@@ -167,7 +167,7 @@ auto sqrt( const fixed_point<ReprType, ExpBits>& x ) noexcept {
 /// @return arctan of x
 template <typename ReprType, unsigned ExpBits>
 [[gnu::const]]
-auto arc_tan( const fixed_point<ReprType, ExpBits>& x ) noexcept {
+auto arc_tan( const fixed_point<ReprType, ExpBits>& x ) noexcept -> typename std::enable_if<std::is_signed<ReprType>::value, fixed_point<ReprType, ExpBits>>::type {
 	using fixed_type = fixed_point<ReprType, ExpBits>;
 	using fixed14_type = fixed_point<int32, 14>;
 
@@ -179,31 +179,30 @@ auto arc_tan( const fixed_point<ReprType, ExpBits>& x ) noexcept {
 }
 
 /// @ingroup bios_math
-/// @brief Returns the principal value of the arc tangent of x, expressed in radians
-/// @param x gba::fixed_point
-/// @return arctan of x
-template <typename LhsReprType, unsigned LhsExpBits, typename RhsReprType, unsigned RhsExpBits>
+/// @brief Computes the arc tangent of y/x using the signs of arguments to determine the correct quadrant
+/// @param x gba::fixed_point (signed)
+/// @param y gba::fixed_point (signed)
+/// @return promoted fixed_point between -pi and +pi
+template <typename LhsReprType, unsigned LhsExpBits, typename RhsReprType, unsigned RhsExpBits, typename = typename std::enable_if<std::is_signed<LhsReprType>::value && std::is_signed<RhsReprType>::value, void>::type>
 [[gnu::const]]
 auto arc_tan2( const fixed_point<LhsReprType, LhsExpBits>& x, const fixed_point<RhsReprType, RhsExpBits>& y ) noexcept {
 	using lhs_type = fixed_point<LhsReprType, LhsExpBits>;
 	using rhs_type = fixed_point<RhsReprType, RhsExpBits>;
 	using repr_type = promote::integer<LhsReprType, RhsReprType>;
 
-	constexpr auto exponent = ( sizeof( repr_type ) * 8 ) - ( std::is_signed<repr_type>::value ?
-		std::max( sizeof( LhsReprType ) * 8 - LhsExpBits, sizeof( RhsReprType ) * 8 - RhsExpBits ) :
-		std::max( lhs_type::integer_digits, rhs_type::integer_digits ) );
+	constexpr auto exponent = ( sizeof( repr_type ) * 8 ) - std::max( sizeof( LhsReprType ) * 8 - LhsExpBits, sizeof( RhsReprType ) * 8 - RhsExpBits );
 
 	using fixed14_type = fixed_point<repr_type, 14>;
-	using fixed16_type = fixed_point<repr_type, 16>;
-	using fixed_type = fixed_point<typename std::make_unsigned<repr_type>::type, exponent>;
+	using fixed15_type = fixed_point<int16, 15>;
+	using fixed_type = fixed_point<repr_type, exponent>;
 
-	constexpr auto two_pi = math::constants<fixed16_type::exponent>::pi * 2;
+	constexpr auto pi = math::constants<fixed15_type::exponent>::pi;
 
 	const auto a = fixed14_type( x ).data();
 	const auto b = fixed14_type( y ).data();
 	const auto resultData = swi::arc_tan2( a, b );
-	const auto resultFixed = fixed16_type::from_data( resultData ); // 0 .. 1
-	return static_cast<fixed_type>( resultFixed * two_pi ); // 0 .. 2pi
+	const auto resultFixed = fixed15_type::from_data( resultData ); // -1..+1
+	return static_cast<fixed_type>( resultFixed * pi ); // -pi..+pi
 }
 
 namespace detail {
@@ -226,9 +225,9 @@ namespace detail {
 		/// @return *this reference
 		template <typename Source, typename Dest>
 		auto& invoke( const Source * src, Dest * dst ) const noexcept {
-			uint_sized_type<sizeof( src )>::type a;
-			uint_sized_type<sizeof( dst )>::type b;
-			uint_sized_type<sizeof( m_setting )>::type c;
+			typename uint_sized_type<sizeof( src )>::type a;
+			typename uint_sized_type<sizeof( dst )>::type b;
+			typename uint_sized_type<sizeof( m_setting )>::type c;
 
 			std::memcpy( &a, &src, sizeof( src ) );
 			std::memcpy( &b, &dst, sizeof( dst ) );
@@ -244,9 +243,9 @@ namespace detail {
 		/// @return *this reference
 		template <typename Source>
 		auto& invoke( const Source * src, uintptr dst ) const noexcept {
-			uint_sized_type<sizeof( src )>::type a;
-			uint_sized_type<sizeof( dst )>::type b;
-			uint_sized_type<sizeof( m_setting )>::type c;
+			typename uint_sized_type<sizeof( src )>::type a;
+			typename uint_sized_type<sizeof( dst )>::type b;
+			typename uint_sized_type<sizeof( m_setting )>::type c;
 
 			std::memcpy( &a, &src, sizeof( src ) );
 			std::memcpy( &b, &dst, sizeof( dst ) );
@@ -289,9 +288,9 @@ namespace detail {
 		/// @return *this reference
 		template <typename Source, typename Dest>
 		auto& invoke( const Source * src, Dest * dst ) const noexcept {
-			uint_sized_type<sizeof( src )>::type a;
-			uint_sized_type<sizeof( dst )>::type b;
-			uint_sized_type<sizeof( m_setting )>::type c;
+			typename uint_sized_type<sizeof( src )>::type a;
+			typename uint_sized_type<sizeof( dst )>::type b;
+			typename uint_sized_type<sizeof( m_setting )>::type c;
 
 			std::memcpy( &a, &src, sizeof( src ) );
 			std::memcpy( &b, &dst, sizeof( dst ) );
@@ -307,9 +306,9 @@ namespace detail {
 		/// @return *this reference
 		template <typename Source>
 		auto& invoke( const Source * src, uintptr dst ) const noexcept {
-			uint_sized_type<sizeof( src )>::type a;
-			uint_sized_type<sizeof( dst )>::type b;
-			uint_sized_type<sizeof( m_setting )>::type c;
+			typename uint_sized_type<sizeof( src )>::type a;
+			typename uint_sized_type<sizeof( dst )>::type b;
+			typename uint_sized_type<sizeof( m_setting )>::type c;
 
 			std::memcpy( &a, &src, sizeof( src ) );
 			std::memcpy( &b, &dst, sizeof( dst ) );
