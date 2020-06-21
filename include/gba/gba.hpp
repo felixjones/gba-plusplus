@@ -11,6 +11,7 @@
 #include <gba/const.hpp>
 #include <gba/display_control.hpp>
 #include <gba/display_status.hpp>
+#include <gba/dma.hpp>
 #include <gba/dma_control.hpp>
 #include <gba/fixed_point.hpp>
 #include <gba/int.hpp>

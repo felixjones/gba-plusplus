@@ -50,7 +50,8 @@ constexpr auto bit_width( T x ) noexcept -> typename std::enable_if<std::is_unsi
 }
 
 template <class T>
-[[nodiscard]] constexpr auto rotl( T x, int s ) noexcept -> typename std::enable_if<std::is_unsigned<T>::value && !std::is_same<T, bool>::value, T>::type {
+[[nodiscard]]
+constexpr auto rotl( T x, int s ) noexcept -> typename std::enable_if<std::is_unsigned<T>::value && !std::is_same<T, bool>::value, T>::type {
 #if __cpp_lib_bitops
 	return std::rotl( x );
 #else
@@ -59,7 +60,8 @@ template <class T>
 }
 
 template <class T>
-[[nodiscard]] constexpr auto rotr( T x, int s ) noexcept -> typename std::enable_if<std::is_unsigned<T>::value && !std::is_same<T, bool>::value, T>::type {
+[[nodiscard]]
+constexpr auto rotr( T x, int s ) noexcept -> typename std::enable_if<std::is_unsigned<T>::value && !std::is_same<T, bool>::value, T>::type {
 #if __cpp_lib_bitops
 	return std::rotr( x );
 #else

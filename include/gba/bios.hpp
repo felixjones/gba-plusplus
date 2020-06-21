@@ -186,8 +186,6 @@ auto arc_tan( const fixed_point<ReprType, ExpBits>& x ) noexcept -> typename std
 template <typename LhsReprType, unsigned LhsExpBits, typename RhsReprType, unsigned RhsExpBits, typename = typename std::enable_if<std::is_signed<LhsReprType>::value && std::is_signed<RhsReprType>::value, void>::type>
 [[gnu::const]]
 auto arc_tan2( const fixed_point<LhsReprType, LhsExpBits>& x, const fixed_point<RhsReprType, RhsExpBits>& y ) noexcept {
-	using lhs_type = fixed_point<LhsReprType, LhsExpBits>;
-	using rhs_type = fixed_point<RhsReprType, RhsExpBits>;
 	using repr_type = promote::integer<LhsReprType, RhsReprType>;
 
 	constexpr auto exponent = ( sizeof( repr_type ) * 8 ) - std::max( sizeof( LhsReprType ) * 8 - LhsExpBits, sizeof( RhsReprType ) * 8 - RhsExpBits );

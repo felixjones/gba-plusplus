@@ -21,7 +21,7 @@ struct display_control {
 			object_layer : 1,
 			background_window0 : 1,
 			background_window1 : 1,
-			object_window : 1;
+		object_window : 1;
 };
 
 } // gba

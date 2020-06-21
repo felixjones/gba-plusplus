@@ -5,6 +5,7 @@
 #include <cstring>
 #include <sstream>
 
+#include <gba/bios.hpp>
 #include <gba/int.hpp>
 #include <gba/memmap.hpp>
 
@@ -40,10 +41,13 @@ namespace detail {
 
 	inline int puts( int level, const std::string& str ) noexcept {
 		using debug_flags = omemmap<uint16, 0x4FFF700>;
-		const auto debug_string = reinterpret_cast<char *>( 0x4FFF600 );
+		const auto debug_string = reinterpret_cast<volatile char *>( 0x4FFF600 );
 
-		const auto length = std::min( static_cast<int>( str.length() ), 0x100 );
-		std::memcpy( debug_string, str.c_str(), length );
+		const auto length = std::min( static_cast<int>( str.length() ), 255 );
+		for ( int ii = 0; ii < length; ii++ ) {
+			debug_string[ii] = str[ii];
+		}
+		debug_string[length] = 0;
 		debug_flags::write( level | 0x100 );
 		return length;
 	}

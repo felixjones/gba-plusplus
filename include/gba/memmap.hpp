@@ -1,16 +1,23 @@
 #ifndef GBAXX_MEMMAP_HPP
 #define GBAXX_MEMMAP_HPP
 
-#include <type_traits>
 #include <cstring>
+#include <type_traits>
 
 #include <gba/int_type.hpp>
 
 namespace gba {
+namespace detail {
+
+	template <class Type>
+	struct converts_to_uint {
+		static constexpr bool value = sizeof( Type ) == 1 || sizeof( Type ) == 2 || sizeof( Type ) == 4;
+	};
+
+} // detail
 
 template <typename Type, unsigned Address>
 class memmap {
-	static_assert( sizeof( Type ) <= 8, "Type is too big." );
 public:
 	using type = Type;
 	static constexpr auto address = Address;
@@ -21,7 +28,7 @@ template <typename Type, unsigned Address, typename Fundamental = void>
 class imemmap;
 
 template <typename Type, unsigned Address>
-class imemmap<Type, Address, typename std::enable_if<std::is_fundamental<Type>::value>::type> : public virtual memmap<Type, Address> {
+class imemmap<Type, Address, typename std::enable_if<detail::converts_to_uint<Type>::value && std::is_fundamental<Type>::value>::type> : public virtual memmap<Type, Address> {
 private:
 	using uint_type = typename uint_sized_type<sizeof( Type )>::type;
 
@@ -32,7 +39,7 @@ public:
 };
 
 template <typename Type, unsigned Address>
-class imemmap<Type, Address, typename std::enable_if<!std::is_fundamental<Type>::value>::type> : public virtual memmap<Type, Address> {
+class imemmap<Type, Address, typename std::enable_if<detail::converts_to_uint<Type>::value && !std::is_fundamental<Type>::value>::type> : public virtual memmap<Type, Address> {
 private:
 	using uint_type = typename uint_sized_type<sizeof( Type )>::type;
 
@@ -50,7 +57,7 @@ template <typename Type, unsigned Address, typename Fundamental = void>
 class omemmap;
 
 template <typename Type, unsigned Address>
-class omemmap<Type, Address, typename std::enable_if<std::is_fundamental<Type>::value && !std::is_const<Type>::value>::type> : public virtual memmap<Type, Address> {
+class omemmap<Type, Address, typename std::enable_if<detail::converts_to_uint<Type>::value && std::is_fundamental<Type>::value>::type> : public virtual memmap<Type, Address> {
 private:
 	using uint_type = typename uint_sized_type<sizeof( Type )>::type;
 
@@ -61,7 +68,7 @@ public:
 };
 
 template <typename Type, unsigned Address>
-class omemmap<Type, Address, typename std::enable_if<!std::is_fundamental<Type>::value && !std::is_const<Type>::value>::type> : public virtual memmap<Type, Address> {
+class omemmap<Type, Address, typename std::enable_if<detail::converts_to_uint<Type>::value && !std::is_fundamental<Type>::value && !std::is_const<Type>::value>::type> : public virtual memmap<Type, Address> {
 private:
 	using uint_type = typename uint_sized_type<sizeof( Type )>::type;
 
