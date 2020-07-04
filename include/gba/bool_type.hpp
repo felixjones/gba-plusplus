@@ -40,7 +40,7 @@ class bool_type : std::conditional<BitIndex / 8 == 0, detail::boolean_zero_paddi
 public:
     constexpr bool_type() noexcept : m_data { false } {}
 
-    constexpr bool_type( const bool value ) noexcept : m_data { value } {}
+	constexpr bool_type( const bool value ) noexcept : m_data { { value } } {}
 
     constexpr auto& operator=( const bool value ) noexcept {
         set_value( value );

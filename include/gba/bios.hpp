@@ -11,7 +11,7 @@
 #include <gba/int.hpp>
 #include <gba/interrupt.hpp>
 #include <gba/int_type.hpp>
-#include <gba/math.hpp>
+#include <gba/math_constants.hpp>
 
 /// @defgroup bios BIOS
 /// @brief Various functions implemented in the GBA BIOS

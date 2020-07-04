@@ -30,6 +30,16 @@ struct jump_table {
 	constexpr jump_table( Entries&&... entries ) : table { std::forward<Entries>( entries )... }, zero( 0 ) {}
 };
 
+namespace detail {
+
+	template <class>
+	struct is_jump_table : public std::false_type {};
+
+	template <class...Ts>
+	struct is_jump_table<jump_table<Ts...>> : public std::true_type {};
+
+} // detail
+
 #else
 
 
@@ -41,7 +51,7 @@ namespace interrupt_handler {
 
 #if __cplusplus >= 201703L
 
-template <class JumpTable>
+template <class JumpTable, typename std::enable_if<detail::is_jump_table<JumpTable>::value, int>::type Dummy = 0>
 [[maybe_unused]]
 inline void set( const JumpTable& table ) noexcept {
 	using vector_type = void( * )( void );

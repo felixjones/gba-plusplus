@@ -1,6 +1,7 @@
 #ifndef GBAXX_BIOS_ASM_HPP
 #define GBAXX_BIOS_ASM_HPP
 
+#include <gba/cpu.hpp>
 #include <gba/int.hpp>
 
 namespace gba {
@@ -20,7 +21,7 @@ inline void soft_reset() noexcept {
 inline void register_ram_reset( uint32 flags ) noexcept {
 #if defined( __thumb__ )
 	__asm__(
-		"mov\tr0, %0\n\t"
+		"movs\tr0, %0\n\t"
 		"swi\t#1"
 		: : "rMI"( flags ) : "r0"
 	);
@@ -52,8 +53,8 @@ inline void stop() noexcept {
 inline void intr_wait( uint32 clearFlags, uint32 flags ) noexcept {
 #if defined( __thumb__ )
 	__asm__(
-		"mov\tr0, %0\n\t"
-		"mov\tr1, %1\n\t"
+		"movs\tr0, %0\n\t"
+		"movs\tr1, %1\n\t"
 		"swi\t#4"
 		: : "rMI"( clearFlags ), "rMI"( flags ) : "r0", "r1"
 	);
@@ -69,13 +70,9 @@ inline void intr_wait( uint32 clearFlags, uint32 flags ) noexcept {
 
 inline void vblank_intr_wait() noexcept {
 #if defined( __thumb__ )
-	__asm__ volatile (
-		"swi\t#5"
-		);
+	__asm__( "swi\t#5" );
 #else
-	__asm__ volatile (
-		"swi\t#5 << 16"
-		);
+	__asm__( "swi\t#5 << 16" );
 #endif
 }
 
@@ -85,14 +82,14 @@ struct [[nodiscard]] div_result {
 	uint32 r2;
 };
 
-[[gnu::const, gnu::optimize( "reg-struct-return" )]]
+[[gnu::const]]
 inline auto div( const int32 a, const int32 b ) noexcept {
 	div_result out;
 
 #if defined( __thumb__ )
 	__asm__(
-		"mov\tr0, %3\n\t"
-		"mov\tr1, %4\n\t"
+		"movs\tr0, %3\n\t"
+		"movs\tr1, %4\n\t"
 		"swi\t#6\n\t"
 		"str\tr0, %0\n\t"
 		"str\tr1, %1\n\t"
@@ -114,14 +111,14 @@ inline auto div( const int32 a, const int32 b ) noexcept {
 	return out;
 }
 
-[[gnu::const, gnu::optimize( "reg-struct-return" )]]
+[[gnu::const]]
 inline auto div_arm( const int32 a, const int32 b ) noexcept {
 	div_result out;
 
 #if defined( __thumb__ )
 	__asm__(
-		"mov\tr0, %3\n\t"
-		"mov\tr1, %4\n\t"
+		"movs\tr0, %3\n\t"
+		"movs\tr1, %4\n\t"
 		"swi\t#7\n\t"
 		"str\tr0, %0\n\t"
 		"str\tr1, %1\n\t"
@@ -147,7 +144,7 @@ inline auto div_arm( const int32 a, const int32 b ) noexcept {
 inline uint32 sqrt( const uint32 x ) noexcept {
 #if defined( __thumb__ )
 	__asm__(
-		"mov\tr0, %0\n\t"
+		"movs\tr0, %0\n\t"
 		"swi\t#8"
 		: : "ri"( x ) : "r0"
 	);
@@ -158,15 +155,14 @@ inline uint32 sqrt( const uint32 x ) noexcept {
 		: : "ri"( x ) : "r0"
 	);
 #endif
-	register uint32 r0 __asm__( "r0" );
-	return r0;
+	return cpu::iregister<uint32, 0>::read();
 }
 
 [[gnu::const, nodiscard]]
 inline int32 arc_tan( const int32 x ) noexcept {
 #if defined( __thumb__ )
 	__asm__(
-		"mov\tr0, %0\n\t"
+		"movs\tr0, %0\n\t"
 		"swi\t#9" 
 		: : "r"( x ) : "r0"
 	);
@@ -177,16 +173,15 @@ inline int32 arc_tan( const int32 x ) noexcept {
 		: : "ri"( x ) : "r0"
 	);
 #endif
-	register int32 r0 __asm__( "r0" );
-	return r0;
+	return cpu::iregister<int32, 0>::read();
 }
 
 [[gnu::const, nodiscard]]
 inline uint32 arc_tan2( const int32 x, const int32 y ) noexcept {
 #if defined( __thumb__ )
 	__asm__(
-		"mov\tr0, %0\n\t"
-		"mov\tr1, %1\n\t"
+		"movs\tr0, %0\n\t"
+		"movs\tr1, %1\n\t"
 		"swi\t#10" 
 		: : "r"( x ), "r"( y ) : "r0", "r1"
 	);
@@ -198,18 +193,17 @@ inline uint32 arc_tan2( const int32 x, const int32 y ) noexcept {
 		: : "ri"( x ), "ri"( y ) : "r0", "r1"
 	);
 #endif
-	register uint32 r0 __asm__( "r0" );
-	return r0;
+	return cpu::iregister<uint32, 0>::read();
 }
 
 inline void cpu_set( const uint32 src, const uint32 dst, const uint32 lengthMode ) {
 #if defined( __thumb__ )
 	__asm__(
-		"mov\tr0, %0\n\t"
-		"mov\tr1, %1\n\t"
-		"mov\tr2, %2\n\t"
+		"movs\tr0, %0\n\t"
+		"movs\tr1, %1\n\t"
+		"movs\tr2, %2\n\t"
 		"swi\t#11" 
-		: : "ri"( src ), "ri"( dst ), "ri"( lengthMode ) : "r0", "r1", "r2"
+		: : "r"( src ), "r"( dst ), "r"( lengthMode ) : "r0", "r1", "r2"
 	);
 #else
 	__asm__(
@@ -225,9 +219,9 @@ inline void cpu_set( const uint32 src, const uint32 dst, const uint32 lengthMode
 inline void cpu_fast_set( const uint32 src, const uint32 dst, const uint32 lengthMode ) {
 #if defined( __thumb__ )
 	__asm__(
-		"mov\tr0, %0\n\t"
-		"mov\tr1, %1\n\t"
-		"mov\tr2, %2\n\t"
+		"movs\tr0, %0\n\t"
+		"movs\tr1, %1\n\t"
+		"movs\tr2, %2\n\t"
 		"swi\t#12" 
 		: : "ri"( src ), "ri"( dst ), "ri"( lengthMode ) : "r0", "r1", "r2"
 	);
@@ -267,8 +261,7 @@ namespace undocumented {
 			: : : "r0"
 		);
 #endif
-		register uint32 r0 __asm__( "r0" );
-		return r0;
+		return cpu::iregister<uint32, 0>::read();
 	}
 
 } // undocumented
