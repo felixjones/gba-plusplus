@@ -3,6 +3,8 @@
 
 #include <type_traits>
 
+#include <gba/bios.hpp>
+#include <gba/math.hpp>
 #include <gba/type_promotion.hpp>
 
 namespace gba {
@@ -760,6 +762,131 @@ using make_fixed = fixed_point<typename int_type<IntegerBits + FractionalBits>::
 template <unsigned IntegerBits, unsigned FractionalBits = 0>
 using make_ufixed = fixed_point<typename uint_type<IntegerBits + FractionalBits>::type, FractionalBits>;
 
+namespace math {
+namespace detail {
+
+	constexpr auto sin_bam16( int16 bam ) noexcept {
+		auto x = bam << 17;
+		if ( ( x ^ ( x << 1 ) ) < 0 ) {
+			x = ( 1 << 31 ) - x;
+		}
+		x = x >> 17;
+		return fixed_point<int32, 12>::from_data( x * ( 0x18000 - ( ( x * x ) >> 11 ) ) >> 17 );
+	}
+
+	template <typename ReprType, unsigned Exponent>
+	constexpr int16 radian_to_bam16( const fixed_point<ReprType, Exponent>& radian ) noexcept {
+		constexpr auto radTo16 = make_ufixed<13, 19>( 16384.0 / 3.14159265358979323846264338327950288 );
+		return static_cast<int16>( radian * radTo16 );
+	}
+
+} // detail
+
+template <unsigned Exponent>
+struct constants {
+	static constexpr auto e          = fixed_point<uint32, Exponent>( 2.7182818284590452354 );
+	static constexpr auto log2e      = fixed_point<uint32, Exponent>( 1.4426950408889634074 );
+	static constexpr auto log10e     = fixed_point<uint32, Exponent>( 0.43429448190325182765 );
+	static constexpr auto pi         = fixed_point<uint32, Exponent>( 3.1415926535897932385 );
+	static constexpr auto inv_pi     = fixed_point<uint32, Exponent>( 0.31830988618379067154 );
+	static constexpr auto inv_sqrtpi = fixed_point<uint32, Exponent>( 0.56418958354775628695 );
+	static constexpr auto ln2        = fixed_point<uint32, Exponent>( 0.69314718055994530942 );
+	static constexpr auto ln10       = fixed_point<uint32, Exponent>( 2.3025850929940456840 );
+	static constexpr auto sqrt2      = fixed_point<uint32, Exponent>( 1.4142135623730950488 );
+	static constexpr auto sqrt3      = fixed_point<uint32, Exponent>( 1.7320508075688772935 );
+	static constexpr auto inv_sqrt3  = fixed_point<uint32, Exponent>( 0.57735026918962576451 );
+	static constexpr auto egmma      = fixed_point<uint32, Exponent>( 0.57721566490153286061 );
+	static constexpr auto phi        = fixed_point<uint32, Exponent>( 1.6180339887498948482 );
+};
+
+template <typename ReprType, unsigned Exponent>
+constexpr auto sqrt( const fixed_point<ReprType, Exponent>& x ) noexcept {
+	if ( __builtin_constant_p( x.data() ) ) {
+		using widened_type = fixed_point<promote::make_wider<ReprType>, Exponent * 2>;
+		return fixed_point<ReprType, Exponent>::from_data( static_cast<ReprType>( math::detail::sqrt_solve1( widened_type( x ).data() ) ) );
+	}
+	return bios::sqrt( x );
+}
+
+template <typename ReprType, unsigned Exponent>
+constexpr auto sin( const fixed_point<ReprType, Exponent>& radian ) noexcept {
+	return math::detail::sin_bam16( math::detail::radian_to_bam16( radian ) );
+}
+
+template <typename ReprType, unsigned Exponent>
+constexpr auto cos( const fixed_point<ReprType, Exponent>& radian ) noexcept {
+	return math::detail::sin_bam16( math::detail::radian_to_bam16( radian ) + 0x2000 );
+}
+
+template <class S, typename std::enable_if<std::is_arithmetic<S>::value, int>::type Dummy = 0>
+constexpr auto sin( const S radian ) noexcept {
+	return math::detail::sin_bam16( math::detail::radian_to_bam16( make_ufixed<13, 19>( radian ) ) );
+}
+
+template <class S, typename std::enable_if<std::is_arithmetic<S>::value, int>::type Dummy = 0>
+constexpr auto cos( const S radian ) noexcept {
+	return math::detail::sin_bam16( math::detail::radian_to_bam16( make_ufixed<13, 19>( radian ) ) + 0x2000 );
+}
+
+template <class AT, class BT, typename ReprType, unsigned Exponent>
+constexpr auto mix( const AT& a, const BT& b, const fixed_point<ReprType, Exponent>& scale ) noexcept {
+	return a * ( fixed_point<ReprType, Exponent>( 1 ) - scale ) + b * scale;
+}
+
+template <typename ReprType, unsigned Exponent>
+constexpr auto abs( const fixed_point<ReprType, Exponent>& x ) noexcept -> typename std::enable_if<std::is_signed<ReprType>::value, fixed_point<typename std::make_unsigned<ReprType>::type, Exponent>>::type {
+	using fixed_type = fixed_point<typename std::make_unsigned<ReprType>::type, Exponent>;
+
+	return fixed_type::from_data( x.data() < 0 ? -x.data() : x.data() );
+}
+
+template <typename ReprType, unsigned Exponent>
+constexpr auto abs( const fixed_point<ReprType, Exponent>& x ) noexcept -> typename std::enable_if<std::is_unsigned<ReprType>::value, fixed_point<ReprType, Exponent>>::type {
+	return x;
+}
+
+template <typename ReprType, unsigned Exponent>
+constexpr auto signbit( const fixed_point<ReprType, Exponent>& x ) noexcept -> typename std::enable_if<std::is_unsigned<ReprType>::value, bool>::type {
+	return false;
+}
+
+template <typename ReprType, unsigned Exponent>
+constexpr auto signbit( const fixed_point<ReprType, Exponent>& x ) noexcept -> typename std::enable_if<std::is_signed<ReprType>::value, bool>::type {
+	return x.data() < 0;
+}
+
+template <typename ReprType, unsigned Exponent>
+constexpr auto round( const fixed_point<ReprType, Exponent>& x ) noexcept {
+	const auto halfBit = x.data() & ( 1 << ( Exponent - 1 ) );
+	return ( x.data() + ( halfBit << 1 ) ) >> Exponent;
+}
+
+template <typename ReprType, unsigned Exponent>
+constexpr auto floor( const fixed_point<ReprType, Exponent>& x ) noexcept {
+	return static_cast<ReprType>( x );
+}
+
+template <typename ReprType, unsigned Exponent>
+constexpr auto ceil( const fixed_point<ReprType, Exponent>& x ) noexcept {
+	constexpr auto mask = ( 1 << Exponent ) - 1;
+	const auto fractional = x.data() & mask;
+	return static_cast<ReprType>( x ) + ( fractional ? 1 : 0 );
+}
+
+template <typename ReprType, unsigned Exponent>
+constexpr auto trunc( const fixed_point<ReprType, Exponent>& x ) noexcept -> typename std::enable_if<std::is_unsigned<ReprType>::value, ReprType>::type {
+	return floor( x );
+}
+
+template <typename ReprType, unsigned Exponent>
+constexpr auto trunc( const fixed_point<ReprType, Exponent>& x ) noexcept -> typename std::enable_if<std::is_signed<ReprType>::value, ReprType>::type {
+	if ( x.data() < 0 ) {
+		return ceil( x );
+	}
+	return floor( x );
+}
+
+} // math
 } // gba
 
 template <typename ReprType, unsigned Exponent>

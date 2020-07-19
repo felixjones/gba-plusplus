@@ -4,7 +4,6 @@
 #include <gba/bios_asm.hpp>
 #include <gba/int.hpp>
 #include <gba/fixed_point.hpp>
-#include <gba/math_constants.hpp>
 
 namespace gba {
 namespace bios {

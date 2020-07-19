@@ -24,7 +24,6 @@
 #include <gba/mat3.hpp>
 #include <gba/mat4.hpp>
 #include <gba/math.hpp>
-#include <gba/math_constants.hpp>
 #include <gba/memmap.hpp>
 #include <gba/mosaic.hpp>
 #include <gba/oam.hpp>
