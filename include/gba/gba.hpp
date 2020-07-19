@@ -4,7 +4,6 @@
 #include <gba/background_control.hpp>
 #include <gba/bios.hpp>
 #include <gba/bios_asm.hpp>
-#include <gba/bios_fixed_point.hpp>
 #include <gba/bit.hpp>
 #include <gba/blending.hpp>
 #include <gba/bool.hpp>
