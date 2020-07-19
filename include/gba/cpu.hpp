@@ -1,65 +1,66 @@
 #ifndef GBAXX_CPU_HPP
 #define GBAXX_CPU_HPP
 
-#include <type_traits>
-
 namespace gba {
 namespace cpu {
 
 template <typename Type, unsigned Register>
 struct iregister {};
 
-template <typename Type>
-struct iregister<Type, 0> {
-	static auto read() noexcept {
-		Type x;
-#if defined( __thumb__ )
-		__asm__( "movs\t%0, r0" : "=r"( x ) );
-#else
-		__asm__( "mov\t%0, r0" : "=r"( x ) );
-#endif
-		return x;
-	}
-};
+template <typename Type, unsigned Register>
+struct oregister {};
 
-template <typename Type>
-struct iregister<Type, 1> {
-	static auto read() noexcept {
-		Type x;
-#if defined( __thumb__ )
-		__asm__( "movs\t%0, r1" : "=r"( x ) );
-#else
-		__asm__( "mov\t%0, r1" : "=r"( x ) );
-#endif
-		return x;
-	}
-};
+template <typename Type, unsigned Register>
+class ioregister : public iregister<Type, Register>, public oregister<Type, Register> {};
 
-template <typename Type>
-struct iregister<Type, 2> {
-	static auto read() noexcept {
-		Type x;
 #if defined( __thumb__ )
-		__asm__( "movs\t%0, r2" : "=r"( x ) );
+#define GBAXX_IREGISTER_READ( REG ) __asm__ volatile ( "movs\t%0, r"#REG : "=r"( x ) :: "cc" )
 #else
-		__asm__( "mov\t%0, r2" : "=r"( x ) );
+#define GBAXX_IREGISTER_READ( REG ) __asm__ volatile ( "mov\t%0, r"#REG : "=r"( x ) )
 #endif
-		return x;
-	}
-};
 
-template <typename Type>
-struct iregister<Type, 3> {
-	static auto read() noexcept {
-		Type x;
+#define GBAXX_IREGISTER( REG )\
+template <typename Type>\
+struct iregister<Type, REG> {\
+	static auto read() noexcept {\
+		Type x;\
+		GBAXX_IREGISTER_READ( REG );\
+		return x;\
+	}\
+}
+
 #if defined( __thumb__ )
-		__asm__( "movs\t%0, r3" : "=r"( x ) );
+#define GBAXX_OREGISTER_WRITE( REG ) __asm__( "movs\tr"#REG", %0" :: "ri"( value ) : "r"#REG, "cc" )
 #else
-		__asm__( "mov\t%0, r3" : "=r"( x ) );
+#define GBAXX_OREGISTER_WRITE( REG ) __asm__( "mov\tr"#REG", %0" :: "ri"( value ) : "r"#REG )
 #endif
-		return x;
-	}
-};
+
+#define GBAXX_OREGISTER( REG )\
+template <typename Type>\
+struct oregister<Type, REG> {\
+	static void write( const Type value ) noexcept {\
+		GBAXX_OREGISTER_WRITE( REG );\
+	}\
+}
+
+#define GBAXX_IOREGISTER( REG )\
+	GBAXX_IREGISTER( REG );\
+	GBAXX_OREGISTER( REG )
+
+GBAXX_IOREGISTER( 0 );
+GBAXX_IOREGISTER( 1 );
+GBAXX_IOREGISTER( 2 );
+GBAXX_IOREGISTER( 3 );
+GBAXX_IOREGISTER( 4 );
+GBAXX_IOREGISTER( 5 );
+GBAXX_IOREGISTER( 6 );
+GBAXX_IOREGISTER( 7 );
+
+#undef GBAXX_IREGISTER
+#undef GBAXX_IREGISTER_READ
+#undef GBAXX_OREGISTER
+#undef GBAXX_OREGISTER_WRITE
+#undef GBAXX_IOREGISTER
 
 } // cpu
 } // gba

@@ -70,16 +70,22 @@ constexpr auto sqrt( T x ) noexcept -> typename std::enable_if<std::is_floating_
 
 template <class T>
 constexpr auto sqrt( T x ) noexcept -> typename std::enable_if<std::is_integral<T>::value && !std::is_same<bool, T>::value, T>::type {
-	using wider_type = typename std::make_signed<promote::make_wider<T>>::type;
+	if ( __builtin_constant_p( x ) ) {
+		using wider_type = typename std::make_signed<promote::make_wider<T>>::type;
 
-	const auto result = detail::sqrt_solve1( wider_type( x ) << ( sizeof( T ) * 8 ) );
-	return static_cast<T>( result ) >> ( sizeof( T ) * 4 );
+		const auto result = detail::sqrt_solve1( wider_type( x ) << ( sizeof( T ) * 8 ) );
+		return static_cast<T>( result ) >> ( sizeof( T ) * 4 );
+	}
+	return bios::sqrt( x );
 }
 
 template <typename ReprType, unsigned Exponent>
 constexpr auto sqrt( const fixed_point<ReprType, Exponent>& x ) noexcept {
-	using widened_type = fixed_point<promote::make_wider<ReprType>, Exponent * 2>;
-	return fixed_point<ReprType, Exponent>::from_data( static_cast<ReprType>( detail::sqrt_solve1( widened_type( x ).data() ) ) );
+	if ( __builtin_constant_p( x.data() ) ) {
+		using widened_type = fixed_point<promote::make_wider<ReprType>, Exponent * 2>;
+		return fixed_point<ReprType, Exponent>::from_data( static_cast<ReprType>( detail::sqrt_solve1( widened_type( x ).data() ) ) );
+	}
+	return bios::sqrt( x );
 }
 
 template <typename ReprType, unsigned Exponent>

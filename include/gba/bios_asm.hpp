@@ -8,71 +8,42 @@ namespace gba {
 namespace bios {
 namespace swi {
 
+#if defined( __thumb__ )
+#define GBAXX_SWI_CALL( NUM )	__asm__( "swi\t#"#NUM )
+#else
+#define GBAXX_SWI_CALL( NUM )	__asm__( "swi\t#"#NUM" << 16" )
+#endif
+
 [[noreturn]]
 inline void soft_reset() noexcept {
-#if defined( __thumb__ )
-	__asm__( "swi\t#0" );
-#else
-	__asm__( "swi\t#0 << 16" );
-#endif
+	GBAXX_SWI_CALL( 0 );
 	__builtin_unreachable();
 }
 
 inline void register_ram_reset( uint32 flags ) noexcept {
-#if defined( __thumb__ )
-	__asm__(
-		"movs\tr0, %0\n\t"
-		"swi\t#1"
-		: : "rMI"( flags ) : "r0"
-	);
-#else
-	__asm__(
-		"mov\tr0, %0\n\t"
-		"swi\t#1 << 16"
-		: : "rM"( flags ) : "r0"
-	);
-#endif
+	cpu::oregister<uint32, 0>::write( flags );
+	GBAXX_SWI_CALL( 1 );
 }
 
 inline void halt() noexcept {
-#if defined( __thumb__ )
-	__asm__( "swi\t#2" );
-#else
-	__asm__( "swi\t#2 << 16" );
-#endif
+	GBAXX_SWI_CALL( 2 );
 }
 
 inline void stop() noexcept {
-#if defined( __thumb__ )
-	__asm__( "swi\t#3" );
-#else
-	__asm__( "swi\t#3 << 16" );
-#endif
+	GBAXX_SWI_CALL( 3 );
 }
 
 inline void intr_wait( uint32 clearFlags, uint32 flags ) noexcept {
-#if defined( __thumb__ )
-	__asm__(
-		"movs\tr0, %0\n\t"
-		"movs\tr1, %1\n\t"
-		"swi\t#4"
-		: : "rMI"( clearFlags ), "rMI"( flags ) : "r0", "r1"
-	);
-#else
-	__asm__(
-		"mov\tr0, %0\n\t"
-		"mov\tr1, %1\n\t"
-		"swi\t#4 << 16"
-		: : "rM"( clearFlags ), "rM"( flags ) : "r0", "r1"
-	);
-#endif
+	cpu::oregister<uint32, 0>::write( clearFlags );
+	cpu::oregister<uint32, 1>::write( flags );
+	GBAXX_SWI_CALL( 4 );
 }
 
 inline void vblank_intr_wait() noexcept {
 #if defined( __thumb__ )
-	__asm__( "swi\t#5" );
+	__asm__( "swi\t#5" ::: "r0", "r1" );
 #else
-	__asm__( "swi\t#5 << 16" );
+	__asm__( "swi\t#5 << 16" ::: "r0", "r1" );
 #endif
 }
 
@@ -84,187 +55,113 @@ struct [[nodiscard]] div_result {
 
 [[gnu::const]]
 inline auto div( const int32 a, const int32 b ) noexcept {
-	div_result out;
+	cpu::oregister<int32, 0>::write( a );
+	cpu::oregister<int32, 1>::write( b );
 
+	div_result out;
 #if defined( __thumb__ )
 	__asm__(
-		"movs\tr0, %3\n\t"
-		"movs\tr1, %4\n\t"
 		"swi\t#6\n\t"
 		"str\tr0, %0\n\t"
 		"str\tr1, %1\n\t"
 		"str\tr3, %2"
-		: "=m"( out.r0 ), "=m"( out.r1 ), "=m"( out.r2 ) : "rMI"( a ), "rMI"( b ) : "r0", "r1", "r3"
+		: "=m"( out.r0 ), "=m"( out.r1 ), "=m"( out.r2 ) :: "r0", "r1", "r3", "cc"
 	);
 #else
 	__asm__(
-		"mov\tr0, %3\n\t"
-		"mov\tr1, %4\n\t"
 		"swi\t#6 << 16\n\t"
 		"str\tr0, %0\n\t"
 		"str\tr1, %1\n\t"
 		"str\tr3, %2"
-		: "=m"( out.r0 ), "=m"( out.r1 ), "=m"( out.r2 ) : "rM"( a ), "rM"( b ) : "r0", "r1", "r3"
+		: "=m"( out.r0 ), "=m"( out.r1 ), "=m"( out.r2 ) :: "r0", "r1", "r3"
 	);
 #endif
-
 	return out;
 }
 
 [[gnu::const]]
 inline auto div_arm( const int32 a, const int32 b ) noexcept {
-	div_result out;
+	cpu::oregister<int32, 0>::write( a );
+	cpu::oregister<int32, 1>::write( b );
 
+	div_result out;
 #if defined( __thumb__ )
 	__asm__(
-		"movs\tr0, %3\n\t"
-		"movs\tr1, %4\n\t"
 		"swi\t#7\n\t"
 		"str\tr0, %0\n\t"
 		"str\tr1, %1\n\t"
 		"str\tr3, %2"
-		: "=m"( out.r0 ), "=m"( out.r1 ), "=m"( out.r2 ) : "rMI"( a ), "rMI"( b ) : "r0", "r1", "r3"
+		: "=m"( out.r0 ), "=m"( out.r1 ), "=m"( out.r2 ) :: "r0", "r1", "r3"
 	);
 #else
 	__asm__(
-		"mov\tr0, %3\n\t"
-		"mov\tr1, %4\n\t"
 		"swi\t#7 << 16\n\t"
 		"str\tr0, %0\n\t"
 		"str\tr1, %1\n\t"
 		"str\tr3, %2"
-		: "=m"( out.r0 ), "=m"( out.r1 ), "=m"( out.r2 ) : "rM"( a ), "rM"( b ) : "r0", "r1", "r3"
+		: "=m"( out.r0 ), "=m"( out.r1 ), "=m"( out.r2 ) :: "r0", "r1", "r3"
 	);
 #endif
-
 	return out;
 }
 
 [[gnu::const, nodiscard]]
 inline uint32 sqrt( const uint32 x ) noexcept {
-#if defined( __thumb__ )
-	__asm__(
-		"movs\tr0, %0\n\t"
-		"swi\t#8"
-		: : "ri"( x ) : "r0"
-	);
-#else
-	__asm__(
-		"mov\tr0, %0\n\t"
-		"swi\t#8 << 16"
-		: : "ri"( x ) : "r0"
-	);
-#endif
-	return cpu::iregister<uint32, 0>::read();
+	using r0 = cpu::ioregister<uint32, 0>;
+
+	r0::write( x );
+	GBAXX_SWI_CALL( 8 );
+	return r0::read();
 }
 
 [[gnu::const, nodiscard]]
 inline int32 arc_tan( const int32 x ) noexcept {
-#if defined( __thumb__ )
-	__asm__(
-		"movs\tr0, %0\n\t"
-		"swi\t#9" 
-		: : "r"( x ) : "r0"
-	);
-#else
-	__asm__(
-		"mov\tr0, %0\n\t"
-		"swi\t#9 << 16" 
-		: : "ri"( x ) : "r0"
-	);
-#endif
-	return cpu::iregister<int32, 0>::read();
+	using r0 = cpu::ioregister<int32, 0>;
+
+	r0::write( x );
+	GBAXX_SWI_CALL( 9 );
+	return r0::read();
 }
 
 [[gnu::const, nodiscard]]
 inline uint32 arc_tan2( const int32 x, const int32 y ) noexcept {
-#if defined( __thumb__ )
-	__asm__(
-		"movs\tr0, %0\n\t"
-		"movs\tr1, %1\n\t"
-		"swi\t#10" 
-		: : "r"( x ), "r"( y ) : "r0", "r1"
-	);
-#else
-	__asm__(
-		"mov\tr0, %0\n\t"
-		"mov\tr1, %1\n\t"
-		"swi\t#10 << 16" 
-		: : "ri"( x ), "ri"( y ) : "r0", "r1"
-	);
-#endif
+	cpu::oregister<int32, 0>::write( x );
+	cpu::oregister<int32, 1>::write( y );
+	GBAXX_SWI_CALL( 10 );
 	return cpu::iregister<uint32, 0>::read();
 }
 
 inline void cpu_set( const uint32 src, const uint32 dst, const uint32 lengthMode ) {
-#if defined( __thumb__ )
-	__asm__(
-		"movs\tr0, %0\n\t"
-		"movs\tr1, %1\n\t"
-		"movs\tr2, %2\n\t"
-		"swi\t#11" 
-		: : "r"( src ), "r"( dst ), "r"( lengthMode ) : "r0", "r1", "r2"
-	);
-#else
-	__asm__(
-		"mov\tr0, %0\n\t"
-		"mov\tr1, %1\n\t"
-		"mov\tr2, %2\n\t"
-		"swi\t#11 << 16" 
-		: : "ri"( src ), "ri"( dst ), "ri"( lengthMode ) : "r0", "r1", "r2"
-	);
-#endif
+	cpu::oregister<uint32, 0>::write( src );
+	cpu::oregister<uint32, 1>::write( dst );
+	cpu::oregister<uint32, 2>::write( lengthMode );
+	GBAXX_SWI_CALL( 11 );
 }
 
 inline void cpu_fast_set( const uint32 src, const uint32 dst, const uint32 lengthMode ) {
-#if defined( __thumb__ )
-	__asm__(
-		"movs\tr0, %0\n\t"
-		"movs\tr1, %1\n\t"
-		"movs\tr2, %2\n\t"
-		"swi\t#12" 
-		: : "ri"( src ), "ri"( dst ), "ri"( lengthMode ) : "r0", "r1", "r2"
-	);
-#else
-	__asm__(
-		"mov\tr0, %0\n\t"
-		"mov\tr1, %1\n\t"
-		"mov\tr2, %2\n\t"
-		"swi\t#12 << 16" 
-		: : "ri"( src ), "ri"( dst ), "ri"( lengthMode ) : "r0", "r1", "r2"
-	);
-#endif
+	cpu::oregister<uint32, 0>::write( src );
+	cpu::oregister<uint32, 1>::write( dst );
+	cpu::oregister<uint32, 2>::write( lengthMode );
+	GBAXX_SWI_CALL( 12 );
 }
 
 namespace undocumented {
 
 	[[noreturn]]
 	inline void hard_reset() noexcept {
-#if defined( __thumb__ )
-		__asm__( "swi\t#38" );
-#else
-		__asm__( "swi\t#38 << 16" );
-#endif
+		GBAXX_SWI_CALL( 38 );
 		__builtin_unreachable();
 	}
 
 	[[gnu::const, nodiscard]]
 	inline uint32 get_bios_checksum() noexcept {
-#if defined( __thumb__ )
-		__asm__(
-			"swi\t#13"
-			: : : "r0"
-		);
-#else
-		__asm__(
-			"swi\t#13 << 16"
-			: : : "r0"
-		);
-#endif
+		GBAXX_SWI_CALL( 13 );
 		return cpu::iregister<uint32, 0>::read();
 	}
 
 } // undocumented
+
+#undef GBAXX_SWI_CALL
 
 } // swi
 } // bios
