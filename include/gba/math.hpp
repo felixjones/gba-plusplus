@@ -32,7 +32,7 @@ namespace detail {
 	constexpr ReprType sqrt_solve3( ReprType n, ReprType bit, ReprType result ) noexcept {
 		if ( bit != 0 ) {
 			if ( n >= result + bit ) {
-				return sqrt_solve3<ReprType>( static_cast< ReprType >( n - ( result + bit ) ), bit >> 2, static_cast< ReprType >( ( result >> 1 ) + bit ) );
+				return sqrt_solve3<ReprType>( static_cast<ReprType>( n - ( result + bit ) ), bit >> 2, static_cast<ReprType>( ( result >> 1 ) + bit ) );
 			} else {
 				return sqrt_solve3<ReprType>( n, bit >> 2, result >> 1 );
 			}

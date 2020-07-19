@@ -42,7 +42,7 @@ protected:
 	static constexpr auto to_value( const fixed_point<RhsReprType, RhsExpBits>& x ) noexcept -> typename std::enable_if<std::is_unsigned<RhsReprType>::value && ( RhsExpBits < exponent ), repr_type>::type {
 		constexpr auto shift = exponent - fixed_point<RhsReprType, RhsExpBits>::exponent;
 
-		return static_cast<repr_type>( x.data() << shift );
+		return static_cast<repr_type>( x.data() ) << shift;
 	}
 
 	template <typename RhsReprType, unsigned RhsExpBits>
