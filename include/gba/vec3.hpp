@@ -1,8 +1,6 @@
 #ifndef GBAXX_VEC3_HPP
 #define GBAXX_VEC3_HPP
 
-#include <cassert>
-
 #include <gba/bios.hpp>
 #include <gba/int.hpp>
 #include <gba/math.hpp>
@@ -32,8 +30,6 @@ struct vec3 {
 	constexpr vec3( const vec3<OType>& other ) noexcept : x( static_cast<value_type>( other.x ) ), y( static_cast<value_type>( other.y ) ), z( static_cast<value_type>( other.z ) ) {}
 
 	constexpr auto& operator []( size_type i ) noexcept {
-		assert( i >= 0 && i < 3 );
-
 		switch ( i ) {
 		default:
 		case 0:
@@ -46,8 +42,6 @@ struct vec3 {
 	}
 
 	constexpr const auto& operator []( size_type i ) const noexcept {
-		assert( i >= 0 && i < 3 );
-
 		switch ( i ) {
 		default:
 		case 0:

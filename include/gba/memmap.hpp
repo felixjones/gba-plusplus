@@ -83,6 +83,6 @@ public:
 template <typename Type, unsigned Address>
 class iomemmap : public imemmap<Type, Address>, public omemmap<Type, Address> {};
 
-}
+} // gba
 
 #endif // define GBAXX_MEMMAP_HPP

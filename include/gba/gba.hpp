@@ -24,6 +24,7 @@
 #include <gba/mat4.hpp>
 #include <gba/math.hpp>
 #include <gba/memmap.hpp>
+#include <gba/memmap_ext.hpp>
 #include <gba/mosaic.hpp>
 #include <gba/oam.hpp>
 #include <gba/printstream.hpp>

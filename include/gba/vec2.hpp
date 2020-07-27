@@ -1,9 +1,7 @@
 #ifndef GBAXX_VEC2_HPP
 #define GBAXX_VEC2_HPP
 
-#include <cassert>
-#include <type_traits>
-
+#include <gba/bios.hpp>
 #include <gba/int.hpp>
 #include <gba/math.hpp>
 
@@ -39,8 +37,6 @@ struct vec2 {
 	constexpr vec2( const vec2<OType>& other ) noexcept : x( other.x ), y( other.y ) {}
 
 	constexpr auto& operator []( size_type i ) noexcept {
-		assert( i >= 0 && i < 2 );
-
 		switch ( i ) {
 		default:
 		case 0:
@@ -51,8 +47,6 @@ struct vec2 {
 	}
 
 	constexpr const auto& operator []( size_type i ) const noexcept {
-		assert( i >= 0 && i < 2 );
-
 		switch ( i ) {
 		default:
 		case 0:
@@ -382,7 +376,11 @@ constexpr auto dot( const vec2<A>& a, const vec2<B>& b ) noexcept {
 template <typename V>
 constexpr auto length( const vec2<V>& v ) noexcept {
 	const auto d = dot( v, v );
-	return math::sqrt( d );
+	if ( __builtin_constant_p( v ) ) {
+		return math::sqrt( d );
+	} else {
+		return bios::sqrt( d );
+	}
 }
 
 template <typename A, typename B>

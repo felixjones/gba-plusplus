@@ -1,8 +1,6 @@
 #ifndef GBAXX_VEC4_HPP
 #define GBAXX_VEC4_HPP
 
-#include <cassert>
-
 #include <gba/bios.hpp>
 #include <gba/int.hpp>
 #include <gba/math.hpp>
@@ -33,8 +31,6 @@ struct vec4 {
 	constexpr vec4( const vec4<OType>& other ) noexcept : x( static_cast<value_type>( other.x ) ), y( static_cast<value_type>( other.y ) ), z( static_cast<value_type>( other.z ) ), w( static_cast<value_type>( other.w ) ) {}
 
 	constexpr auto& operator []( size_type i ) noexcept {
-		assert( i >= 0 && i < 4 );
-
 		switch ( i ) {
 		default:
 		case 0:
@@ -49,8 +45,6 @@ struct vec4 {
 	}
 
 	constexpr const auto& operator []( size_type i ) const noexcept {
-		assert( i >= 0 && i < 4 );
-
 		switch ( i ) {
 		default:
 		case 0:
@@ -422,6 +416,36 @@ template <typename A, typename B>
 constexpr auto operator ||( const vec4<A>& a, const vec4<B>& b ) noexcept {
 	return vec4<bool>( a.x || b.x, a.y || b.y, a.z || b.z, a.w || b.w );
 }
+
+namespace math {
+
+template <typename A, typename B>
+constexpr auto dot( const vec4<A>& a, const vec4<B>& b ) noexcept {
+	const auto c = a * b;
+	return c.x + c.y + c.z + c.w;
+}
+
+template <typename V>
+constexpr auto length( const vec4<V>& v ) noexcept {
+	const auto d = dot( v, v );
+	if ( __builtin_constant_p( v ) ) {
+		return math::sqrt( d );
+	} else {
+		return bios::sqrt( d );
+	}
+}
+
+template <typename A, typename B>
+constexpr auto distance( const vec4<A>& p0, const vec4<B>& p1 ) noexcept {
+	return length( p1 - p0 );
+}
+
+template <typename V>
+constexpr auto normalize( const vec4<V>& v ) noexcept {
+	return v / length( v );
+}
+
+} // math
 
 } // gba
 
