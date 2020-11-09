@@ -72,4 +72,4 @@ Use gba++ types `gba::int16 gba::uint16` and keep volatile as a separate keyword
 
 # What License?
 
-This is still under consideration. For now, the code is under [WTFPL](http://www.wtfpl.net/) with no intensions on keeping it.
+zlib going forward.
