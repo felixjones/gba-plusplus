@@ -1,6 +1,10 @@
 #ifndef GBAXX_GBA_HPP
 #define GBAXX_GBA_HPP
 
+#include <gba/io/bit_container.hpp>
+#include <gba/io/memmap.hpp>
+#include <gba/io/registers.hpp>
+
 #include <gba/types/int_type.hpp>
 
 #include <gba/video/display_control.hpp>

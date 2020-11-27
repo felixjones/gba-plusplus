@@ -25,6 +25,8 @@ struct display_control {
             window_object : 1;
 };
 
+static_assert( sizeof( display_control ) == 2, "display_control must be tightly packed" );
+
 } // gba
 
 #endif // define GBAXX_VIDEO_DISPLAY_CONTROL_HPP
