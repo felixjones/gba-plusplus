@@ -1,6 +1,8 @@
 #ifndef GBAXX_GBA_HPP
 #define GBAXX_GBA_HPP
 
+#include <gba/drawing/bitmap.hpp>
+
 #include <gba/io/bit_container.hpp>
 #include <gba/io/memmap.hpp>
 #include <gba/io/registers.hpp>

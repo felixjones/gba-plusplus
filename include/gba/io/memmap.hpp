@@ -19,7 +19,7 @@ template <typename Type, unsigned Address, typename Void = void>
 class imemmap;
 
 template <typename Type, unsigned Address>
-class imemmap<Type, Address, typename std::enable_if<std::is_fundamental<Type>::value>::type> : public virtual memmap<Type, Address> {
+class imemmap<Type, Address, typename std::enable_if<std::is_fundamental<Type>::value>::type> : public memmap<Type, Address> {
 public:
     [[nodiscard]]
     static Type read() noexcept {
@@ -28,7 +28,7 @@ public:
 };
 
 template <typename Type, unsigned Address>
-class imemmap<Type, Address, typename std::enable_if<!std::is_fundamental<Type>::value>::type> : public virtual memmap<Type, Address> {
+class imemmap<Type, Address, typename std::enable_if<!std::is_fundamental<Type>::value>::type> : public memmap<Type, Address> {
     using container_type = typename bit_container<Type>::type;
 public:
     [[nodiscard]]
@@ -42,7 +42,7 @@ template <typename Type, unsigned Address, typename Void = void>
 class omemmap;
 
 template <typename Type, unsigned Address>
-class omemmap<Type, Address, typename std::enable_if<std::is_fundamental<Type>::value>::type> : public virtual memmap<Type, Address> {
+class omemmap<Type, Address, typename std::enable_if<std::is_fundamental<Type>::value>::type> : public memmap<Type, Address> {
 public:
     static void write( const Type& value ) noexcept {
         *reinterpret_cast<volatile Type *>( Address ) = value;
@@ -50,7 +50,7 @@ public:
 };
 
 template <typename Type, unsigned Address>
-class omemmap<Type, Address, typename std::enable_if<!std::is_fundamental<Type>::value>::type> : public virtual memmap<Type, Address> {
+class omemmap<Type, Address, typename std::enable_if<!std::is_fundamental<Type>::value>::type> : public memmap<Type, Address> {
     using container_type = typename bit_container<Type>::type;
 public:
     static void write( const Type& value ) noexcept {

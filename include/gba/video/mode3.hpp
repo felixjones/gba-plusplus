@@ -1,6 +1,8 @@
 #ifndef GBAXX_VIDEO_MODE3_HPP
 #define GBAXX_VIDEO_MODE3_HPP
 
+#include <gba/drawing/bitmap.hpp>
+#include <gba/drawing/color.hpp>
 #include <gba/video/mode.hpp>
 
 namespace gba {
@@ -10,6 +12,23 @@ namespace gba {
  */
 template <>
 struct mode<3> {
+    /**
+     *
+     */
+    struct frame_buffer {
+        static constexpr auto address = 0x6000000;
+
+        using pixel_type = color::rgb555;
+        using buffer_row = pixel_type[240];
+
+        static void put_pixel( int x, int y, pixel_type color ) noexcept {
+            reinterpret_cast<buffer_row *>( address )[y][x] = color;
+        }
+    };
+
+    /**
+     *
+     */
     struct display_control : gba::display_control {
         constexpr display_control() noexcept : gba::display_control { 3 } {}
 
