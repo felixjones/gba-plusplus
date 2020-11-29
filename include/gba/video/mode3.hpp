@@ -1,6 +1,8 @@
 #ifndef GBAXX_VIDEO_MODE3_HPP
 #define GBAXX_VIDEO_MODE3_HPP
 
+#include <algorithm>
+
 #include <gba/drawing/bitmap.hpp>
 #include <gba/drawing/color.hpp>
 #include <gba/video/mode.hpp>
@@ -23,6 +25,88 @@ struct mode<3> {
 
         static void put_pixel( int x, int y, pixel_type color ) noexcept {
             reinterpret_cast<buffer_row *>( address )[y][x] = color;
+        }
+
+        static void clear_to_color( pixel_type color ) noexcept {
+            struct pixel2_type {
+                pixel_type color[2];
+            };
+            std::fill( reinterpret_cast<pixel2_type *>( address ), reinterpret_cast<pixel2_type *>( address ) + ( 240 * 80 ), pixel2_type { color, color } );
+        }
+
+        static void rect_fill( int x1, int y1, int x2, int y2, pixel_type color ) noexcept {
+            for ( int yy = y1; yy < y2; ++yy ) {
+                std::fill( reinterpret_cast<buffer_row *>( address )[yy] + x1, reinterpret_cast<buffer_row *>( address )[yy] + x2, color );
+            }
+        }
+
+        static void rect( int x1, int y1, int x2, int y2, pixel_type color ) noexcept {
+            std::fill( reinterpret_cast<buffer_row *>( address )[y1] + x1, reinterpret_cast<buffer_row *>( address )[y1] + x2, color );
+            std::fill( reinterpret_cast<buffer_row *>( address )[y2 - 1] + x1, reinterpret_cast<buffer_row *>( address )[y2 - 1] + x2, color );
+            for ( int yy = y1 + 1; yy < y2 - 1; ++yy ) {
+                reinterpret_cast<buffer_row *>( address )[yy][x1] = color;
+                reinterpret_cast<buffer_row *>( address )[yy][x2 - 1] = color;
+            }
+        }
+
+        static void line( int x1, int y1, int x2, int y2, pixel_type color ) noexcept {
+            auto * dst = reinterpret_cast<buffer_row *>( address )[y1] + x1;
+
+            int xstep;
+            int dx;
+            if ( x1 > x2 ) {
+                xstep = -1;
+                dx = x1 - x2;
+            } else {
+                xstep = +1;
+                dx = x2 - x1;
+            }
+
+            int ystep;
+            int dy;
+            if ( y1 > y2 ) {
+                ystep = -240;
+                dy = y1 - y2;
+            } else {
+                ystep = +240;
+                dy = y2 - y1;
+            }
+
+            if ( dy == 0 ) {
+                std::fill( dst, dst + dx, color );
+            } else if ( dx == 0 ) {
+                for ( int yy = 0; yy < dy; ++yy ) {
+                    dst[yy * ystep] = color;
+                }
+            } else if ( dx >= dy ) {
+                int dd = 2 * dy - dx;
+                for ( int ii = 0; ii <= dx; ++ii ) {
+                    *dst = color;
+                    if ( dd >= 0 ) {
+                        dd -= 2 * dx;
+                        dst += ystep;
+                    }
+
+                    dd += 2 * dy;
+                    dst += xstep;
+                }
+            } else {
+                int dd = 2 * dx - dy;
+                for ( int ii = 0; ii <= dy; ++ii ) {
+                    *dst = color;
+                    if ( dd >= 0 ) {
+                        dd -= 2 * dy;
+                        dst += xstep;
+                    }
+
+                    dd += 2 * dx;
+                    dst += ystep;
+                }
+            }
+        }
+
+        static void clear() noexcept {
+            clear_to_color( {} );
         }
     };
 

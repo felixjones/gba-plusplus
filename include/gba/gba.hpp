@@ -10,6 +10,7 @@
 #include <gba/types/int_type.hpp>
 
 #include <gba/video/display_control.hpp>
+#include <gba/video/display_status.hpp>
 #include <gba/video/mode.hpp>
 #include <gba/video/mode0.hpp>
 #include <gba/video/mode1.hpp>

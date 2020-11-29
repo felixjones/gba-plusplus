@@ -13,6 +13,8 @@ struct rgb555 {
     uint16 : 1;
 };
 
+static_assert( sizeof( rgb555 ) == 2, "rgb555 must be tightly packed" );
+
 } // color
 } // gba
 
