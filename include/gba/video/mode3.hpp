@@ -28,10 +28,10 @@ struct mode<3> {
         }
 
         static void clear_to_color( pixel_type color ) noexcept {
-            struct pixel2_type {
-                pixel_type color[2];
+            struct pixel_pair {
+                pixel_type data[2];
             };
-            std::fill( reinterpret_cast<pixel2_type *>( address ), reinterpret_cast<pixel2_type *>( address ) + ( 240 * 80 ), pixel2_type { color, color } );
+            std::fill( reinterpret_cast<pixel_pair *>( address ), reinterpret_cast<pixel_pair *>( address ) + ( 240 * 80 ), pixel_pair { color, color } );
         }
 
         static void rect_fill( int x1, int y1, int x2, int y2, pixel_type color ) noexcept {
