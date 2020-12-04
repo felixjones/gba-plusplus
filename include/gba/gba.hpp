@@ -1,6 +1,8 @@
 #ifndef GBAXX_GBA_HPP
 #define GBAXX_GBA_HPP
 
+#include <gba/bios/halt.hpp>
+
 #include <gba/drawing/bitmap.hpp>
 
 #include <gba/interrupt/flags.hpp>
