@@ -4,7 +4,7 @@
 #include <algorithm>
 
 #include <gba/drawing/bitmap.hpp>
-#include <gba/drawing/color.hpp>
+#include <gba/types/color.hpp>
 #include <gba/video/mode.hpp>
 
 namespace gba {
@@ -25,6 +25,11 @@ struct mode<3> {
 
         static void put_pixel( int x, int y, pixel_type color ) noexcept {
             reinterpret_cast<buffer_row *>( address )[y][x] = color;
+        }
+
+        [[nodiscard]]
+        static pixel_type get_pixel( int x, int y ) noexcept {
+            return reinterpret_cast<buffer_row *>( address )[y][x];
         }
 
         static void clear_to_color( pixel_type color ) noexcept {
@@ -114,7 +119,9 @@ struct mode<3> {
      *
      */
     struct display_control : gba::display_control {
-        constexpr display_control() noexcept : gba::display_control { 3 } {}
+        constexpr display_control() noexcept : gba::display_control { 3, false, false, false, false, false, false,
+                                                                      false, false, false, false, false, false,
+                                                                      false } {}
 
         constexpr auto& object_horizontal_blank_access( const bool value ) noexcept {
             gba::display_control::object_horizontal_blank_access = value;

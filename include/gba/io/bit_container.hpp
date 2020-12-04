@@ -32,7 +32,7 @@ struct bit_container<Type, 1, 0, 0> {
 };
 
 template <typename Type>
-[[nodiscard]]
+[[nodiscard, gnu::always_inline]]
 auto to_bit_container( const Type& type ) noexcept -> typename std::enable_if<std::is_trivially_copyable<Type>::value, typename bit_container<Type>::type>::type {
 #if __cpp_lib_bit_cast
     return std::bit_cast<typename bit_container<Type>::type>( type );
@@ -44,7 +44,7 @@ auto to_bit_container( const Type& type ) noexcept -> typename std::enable_if<st
 }
 
 template <typename Type>
-[[nodiscard]]
+[[nodiscard, gnu::always_inline]]
 auto from_bit_container( const volatile typename bit_container<Type>::type& container ) noexcept -> typename std::enable_if<std::is_trivially_copyable<Type>::value, Type>::type {
     const auto data = container;
 #if __cpp_lib_bit_cast

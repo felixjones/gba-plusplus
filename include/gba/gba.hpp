@@ -7,6 +7,7 @@
 #include <gba/io/memmap.hpp>
 #include <gba/io/registers.hpp>
 
+#include <gba/types/color.hpp>
 #include <gba/types/int_type.hpp>
 
 #include <gba/video/display_control.hpp>
@@ -18,5 +19,6 @@
 #include <gba/video/mode3.hpp>
 #include <gba/video/mode4.hpp>
 #include <gba/video/mode5.hpp>
+#include <gba/video/palette.hpp>
 
 #endif // define GBAXX_GBA_HPP

@@ -11,7 +11,9 @@ namespace gba {
 template <>
 struct mode<5> {
     struct display_control : gba::display_control {
-        constexpr display_control() noexcept : gba::display_control { 5 } {}
+        constexpr display_control() noexcept : gba::display_control { 5, false, false, false, false, false, false,
+                                                                      false, false, false, false, false, false,
+                                                                      false } {}
 
         constexpr auto& page_select( const bool value ) noexcept {
             gba::display_control::page_select = value;

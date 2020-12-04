@@ -13,26 +13,48 @@ struct bitmap : BitmapDef {
         BitmapDef::put_pixel( x, y, color );
     }
 
-    static void clear_to_color( pixel_type color ) noexcept {
+    [[nodiscard]]
+    pixel_type get_pixel( int x, int y ) const noexcept {
+        return BitmapDef::get_pixel( x, y );
+    }
+
+    void clear_to_color( pixel_type color ) noexcept {
         BitmapDef::clear_to_color( color );
     }
 
-    static void rect_fill( int x1, int y1, int x2, int y2, pixel_type color ) noexcept {
+    void rect_fill( int x1, int y1, int x2, int y2, pixel_type color ) noexcept {
         BitmapDef::rect_fill( x1, y1, x2, y2, color );
     }
 
-    static void rect( int x1, int y1, int x2, int y2, pixel_type color ) noexcept {
+    void rect( int x1, int y1, int x2, int y2, pixel_type color ) noexcept {
         BitmapDef::rect( x1, y1, x2, y2, color );
     }
 
-    static void line( int x1, int y1, int x2, int y2, pixel_type color ) noexcept {
+    void line( int x1, int y1, int x2, int y2, pixel_type color ) noexcept {
         BitmapDef::line( x1, y1, x2, y2, color );
     }
 
-    static void clear() noexcept {
+    void clear() noexcept {
         BitmapDef::clear();
     }
 };
+
+template <typename PixelType, unsigned Width, unsigned Height>
+struct image_def {
+    using pixel_type = PixelType;
+    static constexpr auto width = Width;
+    static constexpr auto height = Height;
+
+    [[nodiscard]]
+    pixel_type get_pixel( int x, int y ) const noexcept {
+        return address[( y * Width ) + x];
+    }
+
+    const pixel_type * address;
+};
+
+template <typename PixelType, unsigned Width, unsigned Height>
+using image = bitmap<image_def<PixelType, Width, Height>>;
 
 } // gba
 

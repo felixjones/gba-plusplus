@@ -11,7 +11,9 @@ namespace gba {
 template <>
 struct mode<0> {
     struct display_control : gba::display_control {
-        constexpr display_control() noexcept : gba::display_control { 0 } {}
+        constexpr display_control() noexcept : gba::display_control { 0, false, false, false, false, false, false,
+                                                                      false, false, false, false, false, false,
+                                                                      false } {}
 
         constexpr auto& object_horizontal_blank_access( const bool value ) noexcept {
             gba::display_control::object_horizontal_blank_access = value;

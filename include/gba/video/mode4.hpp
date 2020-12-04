@@ -32,6 +32,12 @@ struct mode<4> {
             reinterpret_cast<buffer_row *>( address )[y][x / 2] = to_bit_container( pair );
         }
 
+        [[nodiscard]]
+        static pixel_type get_pixel( int x, int y ) noexcept {
+            auto pair = from_bit_container<pixel_pair>( reinterpret_cast<buffer_row *>( address )[y][x / 2] );
+            return pair.data[x % 2];
+        }
+
         static void clear_to_color( pixel_type index ) noexcept {
             std::fill( reinterpret_cast<pixel_pair *>( address ), reinterpret_cast<pixel_pair *>( address ) + ( 240 * 80 ), pixel_pair { index, index } );
         }
@@ -191,13 +197,26 @@ struct mode<4> {
         static void clear() noexcept {
             clear_to_color( 0 );
         }
+
+        template <typename BitmapDef, typename = typename std::enable_if<std::is_same<typename BitmapDef::pixel_type, pixel_type>::value, void>::type>
+        static void blit( const bitmap<BitmapDef>& source, int srcX, int srcY, int dstX, int dstY, int width, int height ) noexcept {
+            for ( int yy = 0; yy < height; ++yy ) {
+                // TODO : pixel_pair
+
+                for ( int xx = 0; xx < width; ++xx ) {
+                    put_pixel( dstX + xx, dstY + yy, source.get_pixel( srcX + xx, srcY + yy ) );
+                }
+            }
+        }
     };
 
     using frame_buffer_0 = frame_buffer<0x6000000>;
     using frame_buffer_1 = frame_buffer<0x600a000>;
 
     struct display_control : gba::display_control {
-        constexpr display_control() noexcept : gba::display_control { 4 } {}
+        constexpr display_control() noexcept : gba::display_control { 4, false, false, false, false, false, false,
+                                                                      false, false, false, false, false, false,
+                                                                      false } {}
 
         constexpr auto& page_select( const bool value ) noexcept {
             gba::display_control::page_select = value;

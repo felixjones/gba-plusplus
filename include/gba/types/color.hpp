@@ -1,5 +1,5 @@
-#ifndef GBAXX_DRAWING_COLOR_HPP
-#define GBAXX_DRAWING_COLOR_HPP
+#ifndef GBAXX_TYPES_COLOR_HPP
+#define GBAXX_TYPES_COLOR_HPP
 
 #include <gba/types/int_type.hpp>
 
@@ -18,4 +18,4 @@ static_assert( sizeof( rgb555 ) == 2, "rgb555 must be tightly packed" );
 } // color
 } // gba
 
-#endif // define GBAXX_DRAWING_COLOR_HPP
+#endif // define GBAXX_TYPES_COLOR_HPP
