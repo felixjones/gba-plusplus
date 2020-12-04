@@ -3,7 +3,10 @@
 
 #include <gba/drawing/bitmap.hpp>
 
+#include <gba/interrupt/flags.hpp>
+
 #include <gba/io/bit_container.hpp>
+#include <gba/io/ioguard.hpp>
 #include <gba/io/memmap.hpp>
 #include <gba/io/registers.hpp>
 
