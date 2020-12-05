@@ -22,6 +22,16 @@ public:
     }
 
     [[nodiscard]]
+    constexpr int axis_x() const noexcept {
+        return -( ( m_keys & key::left.data ) == 0 ) + ( ( m_keys & key::right.data ) == 0 );
+    }
+
+    [[nodiscard]]
+    constexpr int axis_y() const noexcept {
+        return -( ( m_keys & key::up.data ) == 0 ) + ( ( m_keys & key::down.data ) == 0 );
+    }
+
+    [[nodiscard]]
     constexpr bool is_down( key_mask mask ) const noexcept {
         return ( m_keys & mask.data ) == 0;
     }
@@ -68,7 +78,7 @@ public:
 
     [[nodiscard]]
     constexpr bool any_switched_down( key_mask mask ) const noexcept {
-        return ( m_keys & m_xor & mask.data ) != m_xor;
+        return ( m_keys & m_xor & mask.data ) != ( m_xor & mask.data );
     }
 
     [[nodiscard]]
