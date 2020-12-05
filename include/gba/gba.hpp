@@ -12,6 +12,9 @@
 #include <gba/io/memmap.hpp>
 #include <gba/io/registers.hpp>
 
+#include <gba/keypad/key_handler.hpp>
+#include <gba/keypad/keys.hpp>
+
 #include <gba/types/color.hpp>
 #include <gba/types/int_type.hpp>
 
