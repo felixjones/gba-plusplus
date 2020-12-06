@@ -4,6 +4,7 @@
 #include <gba/bios/halt.hpp>
 
 #include <gba/drawing/bitmap.hpp>
+#include <gba/drawing/tile_bitmap.hpp>
 
 #include <gba/interrupt/flags.hpp>
 
@@ -18,6 +19,10 @@
 #include <gba/types/color.hpp>
 #include <gba/types/int_type.hpp>
 
+#include <gba/video/background_affine.hpp>
+#include <gba/video/background_control.hpp>
+#include <gba/video/background_regular.hpp>
+#include <gba/video/character_block.hpp>
 #include <gba/video/display_control.hpp>
 #include <gba/video/display_status.hpp>
 #include <gba/video/mode.hpp>

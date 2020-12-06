@@ -1,6 +1,8 @@
 #ifndef GBAXX_VIDEO_MODE2_HPP
 #define GBAXX_VIDEO_MODE2_HPP
 
+#include <gba/io/memmap.hpp>
+#include <gba/video/background_affine.hpp>
 #include <gba/video/mode.hpp>
 
 namespace gba {
@@ -10,6 +12,12 @@ namespace gba {
  */
 template <>
 struct mode<2> {
+    using background2_control = iomemmap<background_affine::control, 0x400000c>;
+    using background3_control = iomemmap<background_affine::control, 0x400000e>;
+
+    /**
+     *
+     */
     struct display_control : gba::display_control {
         constexpr display_control() noexcept : gba::display_control { 2, false, false, false, false, false, false,
                                                                       false, false, false, false, false, false,

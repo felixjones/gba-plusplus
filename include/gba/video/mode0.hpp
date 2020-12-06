@@ -1,6 +1,8 @@
 #ifndef GBAXX_VIDEO_MODE0_HPP
 #define GBAXX_VIDEO_MODE0_HPP
 
+#include <gba/io/memmap.hpp>
+#include <gba/video/background_regular.hpp>
 #include <gba/video/mode.hpp>
 
 namespace gba {
@@ -10,6 +12,23 @@ namespace gba {
  */
 template <>
 struct mode<0> {
+    using background0_control = iomemmap<background_regular::control, 0x4000008>;
+    using background1_control = iomemmap<background_regular::control, 0x400000a>;
+    using background2_control = iomemmap<background_regular::control, 0x400000c>;
+    using background3_control = iomemmap<background_regular::control, 0x400000e>;
+
+    using background0_x = omemmap<int16, 0x4000010>;
+    using background0_y = omemmap<int16, 0x4000012>;
+    using background1_x = omemmap<int16, 0x4000014>;
+    using background1_y = omemmap<int16, 0x4000016>;
+    using background2_x = omemmap<int16, 0x4000018>;
+    using background2_y = omemmap<int16, 0x400001a>;
+    using background3_x = omemmap<int16, 0x400001c>;
+    using background3_y = omemmap<int16, 0x400001e>;
+
+    /**
+     *
+     */
     struct display_control : gba::display_control {
         constexpr display_control() noexcept : gba::display_control { 0, false, false, false, false, false, false,
                                                                       false, false, false, false, false, false,
@@ -76,7 +95,6 @@ struct mode<0> {
         using gba::display_control::page_select;
     };
 };
-
 
 } // gba
 

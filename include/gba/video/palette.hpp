@@ -101,6 +101,8 @@ struct palette_definition {
      */
     class iterator {
     public:
+        using iterator_category = std::forward_iterator_tag;
+
         using value_type = color::rgb555;
         using size_type = uint32;
         using difference_type = int32;
@@ -150,6 +152,8 @@ struct palette_definition {
      */
     class const_iterator {
     public:
+        using iterator_category = std::forward_iterator_tag;
+
         using value_type = color::rgb555;
         using size_type = uint32;
         using difference_type = int32;
@@ -227,8 +231,8 @@ struct palette_definition {
     }
 };
 
-using palette_background_8pp = palette_definition<0x5000000, 256>;
-using palette_object_8pp = palette_definition<0x5000200, 256>;
+using palette_background_8bpp = palette_definition<0x5000000, 256>;
+using palette_object_8bpp = palette_definition<0x5000200, 256>;
 
 /**
  *
@@ -250,6 +254,8 @@ struct palette_bank_definition {
      */
     class iterator {
     public:
+        using iterator_category = std::forward_iterator_tag;
+
         using value_type = color::rgb555;
         using size_type = uint32;
         using difference_type = int32;
@@ -300,6 +306,8 @@ struct palette_bank_definition {
      */
     class const_iterator {
     public:
+        using iterator_category = std::forward_iterator_tag;
+
         using value_type = color::rgb555;
         using size_type = uint32;
         using difference_type = int32;
@@ -411,8 +419,8 @@ struct palette_bank_definition {
     const size_type bank;
 };
 
-using palette_background_4pp = palette_bank_definition<0x5000000, 16>;
-using palette_object_4pp = palette_bank_definition<0x5000200, 16>;
+using palette_background_4bpp = palette_bank_definition<0x5000000, 16>;
+using palette_object_4bpp = palette_bank_definition<0x5000200, 16>;
 
 } // gba
 
