@@ -33,5 +33,6 @@
 #include <gba/video/mode4.hpp>
 #include <gba/video/mode5.hpp>
 #include <gba/video/palette.hpp>
+#include <gba/video/screen_block.hpp>
 
 #endif // define GBAXX_GBA_HPP
