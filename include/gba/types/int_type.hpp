@@ -48,6 +48,61 @@ using uint8 = uint_type<8>::type;
 using uint16 = uint_type<16>::type;
 using uint32 = uint_type<32>::type;
 
+namespace detail {
+
+    template <int MinNumDigits, class Smaller, class T>
+    struct enable_for_range : std::enable_if<MinNumDigits <= std::numeric_limits<T>::digits && std::numeric_limits<Smaller>::digits < MinNumDigits> {};
+
+    template <int MinNumDigits, class Smallest>
+    struct enable_for_range<MinNumDigits, void, Smallest> : std::enable_if<MinNumDigits <= std::numeric_limits<Smallest>::digits> {};
+
+    template <int MinNumDigits, class Enable = void>
+    struct set_digits_signed;
+
+    template <int MinNumDigits>
+    struct set_digits_signed<MinNumDigits, typename detail::enable_for_range<MinNumDigits, void, std::int8_t>::type> {
+        using type = int8;
+    };
+
+    template <int MinNumDigits>
+    struct set_digits_signed<MinNumDigits, typename detail::enable_for_range<MinNumDigits, std::int8_t, std::int16_t>::type> {
+        using type = int16;
+    };
+
+    template <int MinNumDigits>
+    struct set_digits_signed<MinNumDigits, typename detail::enable_for_range<MinNumDigits, std::int16_t, std::int32_t>::type> {
+        using type = int32;
+    };
+
+    template <int MinNumDigits, class Enable = void>
+    struct set_digits_unsigned;
+
+    template <int MinNumDigits>
+    struct set_digits_unsigned<MinNumDigits, typename detail::enable_for_range<MinNumDigits, void, std::uint8_t>::type> {
+        using type = uint8;
+    };
+
+    template <int MinNumDigits>
+    struct set_digits_unsigned<MinNumDigits, typename detail::enable_for_range<MinNumDigits, std::uint8_t, std::uint16_t>::type> {
+        using type = uint16;
+    };
+
+    template <int MinNumDigits>
+    struct set_digits_unsigned<MinNumDigits, typename detail::enable_for_range<MinNumDigits, std::uint16_t, std::uint32_t>::type> {
+        using type = uint32;
+    };
+
+    template <class Integer, int MinNumDigits>
+    using set_digits_integer = std::conditional_t<std::numeric_limits<Integer>::is_signed, set_digits_signed<MinNumDigits>, set_digits_unsigned<MinNumDigits>>;
+
+} // detail
+
+template <class T, int Digits, class Enable = void>
+struct set_digits;
+
+template <class T, int Digits>
+struct set_digits<T, Digits, std::enable_if_t<std::is_integral<T>::value>> : detail::set_digits_integer<T, Digits> {};
+
 } // gba
 
 #endif // define GBAXX_TYPES_INT_TYPE_HPP

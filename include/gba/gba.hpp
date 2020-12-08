@@ -18,6 +18,9 @@
 #include <gba/keypad/keys.hpp>
 
 #include <gba/types/color.hpp>
+#include <gba/types/fixed_point.hpp>
+#include <gba/types/fixed_point_make.hpp>
+#include <gba/types/fixed_point_operators.hpp>
 #include <gba/types/int_type.hpp>
 
 #include <gba/video/background_affine.hpp>
