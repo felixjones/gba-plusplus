@@ -89,4 +89,24 @@ constexpr auto operator /( const LhsInteger& lhs, const gba::fixed_point<RhsRep,
     return gba::fixed_point<LhsInteger, 0> { lhs } / rhs;
 }
 
+template <class LhsRep, int LhsExponent, class Rhs>
+constexpr auto operator +=( gba::fixed_point<LhsRep, LhsExponent>& lhs, const Rhs& rhs) noexcept {
+    return lhs = lhs + rhs;
+}
+
+template <class LhsRep, int LhsExponent, class Rhs>
+constexpr auto operator -=( gba::fixed_point<LhsRep, LhsExponent>& lhs, const Rhs& rhs) noexcept {
+    return lhs = lhs - rhs;
+}
+
+template <class LhsRep, int LhsExponent, class Rhs>
+constexpr auto operator *=( gba::fixed_point<LhsRep, LhsExponent>& lhs, const Rhs& rhs) noexcept {
+    return lhs = lhs * rhs;
+}
+
+template <class LhsRep, int LhsExponent, class Rhs>
+constexpr auto operator /=( gba::fixed_point<LhsRep, LhsExponent>& lhs, const Rhs& rhs) noexcept {
+    return lhs = lhs / rhs;
+}
+
 #endif // define GBAXX_FIXED_POINT_OPERATORS_HPP
