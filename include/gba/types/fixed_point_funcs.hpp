@@ -28,7 +28,7 @@ namespace detail {
 
 constexpr auto sin_bam16( int32 x ) noexcept {
     x = static_cast<uint32>( x ) << 17;
-    if ( ( x ^ ( static_cast<uint32>( x ) << 1 ) ) < 0 ) {
+    if ( static_cast<int32>( x ^ ( static_cast<uint32>( x ) << 1 ) ) < 0 ) {
         x = ( 1 << 31 ) - x;
     }
     x = x >> 17;

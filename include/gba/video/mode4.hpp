@@ -16,9 +16,8 @@ struct mode<4> {
      *
      * @tparam Address starting address of frame buffer page
      */
-    template <unsigned Address>
     struct frame_buffer {
-        static constexpr auto address = Address;
+        uint32 address;
 
         using pixel_type = uint8;
         struct pixel_pair {
@@ -26,23 +25,23 @@ struct mode<4> {
         };
         using buffer_row = uint16[120];
 
-        static void put_pixel( int x, int y, pixel_type index ) noexcept {
+        void put_pixel( int x, int y, pixel_type index ) noexcept {
             auto pair = from_bit_container<pixel_pair>( reinterpret_cast<buffer_row *>( address )[y][x / 2] );
             pair.data[x % 2] = index;
             reinterpret_cast<buffer_row *>( address )[y][x / 2] = to_bit_container( pair );
         }
 
         [[nodiscard]]
-        static pixel_type get_pixel( int x, int y ) noexcept {
+        pixel_type get_pixel( int x, int y ) noexcept {
             auto pair = from_bit_container<pixel_pair>( reinterpret_cast<buffer_row *>( address )[y][x / 2] );
             return pair.data[x % 2];
         }
 
-        static void clear_to_color( pixel_type index ) noexcept {
+        void clear_to_color( pixel_type index ) noexcept {
             std::fill( reinterpret_cast<pixel_pair *>( address ), reinterpret_cast<pixel_pair *>( address ) + ( 240 * 80 ), pixel_pair { index, index } );
         }
 
-        static void rect_fill( int x1, int y1, int x2, int y2, pixel_type index ) noexcept {
+        void rect_fill( int x1, int y1, int x2, int y2, pixel_type index ) noexcept {
             const auto fillPair = to_bit_container( pixel_pair { index, index } );
             const auto left = x1 + ( x1 % 2 );
             const auto right = x2 - ( x2 % 2 );
@@ -69,7 +68,7 @@ struct mode<4> {
             }
         }
 
-        static void rect( int x1, int y1, int x2, int y2, pixel_type index ) noexcept {
+        void rect( int x1, int y1, int x2, int y2, pixel_type index ) noexcept {
             const auto fillPair = to_bit_container( pixel_pair { index, index } );
             const auto left = x1 + ( x1 % 2 );
             const auto right = x2 - ( x2 % 2 );
@@ -117,7 +116,7 @@ struct mode<4> {
             }
         }
 
-        static void line( int x1, int y1, int x2, int y2, pixel_type index ) noexcept {
+        void line( int x1, int y1, int x2, int y2, pixel_type index ) noexcept {
             int xstep;
             int dx;
             if ( x1 > x2 ) {
@@ -194,12 +193,12 @@ struct mode<4> {
             }
         }
 
-        static void clear() noexcept {
+        void clear() noexcept {
             clear_to_color( 0 );
         }
 
         template <typename BitmapDef, typename = typename std::enable_if<std::is_same<typename BitmapDef::pixel_type, pixel_type>::value, void>::type>
-        static void blit( const bitmap<BitmapDef>& source, int srcX, int srcY, int dstX, int dstY, int width, int height ) noexcept {
+        void blit( const bitmap<BitmapDef>& source, int srcX, int srcY, int dstX, int dstY, int width, int height ) noexcept {
             for ( int yy = 0; yy < height; ++yy ) {
                 // TODO : pixel_pair
 
@@ -210,8 +209,13 @@ struct mode<4> {
         }
     };
 
-    using frame_buffer_0 = frame_buffer<0x6000000>;
-    using frame_buffer_1 = frame_buffer<0x600a000>;
+    constexpr auto frame_buffer_0() noexcept {
+        return frame_buffer { 0x6000000 };
+    }
+
+    constexpr auto frame_buffer_1() noexcept {
+        return frame_buffer { 0x600a000 };
+    }
 
     struct display_control : gba::display_control {
         constexpr display_control() noexcept : gba::display_control { 4, false, false, false, false, false, false,
