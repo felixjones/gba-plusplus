@@ -37,6 +37,7 @@
 #include <gba/video/mode3.hpp>
 #include <gba/video/mode4.hpp>
 #include <gba/video/mode5.hpp>
+#include <gba/video/object_attribute.hpp>
 #include <gba/video/palette.hpp>
 #include <gba/video/screen_block.hpp>
 

@@ -123,4 +123,29 @@ constexpr auto operator /=( gba::fixed_point<LhsRep, LhsExponent>& lhs, const Rh
     return lhs = lhs / rhs;
 }
 
+template <class LhsRep, int LhsExponent, class Rhs>
+constexpr auto operator >( gba::fixed_point<LhsRep, LhsExponent>& lhs, const Rhs& rhs) noexcept {
+    return lhs.data() > gba::fixed_point<LhsRep, LhsExponent>( rhs ).data();
+}
+
+template <class LhsRep, int LhsExponent, class Rhs>
+constexpr auto operator >=( gba::fixed_point<LhsRep, LhsExponent>& lhs, const Rhs& rhs) noexcept {
+    return lhs.data() >= gba::fixed_point<LhsRep, LhsExponent>( rhs ).data();
+}
+
+template <class LhsRep, int LhsExponent, class Rhs>
+constexpr auto operator <( gba::fixed_point<LhsRep, LhsExponent>& lhs, const Rhs& rhs) noexcept {
+    return lhs.data() < gba::fixed_point<LhsRep, LhsExponent>( rhs ).data();
+}
+
+template <class LhsRep, int LhsExponent, class Rhs>
+constexpr auto operator <=( gba::fixed_point<LhsRep, LhsExponent>& lhs, const Rhs& rhs) noexcept {
+    return lhs.data() <= gba::fixed_point<LhsRep, LhsExponent>( rhs ).data();
+}
+
+template <class LhsRep, int LhsExponent, class Rhs>
+constexpr auto operator ==( gba::fixed_point<LhsRep, LhsExponent>& lhs, const Rhs& rhs) noexcept {
+    return lhs.data() == gba::fixed_point<LhsRep, LhsExponent>( rhs ).data();
+}
+
 #endif // define GBAXX_FIXED_POINT_OPERATORS_HPP
