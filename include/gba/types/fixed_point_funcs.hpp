@@ -26,18 +26,18 @@
 namespace gba {
 namespace detail {
 
-constexpr auto sin_bam16( int32 bam ) noexcept {
-    auto x = bam << 17;
-    if ( ( x ^ ( x << 1 ) ) < 0 ) {
+constexpr auto sin_bam16( int32 x ) noexcept {
+    x = static_cast<uint32>( x ) << 17;
+    if ( ( x ^ ( static_cast<uint32>( x ) << 1 ) ) < 0 ) {
         x = ( 1 << 31 ) - x;
     }
     x = x >> 17;
-    return make_fixed<19, 12>::from_data( x * ( 0x18000 - ( ( x * x ) >> 11 ) ) >> 17 );
+    return fixed_point<int32, 12>::from_data( x * ( ( 3 << 15 ) - ( x * x >> 11 ) ) >> 17 );
 }
 
 template <class Rep, int Exponent>
 constexpr int32 radian_to_bam16( const fixed_point<Rep, Exponent>& radian ) noexcept {
-    constexpr auto radTo16 = fixed_point<uint32, -19>( 16384.0 / 3.14159265358979323846264338327950288 );
+    constexpr auto radTo16 = fixed_point<Rep, Exponent>( 16384.0 / 3.14159265358979323846264338327950288 );
     return static_cast<int32>( radian * radTo16 );
 }
 
@@ -89,12 +89,12 @@ constexpr auto sqrt( const fixed_point<Rep, Exponent>& x ) noexcept {
 
 template <class Rep, int Exponent>
 constexpr auto sin( const fixed_point<Rep, Exponent>& radian ) noexcept {
-    return detail::sin_bam16( detail::radian_to_bam16( radian ) );
+    return detail::sin_bam16( detail::radian_to_bam16( radian ) & 0xffff );
 }
 
 template <class Rep, int Exponent>
 constexpr auto cos( const fixed_point<Rep, Exponent>& radian ) noexcept {
-    return detail::sin_bam16( detail::radian_to_bam16( radian ) + 0x2000 );
+    return detail::sin_bam16( ( detail::radian_to_bam16( radian ) + 0x2000 ) & 0xffff );
 }
 
 } // gba

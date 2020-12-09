@@ -14,7 +14,9 @@ constexpr auto operator -( const gba::fixed_point<RhsRep, RhsExponent>& rhs ) no
 
 template <class LhsRep, int LhsExponent, class RhsRep, int RhsExponent>
 constexpr auto operator +( const gba::fixed_point<LhsRep, LhsExponent>& lhs, const gba::fixed_point<RhsRep, RhsExponent>& rhs ) noexcept {
-    using larger = typename gba::int_type<std::max( std::numeric_limits<LhsRep>::digits, std::numeric_limits<RhsRep>::digits )>::fast;
+    using larger = std::conditional_t<std::is_signed_v<LhsRep> || std::is_signed_v<RhsRep>,
+            typename gba::int_type<std::max( std::numeric_limits<LhsRep>::digits, std::numeric_limits<RhsRep>::digits )>::fast,
+            typename gba::uint_type<std::max( std::numeric_limits<LhsRep>::digits, std::numeric_limits<RhsRep>::digits )>::fast>;
     constexpr auto exponent = std::max( LhsExponent, RhsExponent );
 
     return gba::fixed_point<larger, exponent>::from_data( gba::fixed_point<larger, exponent>( lhs ).data() + gba::fixed_point<larger, exponent>( rhs ).data() );
@@ -22,7 +24,9 @@ constexpr auto operator +( const gba::fixed_point<LhsRep, LhsExponent>& lhs, con
 
 template <class LhsRep, int LhsExponent, class RhsRep, int RhsExponent>
 constexpr auto operator -( const gba::fixed_point<LhsRep, LhsExponent>& lhs, const gba::fixed_point<RhsRep, RhsExponent>& rhs ) noexcept {
-    using larger = typename gba::int_type<std::max( std::numeric_limits<LhsRep>::digits, std::numeric_limits<RhsRep>::digits )>::fast;
+    using larger = std::conditional_t<std::is_signed_v<LhsRep> || std::is_signed_v<RhsRep>,
+            typename gba::int_type<std::max( std::numeric_limits<LhsRep>::digits, std::numeric_limits<RhsRep>::digits )>::fast,
+            typename gba::uint_type<std::max( std::numeric_limits<LhsRep>::digits, std::numeric_limits<RhsRep>::digits )>::fast>;
     constexpr auto exponent = std::max( LhsExponent, RhsExponent );
 
     return gba::fixed_point<larger, exponent>::from_data( gba::fixed_point<larger, exponent>( lhs ).data() - gba::fixed_point<larger, exponent>( rhs ).data() );
@@ -30,19 +34,29 @@ constexpr auto operator -( const gba::fixed_point<LhsRep, LhsExponent>& lhs, con
 
 template <class LhsRep, int LhsExponent, class RhsRep, int RhsExponent>
 constexpr auto operator *( const gba::fixed_point<LhsRep, LhsExponent>& lhs, const gba::fixed_point<RhsRep, RhsExponent>& rhs ) noexcept {
-    using larger = typename gba::int_type<std::numeric_limits<LhsRep>::digits + std::numeric_limits<RhsRep>::digits>::fast;
-    using word = typename gba::int_type<std::max( std::numeric_limits<LhsRep>::digits, std::numeric_limits<RhsRep>::digits )>::fast;
+    using larger = std::conditional_t<std::is_signed_v<LhsRep> || std::is_signed_v<RhsRep>,
+            typename gba::int_type<std::numeric_limits<LhsRep>::digits + std::numeric_limits<RhsRep>::digits>::fast,
+            typename gba::uint_type<std::numeric_limits<LhsRep>::digits + std::numeric_limits<RhsRep>::digits>::fast>;
+    using word = std::conditional_t<std::is_signed_v<LhsRep> || std::is_signed_v<RhsRep>,
+            typename gba::int_type<std::max( std::numeric_limits<LhsRep>::digits, std::numeric_limits<RhsRep>::digits )>::fast,
+            typename gba::uint_type<std::max( std::numeric_limits<LhsRep>::digits, std::numeric_limits<RhsRep>::digits )>::fast>;
 
     constexpr auto min_exponent = std::min( LhsExponent, RhsExponent );
     constexpr auto sum_exponent = min_exponent + min_exponent;
 
-    return gba::fixed_point<word, sum_exponent>::from_data( gba::fixed_point<larger, min_exponent>( lhs ).data() * gba::fixed_point<larger, min_exponent>( rhs ).data() );
+    const auto result = gba::fixed_point<larger, sum_exponent>::from_data( gba::fixed_point<larger, min_exponent>( lhs ).data() * gba::fixed_point<larger, min_exponent>( rhs ).data() );
+
+    return gba::fixed_point<word, min_exponent>( result );
 }
 
 template <class LhsRep, int LhsExponent, class RhsRep, int RhsExponent>
 constexpr auto operator /( const gba::fixed_point<LhsRep, LhsExponent>& lhs, const gba::fixed_point<RhsRep, RhsExponent>& rhs ) noexcept {
-    using larger = typename gba::int_type<std::numeric_limits<LhsRep>::digits + std::numeric_limits<RhsRep>::digits>::fast;
-    using word = typename gba::int_type<std::max( std::numeric_limits<LhsRep>::digits, std::numeric_limits<RhsRep>::digits )>::fast;
+    using larger = std::conditional_t<std::is_signed_v<LhsRep> || std::is_signed_v<RhsRep>,
+            typename gba::int_type<std::numeric_limits<LhsRep>::digits + std::numeric_limits<RhsRep>::digits>::fast,
+            typename gba::uint_type<std::numeric_limits<LhsRep>::digits + std::numeric_limits<RhsRep>::digits>::fast>;
+    using word = std::conditional_t<std::is_signed_v<LhsRep> || std::is_signed_v<RhsRep>,
+            typename gba::int_type<std::max( std::numeric_limits<LhsRep>::digits, std::numeric_limits<RhsRep>::digits )>::fast,
+            typename gba::uint_type<std::max( std::numeric_limits<LhsRep>::digits, std::numeric_limits<RhsRep>::digits )>::fast>;
 
     constexpr auto sum_exponent = LhsExponent + RhsExponent;
 
