@@ -209,11 +209,11 @@ struct mode<4> {
         }
     };
 
-    constexpr auto frame_buffer_0() noexcept {
+    static constexpr auto frame_buffer_0() noexcept {
         return frame_buffer { 0x6000000 };
     }
 
-    constexpr auto frame_buffer_1() noexcept {
+    static constexpr auto frame_buffer_1() noexcept {
         return frame_buffer { 0x600a000 };
     }
 
