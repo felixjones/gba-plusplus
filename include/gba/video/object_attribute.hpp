@@ -11,13 +11,13 @@ namespace object {
 
 enum class graphics_mode : uint16 {
     normal = 0,
-    blend = 1,
-    window = 2
+    blended = 1,
+    windowed = 2
 };
 
 enum class color_mode : uint16 {
     bpp4 = 0,
-    bbp8 = 1
+    bpp8 = 1
 };
 
 enum class shape : uint16 {
@@ -38,12 +38,12 @@ struct [[gnu::aligned( 8 )]] object_attribute {
     object::shape shape : 2;
 
     uint16 x : 9,
-        yflip_xflip_OR_affine_index : 5,
-        size : 2;
+            yflip_xflip_OR_affine_index : 5,
+            size : 2;
 
     uint16 tile_index : 10,
-        priority : 2,
-        palette_bank : 4;
+            priority : 2,
+            palette_bank : 4;
 
     make_fixed<7, 8> matrix;
 };
@@ -52,10 +52,10 @@ static_assert( sizeof( object_attribute ) == 8, "object_attribute must be tightl
 
 struct object_affine : object_attribute {
     constexpr object_affine() noexcept : object_attribute {
-        0, true, false, object::graphics_mode::normal, false, object::color_mode::bpp4, object::shape::square,
-        0, 0, 0,
-        0, 0, 0,
-        0
+            0, true, false, object::graphics_mode::normal, false, object::color_mode::bpp4, object::shape::square,
+            0, 0, 0,
+            0, 0, 0,
+            0
     } {}
 
     constexpr auto& y( int value ) noexcept {
