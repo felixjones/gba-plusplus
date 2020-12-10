@@ -17,7 +17,7 @@ constexpr auto operator +( const gba::fixed_point<LhsRep, LhsExponent>& lhs, con
     using larger = std::conditional_t<std::is_signed_v<LhsRep> || std::is_signed_v<RhsRep>,
             typename gba::int_type<std::max( std::numeric_limits<LhsRep>::digits, std::numeric_limits<RhsRep>::digits )>::fast,
             typename gba::uint_type<std::max( std::numeric_limits<LhsRep>::digits, std::numeric_limits<RhsRep>::digits )>::fast>;
-    constexpr auto exponent = std::max( LhsExponent, RhsExponent );
+    constexpr auto exponent = ( LhsExponent + RhsExponent ) / 2;
 
     return gba::fixed_point<larger, exponent>::from_data( gba::fixed_point<larger, exponent>( lhs ).data() + gba::fixed_point<larger, exponent>( rhs ).data() );
 }
@@ -27,7 +27,7 @@ constexpr auto operator -( const gba::fixed_point<LhsRep, LhsExponent>& lhs, con
     using larger = std::conditional_t<std::is_signed_v<LhsRep> || std::is_signed_v<RhsRep>,
             typename gba::int_type<std::max( std::numeric_limits<LhsRep>::digits, std::numeric_limits<RhsRep>::digits )>::fast,
             typename gba::uint_type<std::max( std::numeric_limits<LhsRep>::digits, std::numeric_limits<RhsRep>::digits )>::fast>;
-    constexpr auto exponent = std::max( LhsExponent, RhsExponent );
+    constexpr auto exponent = ( LhsExponent + RhsExponent ) / 2;
 
     return gba::fixed_point<larger, exponent>::from_data( gba::fixed_point<larger, exponent>( lhs ).data() - gba::fixed_point<larger, exponent>( rhs ).data() );
 }
@@ -41,12 +41,12 @@ constexpr auto operator *( const gba::fixed_point<LhsRep, LhsExponent>& lhs, con
             typename gba::int_type<std::max( std::numeric_limits<LhsRep>::digits, std::numeric_limits<RhsRep>::digits )>::fast,
             typename gba::uint_type<std::max( std::numeric_limits<LhsRep>::digits, std::numeric_limits<RhsRep>::digits )>::fast>;
 
-    constexpr auto min_exponent = std::min( LhsExponent, RhsExponent );
-    constexpr auto sum_exponent = min_exponent + min_exponent;
+    constexpr auto max_exponent = std::max( LhsExponent, RhsExponent );
+    constexpr auto sum_exponent = LhsExponent + RhsExponent;
 
-    const auto result = gba::fixed_point<larger, sum_exponent>::from_data( gba::fixed_point<larger, min_exponent>( lhs ).data() * gba::fixed_point<larger, min_exponent>( rhs ).data() );
+    const auto result = gba::fixed_point<larger, sum_exponent>::from_data( gba::fixed_point<larger, LhsExponent>( lhs ).data() * gba::fixed_point<larger, RhsExponent>( rhs ).data() );
 
-    return gba::fixed_point<word, min_exponent>( result );
+    return gba::fixed_point<word, max_exponent>( result );
 }
 
 template <class LhsRep, int LhsExponent, class RhsRep, int RhsExponent>
@@ -124,28 +124,33 @@ constexpr auto operator /=( gba::fixed_point<LhsRep, LhsExponent>& lhs, const Rh
 }
 
 template <class LhsRep, int LhsExponent, class Rhs>
-constexpr auto operator >( gba::fixed_point<LhsRep, LhsExponent>& lhs, const Rhs& rhs) noexcept {
-    return lhs.data() > gba::fixed_point<LhsRep, LhsExponent>( rhs ).data();
-}
-
-template <class LhsRep, int LhsExponent, class Rhs>
-constexpr auto operator >=( gba::fixed_point<LhsRep, LhsExponent>& lhs, const Rhs& rhs) noexcept {
-    return lhs.data() >= gba::fixed_point<LhsRep, LhsExponent>( rhs ).data();
-}
-
-template <class LhsRep, int LhsExponent, class Rhs>
-constexpr auto operator <( gba::fixed_point<LhsRep, LhsExponent>& lhs, const Rhs& rhs) noexcept {
+constexpr bool operator <( const gba::fixed_point<LhsRep, LhsExponent>& lhs, const Rhs& rhs) noexcept {
     return lhs.data() < gba::fixed_point<LhsRep, LhsExponent>( rhs ).data();
 }
 
 template <class LhsRep, int LhsExponent, class Rhs>
-constexpr auto operator <=( gba::fixed_point<LhsRep, LhsExponent>& lhs, const Rhs& rhs) noexcept {
+constexpr bool operator <=( const gba::fixed_point<LhsRep, LhsExponent>& lhs, const Rhs& rhs) noexcept {
     return lhs.data() <= gba::fixed_point<LhsRep, LhsExponent>( rhs ).data();
 }
 
 template <class LhsRep, int LhsExponent, class Rhs>
-constexpr auto operator ==( gba::fixed_point<LhsRep, LhsExponent>& lhs, const Rhs& rhs) noexcept {
+constexpr bool operator >( const gba::fixed_point<LhsRep, LhsExponent>& lhs, const Rhs& rhs) noexcept {
+    return lhs.data() > gba::fixed_point<LhsRep, LhsExponent>( rhs ).data();
+}
+
+template <class LhsRep, int LhsExponent, class Rhs>
+constexpr bool operator >=( const gba::fixed_point<LhsRep, LhsExponent>& lhs, const Rhs& rhs) noexcept {
+    return lhs.data() >= gba::fixed_point<LhsRep, LhsExponent>( rhs ).data();
+}
+
+template <class LhsRep, int LhsExponent, class Rhs>
+constexpr bool operator ==( const gba::fixed_point<LhsRep, LhsExponent>& lhs, const Rhs& rhs) noexcept {
     return lhs.data() == gba::fixed_point<LhsRep, LhsExponent>( rhs ).data();
+}
+
+template <class LhsRep, int LhsExponent, class Rhs>
+constexpr bool operator !=( const gba::fixed_point<LhsRep, LhsExponent>& lhs, const Rhs& rhs) noexcept {
+    return lhs.data() != gba::fixed_point<LhsRep, LhsExponent>( rhs ).data();
 }
 
 #endif // define GBAXX_FIXED_POINT_OPERATORS_HPP

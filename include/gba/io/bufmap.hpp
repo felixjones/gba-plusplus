@@ -36,6 +36,7 @@ struct bufmap {
         using const_pointer = const value_type *;
 
         constexpr explicit iterator( size_type pos ) noexcept : m_pos { pos } {}
+        constexpr iterator( const iterator& other ) noexcept : m_pos { other.m_pos } {}
 
         bool operator ==( const iterator& other ) const noexcept {
             return m_pos == other.m_pos;
@@ -216,6 +217,10 @@ struct bufmap_banked {
         iterator& operator ++() noexcept {
             ++m_pos;
             return *this;
+        }
+
+        iterator operator +( int i ) noexcept {
+            return iterator( m_owner, m_pos + i );
         }
 
     protected:

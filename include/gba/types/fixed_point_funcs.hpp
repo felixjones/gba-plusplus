@@ -22,6 +22,7 @@
 #include <gba/bios/sqrt.hpp>
 #include <gba/types/fixed_point.hpp>
 #include <gba/types/fixed_point_make.hpp>
+#include <gba/types/fixed_point_operators.hpp>
 
 namespace gba {
 namespace detail {
@@ -32,7 +33,7 @@ constexpr auto sin_bam16( int32 x ) noexcept {
         x = ( 1 << 31 ) - x;
     }
     x = x >> 17;
-    return fixed_point<int32, 12>::from_data( x * ( ( 3 << 15 ) - ( x * x >> 11 ) ) >> 17 );
+    return make_fixed<19, 12>::from_data( x * ( ( 3 << 15 ) - ( x * x >> 11 ) ) >> 17 );
 }
 
 template <class Rep, int Exponent>
@@ -89,12 +90,12 @@ constexpr auto sqrt( const fixed_point<Rep, Exponent>& x ) noexcept {
 
 template <class Rep, int Exponent>
 constexpr auto sin( const fixed_point<Rep, Exponent>& radian ) noexcept {
-    return detail::sin_bam16( detail::radian_to_bam16( radian ) & 0xffff );
+    return detail::sin_bam16( detail::radian_to_bam16( radian ) );
 }
 
 template <class Rep, int Exponent>
 constexpr auto cos( const fixed_point<Rep, Exponent>& radian ) noexcept {
-    return detail::sin_bam16( ( detail::radian_to_bam16( radian ) + 0x2000 ) & 0xffff );
+    return detail::sin_bam16( detail::radian_to_bam16( radian ) + 0x2000 );
 }
 
 } // gba

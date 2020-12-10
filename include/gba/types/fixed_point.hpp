@@ -180,7 +180,7 @@ template <class Rep, int Exponent>
 template <class S>
 constexpr typename fixed_point<Rep, Exponent>::rep fixed_point<Rep, Exponent>::floating_point_to_rep( S s ) noexcept {
     static_assert( std::numeric_limits<S>::is_iec559, "S must be floating-point type" );
-    return static_cast<rep>( s * one<S>() );
+    return static_cast<long long>( s * one<S>() );
 }
 
 template <class Rep, int Exponent>
