@@ -2,7 +2,7 @@
 #define GBAXX_EXT_AGBABI_COROUTINE_HPP
 
 #include <cstddef>
-#include <tuple>
+#include <functional>
 
 #if defined( __agb_abi )
 
@@ -10,10 +10,10 @@
 
 extern "C" {
 
-int __agbabi_getcontext( struct ucontext_t * ucp );
-int __agbabi_setcontext( const ucontext_t * ucp) ;
-void __agbabi_makecontext( struct ucontext_t * ucp, void ( * func )( void ), int argc, ... );
-int __agbabi_swapcontext( struct ucontext_t * oucp, const ucontext_t * ucp );
+int __agbabi_getcontext( struct ucontext_t * );
+int __agbabi_setcontext( const ucontext_t * ) ;
+void __agbabi_makecontext( struct ucontext_t *, void ( * )( void ), int, ... );
+int __agbabi_swapcontext( struct ucontext_t *, const ucontext_t * );
 
 }
 
@@ -21,117 +21,89 @@ int __agbabi_swapcontext( struct ucontext_t * oucp, const ucontext_t * ucp );
 
 namespace gba {
 namespace agbabi {
-
+    
 template <typename R>
 struct coroutine {
-    class context {
-    public:
-        context( void * sp, std::size_t sz ) noexcept : m_link {}, m_context {}, m_returnContext {}, m_completed { false } {
-            m_context.uc_stack.ss_sp = sp;
-            m_context.uc_stack.ss_size = sz;
-            m_context.uc_link = &m_returnContext;
-
-            m_returnContext.uc_stack.ss_sp = sp;
-            m_returnContext.uc_stack.ss_size = sz;
-            m_returnContext.uc_link = &m_link;
-        }
-
-        template <class... Ts>
-        void make( void( * fn )( void ), Ts... args ) {
-            const auto fnptr = reinterpret_cast<void( * )( void )>( static_cast<void( * )( bool * )>( []( bool * complete ) {
-                *complete = true;
-            } ) );
-            __agbabi_makecontext( &m_returnContext, fnptr, 1, &m_completed );
-
-            __agbabi_makecontext( &m_context, fn, sizeof...( Ts ), args... );
-        }
-
-        void call() {
-            __agbabi_swapcontext( &m_link, &m_context );
-        }
-
-        void yield() {
-            __agbabi_swapcontext( &m_context, &m_link );
-        }
-
-        bool completed() const {
-            return m_completed;
-        }
-
-    protected:
-        ucontext_t m_link;
-        ucontext_t m_context;
-        ucontext_t m_returnContext;
-        bool m_completed;
-    };
 
     class pull_type;
 
     class push_type {
         friend pull_type;
+    protected:
+        push_type( pull_type& pull ) noexcept : m_value {}, m_pull { pull } {}
     public:
-        push_type( pull_type& pull ) noexcept : m_pull { pull }, m_value {} {}
-
         void operator ()( R value ) noexcept {
             m_value = value;
-            m_pull.m_context->yield();
+            m_pull.join();
+        }
+
+        explicit operator bool() const noexcept {
+            return m_pull;
+        }
+
+        bool operator!() const noexcept {
+            return !m_pull;
         }
 
     protected:
-        pull_type& m_pull;
         volatile R m_value;
+    private:
+        pull_type& m_pull;
     };
 
     class pull_type {
         friend push_type;
     public:
         template <typename Fn, class... Ts>
-        pull_type( void * sp, std::size_t sz, Fn&& fn, Ts... args ) noexcept : m_push( *this ), m_context { new context( sp, sz ) } {
-            const auto fnptr = reinterpret_cast<void( * )( void )>( static_cast<void( * )( push_type&, Ts... )>( fn ) );
-            m_context->make( fnptr, m_push, args... );
+        pull_type( void * sp, std::size_t sz, Fn&& fn, Ts... args ) noexcept : 
+            m_push( *this ), m_startContext {}, m_link {}, m_fiber {}
+        {
+            m_fiber.uc_link = &m_link;
+            m_fiber.uc_stack.ss_sp = sp;
+            m_fiber.uc_stack.ss_size = sz;
+            
+            const auto fnPtr = reinterpret_cast<void( * )( void )>( static_cast<void( * )( push_type&, Ts... )>( fn ) );
 
-            m_context->call();
-            if ( m_context->completed() ) {
-                delete m_context;
-                m_context = nullptr;
-            }
-        }
-
-        ~pull_type() {
-            if ( m_context ) {
-                delete m_context;
-            }
+            __agbabi_makecontext( &m_fiber, fnPtr, 2 + sizeof...( Ts ),
+                std::ref( m_push ), 
+                std::forward<Ts>( args )... 
+            );
+            m_startContext = m_fiber.uc_mcontext;
+            
+            __agbabi_swapcontext( &m_link, &m_fiber );
         }
 
         pull_type( const pull_type& ) = delete;
         pull_type& operator =( const pull_type& ) = delete;
 
         void operator ()( void ) noexcept {
-            if ( m_context ) {
-                m_context->call();
-                if ( m_context->completed() ) {
-                    delete m_context;
-                    m_context = nullptr;
-                }
+            if ( m_link.uc_stack.ss_size == 0 ) {
+                // Restartable co-routine
+                m_fiber.uc_mcontext = m_startContext;
+            } else {
+                m_link.uc_stack.ss_size = 0; // HACK : Reset yield flag
             }
+            __agbabi_swapcontext( &m_link, &m_fiber );
         }
 
         explicit operator bool() const noexcept {
-            return m_context == nullptr || m_context->completed();
+            return m_link.uc_stack.ss_size == 0;
         }
 
         bool operator!() const noexcept {
-            return m_context != nullptr && !m_context->completed();
+            return m_link.uc_stack.ss_size != 0;
         }
 
         R get() const noexcept {
             return m_push.m_value;
         }
 
+        /**
+         * 
+         */ 
         class iterator {
         public:
             iterator( pull_type& pull ) noexcept : m_pull { pull } {}
-            iterator( pull_type& pull, int ) noexcept : m_pull { pull } {}
 
             bool operator !=( bool ) const noexcept {
                 return !m_pull;
@@ -159,9 +131,17 @@ struct coroutine {
         }
 
     protected:
+        void join() noexcept {
+            m_link.uc_stack.ss_size = 1; // HACK : Set yield flag
+            __agbabi_swapcontext( &m_fiber, &m_link );
+        }
+
         push_type m_push;
-        context * m_context;
+        mcontext_t m_startContext;
+        ucontext_t m_link;
+        ucontext_t m_fiber;
     };
+
 };
 
 } // agbabi
