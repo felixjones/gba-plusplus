@@ -2,6 +2,8 @@
 #define GBAXX_VIDEO_MODE4_HPP
 
 #include <gba/io/bit_container.hpp>
+#include <gba/io/memmap.hpp>
+#include <gba/video/background_affine.hpp>
 #include <gba/video/mode.hpp>
 
 namespace gba {
@@ -11,6 +13,8 @@ namespace gba {
  */
 template <>
 struct mode<4> {
+
+    using background2_matrix = omemmap<background_affine::mat3x2, 0x4000020>;
 
     /**
      *

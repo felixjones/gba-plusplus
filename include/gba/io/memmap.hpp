@@ -61,7 +61,7 @@ public:
 
     [[gnu::always_inline]]
     static void write( Type&& value ) noexcept {
-        *reinterpret_cast<volatile container_type *>( Address ) = to_bit_container( value );
+        *std::launder( reinterpret_cast<container_type *>( Address ) ) = to_bit_container( value );
     }
 };
 

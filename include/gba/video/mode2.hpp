@@ -15,6 +15,9 @@ struct mode<2> {
     using background2_control = iomemmap<background_affine::control, 0x400000c>;
     using background3_control = iomemmap<background_affine::control, 0x400000e>;
 
+    using background2_matrix = omemmap<background_affine::mat3x2, 0x4000020>;
+    using background3_matrix = omemmap<background_affine::mat3x2, 0x4000030>;
+
     /**
      *
      */

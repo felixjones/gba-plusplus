@@ -22,6 +22,8 @@ struct mode<1> {
     using background1_x = omemmap<int16, 0x4000014>;
     using background1_y = omemmap<int16, 0x4000016>;
 
+    using background2_matrix = omemmap<background_affine::mat3x2, 0x4000020>;
+
     /**
      *
      */

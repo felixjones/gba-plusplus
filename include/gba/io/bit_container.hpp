@@ -15,6 +15,8 @@
 #define gbaxx_bit_container_constexpr
 #endif
 
+#include <array>
+
 #include <gba/types/int_type.hpp>
 
 namespace gba {
@@ -35,6 +37,11 @@ struct bit_container<Type, 0, 1, 0> {
 template <typename Type>
 struct bit_container<Type, 1, 0, 0> {
     using type = uint32;
+};
+
+template <typename Type>
+struct bit_container<Type, 4, 0, 0> {
+    using type = std::array<uint32, 4>;
 };
 
 template <typename Type>

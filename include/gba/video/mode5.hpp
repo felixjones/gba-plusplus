@@ -1,6 +1,8 @@
 #ifndef GBAXX_VIDEO_MODE5_HPP
 #define GBAXX_VIDEO_MODE5_HPP
 
+#include <gba/io/memmap.hpp>
+#include <gba/video/background_affine.hpp>
 #include <gba/video/mode.hpp>
 
 namespace gba {
@@ -10,6 +12,9 @@ namespace gba {
  */
 template <>
 struct mode<5> {
+
+    using background2_matrix = omemmap<background_affine::mat3x2, 0x4000020>;
+
     struct display_control : gba::display_control {
         constexpr display_control() noexcept : gba::display_control { 5, false, false, false, false, false, false,
                                                                       false, false, false, false, false, false,

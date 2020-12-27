@@ -1,6 +1,7 @@
 #ifndef GBAXX_VIDEO_BACKGROUND_AFFINE_HPP
 #define GBAXX_VIDEO_BACKGROUND_AFFINE_HPP
 
+#include <gba/types/fixed_point.hpp>
 #include <gba/video/background_control.hpp>
 
 namespace gba {
@@ -46,6 +47,20 @@ struct background_affine {
     protected:
         using gba::background_control::color_mode;
     };
+
+    struct mat3x2 {
+        using mat_type = fixed_point<int16, -8>;
+        using vec_type = fixed_point<int32, -8>;
+
+        mat_type a;
+        mat_type b;
+        mat_type c;
+        mat_type d;
+        vec_type x;
+        vec_type y;
+    };
+
+    static_assert( sizeof( mat3x2 ) == 16, "background_affine::mat3x2 must be tightly packed" );
 
 };
 

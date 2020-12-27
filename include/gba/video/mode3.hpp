@@ -4,7 +4,9 @@
 #include <algorithm>
 
 #include <gba/drawing/bitmap.hpp>
+#include <gba/io/memmap.hpp>
 #include <gba/types/color.hpp>
+#include <gba/video/background_affine.hpp>
 #include <gba/video/mode.hpp>
 
 namespace gba {
@@ -14,6 +16,9 @@ namespace gba {
  */
 template <>
 struct mode<3> {
+
+    using background2_matrix = omemmap<background_affine::mat3x2, 0x4000020>;
+
     /**
      *
      */
