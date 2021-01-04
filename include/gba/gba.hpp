@@ -2,6 +2,8 @@
 #define GBAXX_GBA_HPP
 
 #include <gba/bios/halt.hpp>
+#include <gba/bios/math.hpp>
+#include <gba/bios/swi.hpp>
 
 #include <gba/drawing/bitmap.hpp>
 #include <gba/drawing/tile_bitmap.hpp>

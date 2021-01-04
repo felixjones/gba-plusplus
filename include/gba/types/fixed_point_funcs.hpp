@@ -19,7 +19,7 @@
 
 #include <algorithm>
 
-#include <gba/bios/sqrt.hpp>
+#include <gba/bios/math.hpp>
 #include <gba/types/fixed_point.hpp>
 #include <gba/types/fixed_point_make.hpp>
 #include <gba/types/fixed_point_operators.hpp>

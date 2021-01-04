@@ -17,6 +17,9 @@ namespace gba {
 template <>
 struct mode<3> {
 
+    static constexpr auto screen_width = 240;
+    static constexpr auto screen_height = 160;
+
     using background2_matrix = omemmap<background_affine::mat3x2, 0x4000020>;
 
     /**

@@ -12,6 +12,10 @@ namespace gba {
  */
 template <>
 struct mode<0> {
+
+    static constexpr auto screen_width = 240;
+    static constexpr auto screen_height = 160;
+
     using background0_control = iomemmap<background_regular::control, 0x4000008>;
     using background1_control = iomemmap<background_regular::control, 0x400000a>;
     using background2_control = iomemmap<background_regular::control, 0x400000c>;

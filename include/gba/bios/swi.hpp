@@ -1,6 +1,8 @@
 #ifndef GBAXX_BIOS_SWI_HPP
 #define GBAXX_BIOS_SWI_HPP
 
+#include <tuple>
+
 namespace gba {
 namespace bios {
 
@@ -22,7 +24,7 @@ struct swi<Swi, void( void )> {
     }
 
     [[gnu::always_inline]]
-    static void clobber_call_0_1() noexcept {
+    static void call_clobber_0_1() noexcept {
         asm(
 #if defined( __thumb__ )
         "swi\t%[Swi]"
@@ -37,16 +39,16 @@ struct swi<Swi, void( void )> {
 template <unsigned Swi>
 struct swi<Swi, void( int )> {
     [[gnu::always_inline]]
-    static void call_r2( int&& arg0 ) noexcept {
+    static void call_2( int arg0 ) noexcept {
         asm(
-        #if defined( __thumb__ )
-        "movs\tr2, %[arg0]\n\t"
+#if defined( __thumb__ )
+        "movs\tr2, %[r0]\n\t"
         "swi\t%[Swi]"
 #elif defined( __arm__ )
-        "mov\tr2, %[arg0]\n\t"
+        "mov\tr2, %[r0]\n\t"
         "swi\t%[Swi] << 16"
 #endif
-        :: [Swi]"i"( Swi ), [arg0]"ri"( arg0 ) : "r2"
+        :: [Swi]"i"( Swi ), [r0]"r"( arg0 ) : "r2"
         );
     }
 };
@@ -54,38 +56,90 @@ struct swi<Swi, void( int )> {
 template <unsigned Swi>
 struct swi<Swi, void( int, int )> {
     [[gnu::always_inline]]
-    static void call( int&& arg0, int&& arg1 ) noexcept {
+    static void call( int arg0, int arg1 ) noexcept {
         asm(
-        #if defined( __thumb__ )
-        "movs\tr0, %[arg0]\n\t"
-        "movs\tr1, %[arg1]\n\t"
+#if defined( __thumb__ )
+        "movs\tr0, %[r0]\n\t"
+        "movs\tr1, %[r1]\n\t"
         "swi\t%[Swi]"
 #elif defined( __arm__ )
-        "mov\tr0, %[arg0]\n\t"
-        "mov\tr1, %[arg1]\n\t"
+        "mov\tr0, %[r0]\n\t"
+        "mov\tr1, %[r1]\n\t"
         "swi\t%[Swi] << 16"
 #endif
-        :: [Swi]"i"( Swi ), [arg0]"ri"( arg0 ), [arg1]"ri"( arg1 ) : "r0", "r1"
+        :: [Swi]"i"( Swi ), [r0]"r"( arg0 ), [r1]"r"( arg1 ) : "r0", "r1"
         );
     }
 };
+
 template <unsigned Swi>
 struct swi<Swi, unsigned int( unsigned int )> {
     [[nodiscard, gnu::always_inline, gnu::pure]]
-    static unsigned int call( unsigned int && arg0 ) noexcept {
+    static auto call( unsigned int arg0 ) noexcept {
         asm(
 #if defined( __thumb__ )
-        "movs\tr0, %[arg0]\n\t"
+        "movs\tr0, %[r0]\n\t"
         "swi\t%[Swi]\n\t"
-        "movs\t%[arg0], r0"
+        "movs\t%[r0], r0"
 #elif defined( __arm__ )
-        "mov\tr0, %[arg0]\n\t"
+        "mov\tr0, %[r0]\n\t"
         "swi\t%[Swi] << 16\n\t"
-        "mov\t%[ret], r0"
+        "mov\t%[r0], r0"
 #endif
-        : [arg0]"+ri"( arg0 ) : [Swi]"i"( Swi ) :"r0"
+        : [r0]"+r"( arg0 ) : [Swi]"i"( Swi ) : "r0"
         );
         return arg0;
+    }
+};
+
+template <unsigned Swi>
+struct swi<Swi, short( short, short )> {
+    [[nodiscard, gnu::always_inline, gnu::pure]]
+    static auto call( short arg0, short arg1 ) noexcept {
+        short result;
+        asm(
+#if defined( __thumb__ )
+        "movs\tr0, %[r0]\n\t"
+        "movs\tr1, %[r1]\n\t"
+        "swi\t%[Swi]\n\t"
+        "movs\t%[out], r0"
+#elif defined( __arm__ )
+        "mov\tr0, %[r0]\n\t"
+        "mov\tr1, %[r1]\n\t"
+        "swi\t%[Swi] << 16\n\t"
+        "mov\t%[out], r0"
+#endif
+        : [out]"+r"( result ) : [Swi]"i"( Swi ), [r0]"r"( arg0 ), [r1]"r"( arg1 ) : "r0", "r1"
+        );
+        return result;
+    }
+};
+
+template <unsigned Swi>
+struct swi<Swi, std::tuple<int, int, unsigned int>( int, int )> {
+    [[nodiscard, gnu::always_inline, gnu::pure]]
+    static auto call_clobber_3( int arg0, int arg1 ) noexcept {
+        unsigned int r3;
+        asm(
+#if defined( __thumb__ )
+        "movs\tr0, %[r0]\n\t"
+        "movs\tr1, %[r1]\n\t"
+        "swi\t%[Swi]\n\t"
+        "movs\t%[r0], r0\n\t"
+        "movs\t%[r1], r1\n\t"
+        "movs\t%[r3], r3"
+#elif defined( __arm__ )
+        "mov\tr0, %[r0]\n\t"
+        "mov\tr1, %[r1]\n\t"
+        "swi\t%[Swi] << 16\n\t"
+        "mov\t%[r0], r0\n\t"
+        "mov\t%[r1], r1\n\t"
+        "mov\t%[r3], r3"
+#endif
+        : [r0]"+r"( arg0 ), [r1]"+r"( arg1 ), [r3]"+r"( r3 )
+        : [Swi]"i"( Swi ) : "r0", "r1", "r3"
+        );
+        return std::make_tuple( arg0, arg1, r3 );
     }
 };
 

@@ -25,14 +25,14 @@ inline void intr_wait( bool resetFlag, irq::flags flags ) noexcept {
 
 [[gnu::always_inline]]
 inline void vblank_intr_wait() noexcept {
-    swi<5, void( void )>::clobber_call_0_1();
+    swi<5, void( void )>::call_clobber_0_1();
 }
 
 namespace undocumented {
 
 [[gnu::always_inline]]
 inline void custom_halt( bool stop ) noexcept {
-    swi<0x27, void( int )>::call_r2( stop ? 0x80 : 0 );
+    swi<0x27, void( int )>::call_2( stop ? 0x80 : 0 );
 }
 
 } // undocumented
