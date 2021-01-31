@@ -19,6 +19,7 @@
 
 #include <algorithm>
 
+#include <gba/bios/affine.hpp>
 #include <gba/bios/math.hpp>
 #include <gba/types/fixed_point.hpp>
 #include <gba/types/fixed_point_make.hpp>
@@ -39,6 +40,12 @@ constexpr auto sin_bam16( int32 x ) noexcept {
 template <class Rep, int Exponent>
 constexpr int32 radian_to_bam16( const fixed_point<Rep, Exponent>& radian ) noexcept {
     constexpr auto radTo16 = fixed_point<Rep, Exponent>( 16384.0 / 3.14159265358979323846264338327950288 );
+    return static_cast<int32>( radian * radTo16 );
+}
+
+template <class Rep, int Exponent>
+constexpr int32 radian_to_ubam16( const fixed_point<Rep, Exponent>& radian ) noexcept {
+    constexpr auto radTo16 = fixed_point<Rep, Exponent>( 16384.0 / 3.14159265358979323846264338327950288 ) * 2;
     return static_cast<int32>( radian * radTo16 );
 }
 
@@ -96,6 +103,19 @@ constexpr auto sin( const fixed_point<Rep, Exponent>& radian ) noexcept {
 template <class Rep, int Exponent>
 constexpr auto cos( const fixed_point<Rep, Exponent>& radian ) noexcept {
     return detail::sin_bam16( detail::radian_to_bam16( radian ) + 0x2000 );
+}
+
+using cosine_type = gba::fixed_point<int16, -8>;
+
+template <class Rep, int Exponent>
+constexpr std::tuple<cosine_type, cosine_type> cosine( const fixed_point<Rep, Exponent>& radian ) noexcept {
+    bios::obj_affine_input i {
+        1, 1,
+        cosine_type::from_data( detail::radian_to_ubam16( radian ) )
+    };
+    bios::obj_affine_matrix m; // NOLINT(cppcoreguidelines-pro-type-member-init)
+    bios::obj_affine_set( &i, &m, 1, 2 );
+    return std::make_tuple( m.pa, m.pc );
 }
 
 } // gba

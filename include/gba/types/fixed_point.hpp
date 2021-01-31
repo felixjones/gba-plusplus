@@ -107,9 +107,14 @@ namespace detail {
 template <class T>
 using scale_result_type = decltype( std::declval<T>() * std::declval<T>() );
 
+template <int Value>
+constexpr auto abs() noexcept {
+    return Value < 0 ? -Value : Value;
+}
+
 template <int Exp, class T>
 constexpr scale_result_type<T> ipow2() noexcept {
-    return scale_result_type<T> { 1 } << std::abs( Exp );
+    return scale_result_type<T> { 1 } << abs<Exp>();
 }
 
 template <class S, int Exponent, std::enable_if_t<Exponent == 0, int> Dummy = 0>

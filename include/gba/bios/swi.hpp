@@ -143,6 +143,54 @@ struct swi<Swi, std::tuple<int, int, unsigned int>( int, int )> {
     }
 };
 
+template <unsigned Swi>
+struct swi<Swi, void( const void *, void *, unsigned int )> {
+    [[gnu::always_inline]]
+    static void call( const void * arg0, void * arg1, unsigned int arg2 ) {
+        asm(
+#if defined( __thumb__ )
+        "movs\tr0, %[r0]\n\t"
+        "movs\tr1, %[r1]\n\t"
+        "movs\tr2, %[r2]\n\t"
+        "swi\t%[Swi]"
+#elif defined( __arm__ )
+        "mov\tr0, %[r0]\n\t"
+        "mov\tr1, %[r1]\n\t"
+        "mov\tr2, %[r2]\n\t"
+        "swi\t%[Swi] << 16"
+#endif
+        :: [Swi]"i"( Swi ), [r0]"r"( arg0 ), [r1]"r"( arg1 ), [r2]"r"( arg2 ) : "r0", "r1", "r2"
+        );
+    }
+};
+
+template <unsigned Swi>
+struct swi<Swi, void( const void *, void *, unsigned int, unsigned int )> {
+    [[gnu::always_inline]]
+    static void call( const void * arg0, void * arg1, unsigned int arg2, unsigned int arg3 ) {
+        asm(
+#if defined( __thumb__ )
+        "push\t{r0-r3}\n\t"
+        "movs\tr0, %[r0]\n\t"
+        "movs\tr1, %[r1]\n\t"
+        "movs\tr2, %[r2]\n\t"
+        "movs\tr3, %[r3]\n\t"
+        "swi\t%[Swi]\n\t"
+        "pop\t{r0-r3}"
+#elif defined( __arm__ )
+        "push\t{r0-r3}\n\t"
+        "mov\tr0, %[r0]\n\t"
+        "mov\tr1, %[r1]\n\t"
+        "mov\tr2, %[r2]\n\t"
+        "mov\tr3, %[r3]\n\t"
+        "swi\t%[Swi] << 16"
+        "pop\t{r0-r3}"
+#endif
+        :: [Swi]"i"( Swi ), [r0]"r"( arg0 ), [r1]"r"( arg1 ), [r2]"r"( arg2 ), [r3]"r"( arg3 )
+        );
+    }
+};
+
 } // bios
 } // gba
 

@@ -1,6 +1,8 @@
 #ifndef GBAXX_GBA_HPP
 #define GBAXX_GBA_HPP
 
+#include <gba/bios/affine.hpp>
+#include <gba/bios/cpu_copy.hpp>
 #include <gba/bios/halt.hpp>
 #include <gba/bios/math.hpp>
 #include <gba/bios/swi.hpp>

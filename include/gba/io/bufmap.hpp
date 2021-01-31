@@ -88,6 +88,7 @@ struct bufmap {
         using const_pointer = const value_type *;
 
         constexpr explicit const_iterator( size_type pos ) noexcept : m_pos { pos } {}
+        constexpr const_iterator( const const_iterator& other ) noexcept :  m_pos { other.m_pos } {}
 
         bool operator ==( const const_iterator& other ) const noexcept {
             return m_pos == other.m_pos;
@@ -111,7 +112,7 @@ struct bufmap {
         }
 
         const_iterator operator ++( int ) noexcept {
-            return iterator( m_pos++ );
+            return const_iterator( m_pos++ );
         }
 
         const_iterator& operator ++() noexcept {
@@ -188,6 +189,7 @@ struct bufmap_banked {
         using const_pointer = const value_type *;
 
         constexpr explicit iterator( bufmap_banked& owner, size_type pos ) noexcept : m_owner { owner }, m_pos { pos } {}
+        constexpr iterator( const iterator& other ) noexcept : m_owner { other.m_owner }, m_pos { other.m_pos } {}
 
         bool operator ==( const iterator& other ) const noexcept {
             return m_owner.bank == other.m_owner.bank && m_pos == other.m_pos;
@@ -244,6 +246,7 @@ struct bufmap_banked {
         using const_pointer = const value_type *;
 
         constexpr explicit const_iterator( const bufmap_banked& owner, size_type pos ) noexcept : m_owner { owner }, m_pos { pos } {}
+        constexpr const_iterator( const const_iterator& other ) noexcept : m_owner { other.m_owner }, m_pos { other.m_pos } {}
 
         bool operator ==( const const_iterator& other ) const noexcept {
             return m_owner.bank == other.m_owner.bank && m_pos == other.m_pos;
