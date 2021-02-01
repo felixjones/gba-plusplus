@@ -11,6 +11,8 @@
 
 #if __cpp_lib_is_constant_evaluated
 #define gbaxx_fixed_point_funcs_constant( x )   std::is_constant_evaluated()
+#elif __has_builtin( __builtin_is_constant_evaluated  )
+#define gbaxx_fixed_point_funcs_constant( x )   __builtin_is_constant_evaluated()
 #elif __has_builtin( __builtin_constant_p )
 #define gbaxx_fixed_point_funcs_constant( x )   __builtin_constant_p( x )
 #else
@@ -25,16 +27,29 @@
 #include <gba/types/fixed_point_make.hpp>
 #include <gba/types/fixed_point_operators.hpp>
 
+#if defined( __agb_abi )
+extern "C" {
+
+int __agbabi_sin( int angle );
+
+}
+#endif
+
 namespace gba {
 namespace detail {
 
 constexpr auto sin_bam16( int32 x ) noexcept {
+#if defined( __agb_abi )
+    if ( gbaxx_fixed_point_funcs_constant( x ) == false ) {
+        return make_fixed<2, 29>::from_data( __agbabi_sin( x ) );
+    }
+#endif
     x = static_cast<uint32>( x ) << 17;
     if ( static_cast<int32>( x ^ ( static_cast<uint32>( x ) << 1 ) ) < 0 ) {
         x = ( 1 << 31 ) - x;
     }
     x = x >> 17;
-    return make_fixed<19, 12>::from_data( x * ( ( 3 << 15 ) - ( x * x >> 11 ) ) >> 17 );
+    return make_fixed<2, 29>::from_data( x * ( ( 3 << 15 ) - ( x * x >> 11 ) ) );
 }
 
 template <class Rep, int Exponent>
@@ -109,13 +124,17 @@ using cosine_type = gba::fixed_point<int16, -8>;
 
 template <class Rep, int Exponent>
 constexpr std::tuple<cosine_type, cosine_type> cosine( const fixed_point<Rep, Exponent>& radian ) noexcept {
-    bios::obj_affine_input i {
-        1, 1,
-        cosine_type::from_data( detail::radian_to_ubam16( radian ) )
-    };
-    bios::obj_affine_matrix m; // NOLINT(cppcoreguidelines-pro-type-member-init)
-    bios::obj_affine_set( &i, &m, 1, 2 );
-    return std::make_tuple( m.pa, m.pc );
+    if ( gbaxx_fixed_point_funcs_constant( radian.data() ) ) {
+        return std::make_tuple( cos( radian ), sin( radian ) );
+    } else {
+        bios::obj_affine_input i {
+                1, 1,
+                cosine_type::from_data( detail::radian_to_ubam16( radian ) )
+        };
+        bios::obj_affine_matrix m; // NOLINT(cppcoreguidelines-pro-type-member-init)
+        bios::obj_affine_set( &i, &m, 1, 2 );
+        return std::make_tuple( m.pa, m.pc );
+    }
 }
 
 } // gba

@@ -5,7 +5,6 @@
 
 #include <gba/ext/agbabi/coroutine.hpp>
 #include <gba/ext/agbabi/irq_handlers.hpp>
-#include <gba/ext/agbabi/coroutine.hpp>
 
 #else
 #error __agb_abi not defined
