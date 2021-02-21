@@ -9,31 +9,43 @@ The first version, `0.0.1`, will be considered ready when we are functionally eq
 
 # Example style
 
-Note: This is not functioning code.
-
 ```C++
 #include <gba/gba.hpp>
+#include <gba/ext/agbabi.hpp>
+
+#define EVER ;;
 
 using namespace gba;
 
-int main( int argc, char * argv[] ) {
-	interrupt_handler::set( nullptr ); // gba-toolchain empty IRQ handler, can be replaced with libgba/tonclib IRQ
-	
-	io::display_status::write( display_status { .emit_vblank = true } );
-	io::interrupt_mask_enable::write( interrupt { .vblank = true } );
-	io::interrupt_master_enable::write( true );
+static constexpr auto reset_keys = key::button_a | key::button_b | key::start | key::select;
 
-	while ( true ) {
-		const auto keys = key_state( io::key_status::read() );
-		if ( keys.button_a() ) {
-			// Do something
-		}
-		
-		bios::vblank_intr_wait();
-	}
-	
-	return 0;
+int main() {
+    reg::dispcnt::write( io::mode<4>::display_control()
+        .set_object_tile_map( object_tile_map::linear )
+        .set_layer_background_2( true )
+    );
+    
+    reg::dispstat::write( display_status {
+        .vblank_irq = true
+    } );
+    
+    reg::ie::write( interrupt_mask {
+        .vblank = true
+    } );
+    
+    reg::ime::write( true );
+    
+    io::keypad_manager keypad;
+    for ( EVER ) {
+        keypad.poll();
+        if ( keypad.is_down( reset_keys ) ) {
+            bios::soft_reset();
+        }
+        
+        bios::vblank_intr_wait();
+    }
 }
+
 ```
 
 # Philosophy

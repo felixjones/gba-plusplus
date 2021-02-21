@@ -4,7 +4,7 @@
 #include <tuple>
 
 #include <gba/bios/swi.hpp>
-#include <gba/io/bit_container.hpp>
+#include <gba/types/bit_container.hpp>
 #include <gba/types/int_type.hpp>
 
 namespace gba {

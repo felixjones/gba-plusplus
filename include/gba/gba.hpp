@@ -5,44 +5,34 @@
 #include <gba/bios/cpu_copy.hpp>
 #include <gba/bios/halt.hpp>
 #include <gba/bios/math.hpp>
+#include <gba/bios/reset.hpp>
 #include <gba/bios/swi.hpp>
 
-#include <gba/drawing/bitmap.hpp>
-#include <gba/drawing/tile_bitmap.hpp>
+#include <gba/display/display_control.hpp>
+#include <gba/display/interrupt_status.hpp>
 
-#include <gba/interrupt/flags.hpp>
+#include <gba/io/io.hpp>
+#include <gba/io/mode0.hpp>
+#include <gba/io/mode1.hpp>
+#include <gba/io/mode2.hpp>
+#include <gba/io/mode3.hpp>
+#include <gba/io/mode4.hpp>
+#include <gba/io/mode5.hpp>
 
-#include <gba/io/bit_container.hpp>
-#include <gba/io/bufmap.hpp>
-#include <gba/io/ioguard.hpp>
-#include <gba/io/memmap.hpp>
-#include <gba/io/registers.hpp>
+#include <gba/keypad/keypad.hpp>
+#include <gba/keypad/keypad_manager.hpp>
 
-#include <gba/keypad/key_handler.hpp>
-#include <gba/keypad/keys.hpp>
+#include <gba/registers/display.hpp>
+#include <gba/registers/interrupt_control.hpp>
+#include <gba/registers/keypad_input.hpp>
 
-#include <gba/types/color.hpp>
+#include <gba/types/bit_container.hpp>
 #include <gba/types/fixed_point.hpp>
 #include <gba/types/fixed_point_funcs.hpp>
 #include <gba/types/fixed_point_make.hpp>
 #include <gba/types/fixed_point_operators.hpp>
 #include <gba/types/int_type.hpp>
-
-#include <gba/video/background_affine.hpp>
-#include <gba/video/background_control.hpp>
-#include <gba/video/background_regular.hpp>
-#include <gba/video/character_block.hpp>
-#include <gba/video/display_control.hpp>
-#include <gba/video/display_status.hpp>
-#include <gba/video/mode.hpp>
-#include <gba/video/mode0.hpp>
-#include <gba/video/mode1.hpp>
-#include <gba/video/mode2.hpp>
-#include <gba/video/mode3.hpp>
-#include <gba/video/mode4.hpp>
-#include <gba/video/mode5.hpp>
-#include <gba/video/object_attribute.hpp>
-#include <gba/video/palette.hpp>
-#include <gba/video/screen_block.hpp>
+#include <gba/types/interrupt_mask.hpp>
+#include <gba/types/memmap.hpp>
 
 #endif // define GBAXX_GBA_HPP

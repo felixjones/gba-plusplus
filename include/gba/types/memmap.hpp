@@ -1,9 +1,10 @@
-#ifndef GBAXX_IO_MEMMAP_HPP
-#define GBAXX_IO_MEMMAP_HPP
+#ifndef GBAXX_TYPES_MEMMAP_HPP
+#define GBAXX_TYPES_MEMMAP_HPP
 
+#include <new>
 #include <type_traits>
 
-#include <gba/io/bit_container.hpp>
+#include <gba/types/bit_container.hpp>
 
 namespace gba {
 
@@ -71,4 +72,4 @@ class iomemmap : public imemmap<Type, Address>, public omemmap<Type, Address> {
 
 } // gba
 
-#endif // define GBAXX_IO_MEMMAP_HPP
+#endif // define GBAXX_TYPES_MEMMAP_HPP

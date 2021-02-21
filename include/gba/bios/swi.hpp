@@ -39,6 +39,20 @@ struct swi<Swi, void( void )> {
 template <unsigned Swi>
 struct swi<Swi, void( int )> {
     [[gnu::always_inline]]
+    static void call( int arg0 ) noexcept {
+        asm(
+#if defined( __thumb__ )
+        "movs\tr0, %[r0]\n\t"
+        "swi\t%[Swi]"
+#elif defined( __arm__ )
+        "mov\tr0, %[r0]\n\t"
+        "swi\t%[Swi] << 16"
+#endif
+        :: [Swi]"i"( Swi ), [r0]"r"( arg0 ) : "r0"
+        );
+    }
+
+    [[gnu::always_inline]]
     static void call_2( int arg0 ) noexcept {
         asm(
 #if defined( __thumb__ )

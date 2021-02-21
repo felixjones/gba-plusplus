@@ -1,5 +1,5 @@
-#ifndef GBAXX_IO_BIT_CONTAINER_HPP
-#define GBAXX_IO_BIT_CONTAINER_HPP
+#ifndef GBAXX_TYPES_BIT_CONTAINER_HPP
+#define GBAXX_TYPES_BIT_CONTAINER_HPP
 
 #if !defined( __has_builtin )
 #define __has_builtin( x )  0
@@ -73,4 +73,4 @@ gbaxx_bit_container_constexpr auto from_bit_container( const volatile typename b
 
 #undef gbaxx_bit_container_constexpr
 
-#endif // define GBAXX_IO_BIT_CONTAINER_HPP
+#endif // define GBAXX_TYPES_BIT_CONTAINER_HPP
