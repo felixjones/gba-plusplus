@@ -3,6 +3,7 @@
 
 #include <gba/bios/swi.hpp>
 #include <gba/types/fixed_point.hpp>
+#include <gba/types/matrix/mat2x2.hpp>
 
 namespace gba {
 namespace bios {
@@ -26,6 +27,11 @@ static_assert( sizeof( obj_affine_matrix ) == 8, "obj_affine_matrix must be tigh
 
 [[gnu::always_inline]]
 inline void obj_affine_set( const obj_affine_input * input, obj_affine_matrix * output, unsigned int count, unsigned int stride ) noexcept {
+    swi<15, void( const void *, void *, unsigned int, unsigned int )>::call( input, output, count, stride );
+}
+
+[[gnu::always_inline]]
+inline void obj_affine_set( const obj_affine_input * input, mat2<fixed_point<int16, -8>> * output, unsigned int count, unsigned int stride ) noexcept {
     swi<15, void( const void *, void *, unsigned int, unsigned int )>::call( input, output, count, stride );
 }
 

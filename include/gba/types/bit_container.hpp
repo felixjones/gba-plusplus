@@ -40,6 +40,11 @@ struct bit_container<Type, 1, 0, 0> {
 };
 
 template <typename Type>
+struct bit_container<Type, 2, 0, 0> {
+    using type = std::array<uint32, 2>;
+};
+
+template <typename Type>
 struct bit_container<Type, 4, 0, 0> {
     using type = std::array<uint32, 4>;
 };

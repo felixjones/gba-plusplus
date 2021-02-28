@@ -20,8 +20,8 @@ struct display_control {
     uint16 mode : 3;
     bool color_game_boy : 1;
     uint16 page : 1;
-    oam_hblank_access oam_hblank_access : 1;
-    object_tile_map object_tile_map : 1;
+    gba::oam_hblank_access oam_hblank_access : 1;
+    gba::object_tile_map object_tile_map : 1;
     bool force_blank : 1,
             layer_background_0 : 1,
             layer_background_1 : 1,

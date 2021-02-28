@@ -81,6 +81,16 @@ public:
         return ( m_xor & mask ) == mask;
     }
 
+    [[nodiscard]]
+    constexpr bool switched_down( key_mask mask ) const noexcept {
+        return is_switched( mask ) && is_down( mask );
+    }
+
+    [[nodiscard]]
+    constexpr bool switched_up( key_mask mask ) const noexcept {
+        return is_switched( mask ) && is_up( mask );
+    }
+
 protected:
     uint32 m_keys;
     uint32 m_xor;

@@ -2,7 +2,9 @@
 #define GBAXX_IO_MODE0_HPP
 
 #include <gba/display/display_control.hpp>
+#include <gba/io/background_mode.hpp>
 #include <gba/io/io.hpp>
+#include <gba/types/vector/vec2.hpp>
 
 namespace gba {
 namespace io {
@@ -14,7 +16,9 @@ struct mode<0> {
 
     class display_control {
     public:
-        constexpr display_control() noexcept : m_data { .mode = value } {}
+        constexpr display_control() noexcept : m_data { value, false, 0, oam_hblank_access::locked, object_tile_map::two_dimensional, false,
+                                                        false, false, false, false, false, false, false,
+                                                        false } {}
 
         constexpr display_control( const gba::display_control& displayControl ) noexcept : m_data { displayControl } {
             m_data.mode = value;
@@ -121,6 +125,33 @@ struct mode<0> {
 
     static_assert( sizeof( display_control ) == 2, "mode<0>::display_control must be tightly packed" );
 
+    using background_control = background_control_regular;
+
+    struct reg {
+        reg() = delete;
+
+        using bg0cnt = iomemmap<background_control, 0x4000008>;
+        using bg1cnt = iomemmap<background_control, 0x400000a>;
+        using bg2cnt = iomemmap<background_control, 0x400000c>;
+        using bg3cnt = iomemmap<background_control, 0x400000c>;
+
+        using bg0hofs = omemmap<int16, 0x4000010>;
+        using bg0vofs = omemmap<int16, 0x4000012>;
+
+        using bg1hofs = omemmap<int16, 0x4000014>;
+        using bg1vofs = omemmap<int16, 0x4000016>;
+
+        using bg2hofs = omemmap<int16, 0x4000018>;
+        using bg2vofs = omemmap<int16, 0x400001a>;
+
+        using bg3hofs = omemmap<int16, 0x400001c>;
+        using bg3vofs = omemmap<int16, 0x400001e>;
+
+        using bg0ofs_vec2 = omemmap<vec2<int16>, 0x4000010>;
+        using bg1ofs_vec2 = omemmap<vec2<int16>, 0x4000014>;
+        using bg2ofs_vec2 = omemmap<vec2<int16>, 0x4000018>;
+        using bg3ofs_vec2 = omemmap<vec2<int16>, 0x400001c>;
+    };
 };
 
 } // io

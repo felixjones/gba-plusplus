@@ -65,11 +65,11 @@ struct coroutine {
             const auto fnPtr = reinterpret_cast<void( * )( void )>( static_cast<void( * )( push_type&, Ts... )>( fn ) );
 
             __agbabi_makecontext( &m_fiber, fnPtr, 2 + sizeof...( Ts ),
-                std::ref( m_push ), 
-                std::forward<Ts>( args )... 
+                std::ref( m_push ),
+                std::forward<Ts>( args )...
             );
             m_startContext = m_fiber.uc_mcontext;
-            
+
             __agbabi_swapcontext( &m_link, &m_fiber );
         }
 

@@ -52,12 +52,12 @@ public:
         return *this;
     }
 
-    constexpr operator bool() const noexcept {
+    explicit constexpr operator bool() const noexcept {
         return static_cast<bool>( m_data );
     }
 
     template <class S, std::enable_if_t<std::numeric_limits<S>::is_integer, int> Dummy = 0>
-    constexpr operator S() const noexcept {
+    explicit constexpr operator S() const noexcept {
         return rep_to_integral<S>( m_data );
     }
 
@@ -202,5 +202,8 @@ constexpr S fixed_point<Rep, Exponent>::inverse_one() noexcept {
 }
 
 } // gba
+
+#include <gba/types/fixed_point_make.hpp>
+#include <gba/types/fixed_point_operators.hpp>
 
 #endif // define GBAXX_FIXED_POINT_HPP
