@@ -1,7 +1,6 @@
 #ifndef GBAXX_TYPES_MEMMAP_HPP
 #define GBAXX_TYPES_MEMMAP_HPP
 
-#include <new>
 #include <type_traits>
 
 #include <gba/types/bit_container.hpp>
@@ -62,7 +61,7 @@ public:
 
     [[gnu::always_inline]]
     static void write( Type&& value ) noexcept {
-        *std::launder( reinterpret_cast<container_type *>( Address ) ) = to_bit_container( value );
+        *reinterpret_cast<container_type *>( Address ) = to_bit_container( value );
     }
 };
 

@@ -137,6 +137,28 @@ constexpr std::tuple<cosine_type, cosine_type> cosine( const fixed_point<Rep, Ex
     }
 }
 
+template <class Rep, int Exponent>
+constexpr auto nextafter( const fixed_point<Rep, Exponent>& from, const fixed_point<Rep, Exponent>& to ) noexcept {
+    if ( from < to ) {
+        return fixed_point<Rep, Exponent>::from_data( from.data() + 1 );
+    } else if ( from > to ) {
+        return fixed_point<Rep, Exponent>::from_data( from.data() - 1 );
+    }
+
+    return from;
+}
+
+template <class LhsRep, int LhsExponent, class RhsRep, int RhsExponent>
+constexpr auto nexttoward( const fixed_point<LhsRep, LhsExponent>& from, const fixed_point<RhsRep, RhsExponent>& to ) noexcept {
+    if ( from < to ) {
+        return fixed_point<LhsRep, LhsExponent>::from_data( from.data() + 1 );
+    } else if ( from > to ) {
+        return fixed_point<LhsRep, LhsExponent>::from_data( from.data() - 1 );
+    }
+
+    return from;
+}
+
 } // gba
 
 #endif // define GBAXX_FIXED_POINT_FUNCS_HPP

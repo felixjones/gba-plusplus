@@ -10,10 +10,10 @@
 
 extern "C" {
 
-int __agbabi_getcontext( struct ucontext_t * );
+int __agbabi_getcontext( ucontext_t * );
 int __agbabi_setcontext( const ucontext_t * ) ;
-void __agbabi_makecontext( struct ucontext_t *, void ( * )( void ), int, ... );
-int __agbabi_swapcontext( struct ucontext_t *, const ucontext_t * );
+void __agbabi_makecontext( ucontext_t *, void ( * )( void ), int, ... );
+int __agbabi_swapcontext( ucontext_t *, const ucontext_t * );
 
 }
 

@@ -9,8 +9,11 @@
 #include <gba/bios/swi.hpp>
 
 #include <gba/display/background_control.hpp>
+#include <gba/display/color_blend.hpp>
 #include <gba/display/display_control.hpp>
 #include <gba/display/interrupt_status.hpp>
+#include <gba/display/mosaic.hpp>
+#include <gba/display/window.hpp>
 
 #include <gba/io/background_matrix.hpp>
 #include <gba/io/background_mode.hpp>
@@ -39,6 +42,7 @@
 #include <gba/types/vector/vec4.hpp>
 
 #include <gba/types/bit_container.hpp>
+#include <gba/types/dimension.hpp>
 #include <gba/types/fixed_point.hpp>
 #include <gba/types/fixed_point_funcs.hpp>
 #include <gba/types/fixed_point_make.hpp>
@@ -47,6 +51,7 @@
 #include <gba/types/interrupt_mask.hpp>
 #include <gba/types/matrix.hpp>
 #include <gba/types/memmap.hpp>
+#include <gba/types/uint_size.hpp>
 #include <gba/types/vector.hpp>
 
 #endif // define GBAXX_GBA_HPP

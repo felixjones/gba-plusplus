@@ -2,8 +2,11 @@
 #define GBAXX_REGISTERS_DISPLAY_HPP
 
 #include <gba/display/background_control.hpp>
+#include <gba/display/color_blend.hpp>
 #include <gba/display/display_control.hpp>
 #include <gba/display/interrupt_status.hpp>
+#include <gba/display/mosaic.hpp>
+#include <gba/display/window.hpp>
 #include <gba/types/fixed_point.hpp>
 #include <gba/types/fixed_point_make.hpp>
 #include <gba/types/int_type.hpp>
@@ -46,6 +49,20 @@ using bg3pc = omemmap<make_fixed<7, 8>, 0x4000034>;
 using bg3pd = omemmap<make_fixed<7, 8>, 0x4000036>;
 using bg3x = omemmap<make_fixed<19, 8>, 0x4000038>;
 using bg3y = omemmap<make_fixed<19, 8>, 0x400003c>;
+
+using win0h = omemmap<window_dimension, 0x4000040>;
+using win1h = omemmap<window_dimension, 0x4000042>;
+using win0v = omemmap<window_dimension, 0x4000044>;
+using win1v = omemmap<window_dimension, 0x4000046>;
+
+using winin = iomemmap<window_control, 0x4000048>;
+using winout = iomemmap<window_control, 0x400004a>;
+
+using mosaic = omemmap<mosaic_size, 0x400004c>;
+
+using bldcnt = iomemmap<blend_control, 0x4000050>;
+using bldalpha = iomemmap<blend_alpha, 0x4000052>;
+using bldy = omemmap<blend_gamma, 0x4000054>;
 
 namespace undocumented {
 
