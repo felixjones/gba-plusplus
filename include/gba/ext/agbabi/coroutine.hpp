@@ -1,9 +1,6 @@
 #ifndef GBAXX_EXT_AGBABI_COROUTINE_HPP
 #define GBAXX_EXT_AGBABI_COROUTINE_HPP
 
-#include <cstddef>
-#include <functional>
-
 #if defined( __agb_abi )
 
 #include <sys/ucontext.h>
@@ -17,134 +14,220 @@ int __agbabi_swapcontext( ucontext_t *, const ucontext_t * );
 
 }
 
-#endif
-
 namespace gba {
 namespace agbabi {
-    
+
 template <typename R>
 struct coroutine {
 
     class pull_type;
 
-    class push_type {
+    class iterator {
         friend pull_type;
-    protected:
-        push_type( pull_type& pull ) noexcept : m_value {}, m_pull { pull } {}
     public:
-        void operator ()( R value ) noexcept {
-            m_value = value;
-            m_pull.join();
-        }
-
-        explicit operator bool() const noexcept {
-            return m_pull;
-        }
-
-        bool operator!() const noexcept {
+        [[nodiscard]]
+        bool operator ==( bool ) const noexcept {
             return !m_pull;
         }
 
-    protected:
-        volatile R m_value;
+        [[nodiscard]]
+        bool operator !=( bool ) const noexcept {
+            return m_pull;
+        }
+
+        [[nodiscard]]
+        R operator *() const noexcept {
+            return m_pull.get();
+        }
+
+        iterator& operator ++() noexcept {
+            m_pull();
+            return *this;
+        }
+
+        iterator& operator ++( int ) noexcept {
+            m_pull();
+            return *this;
+        }
+
     private:
+        iterator( pull_type& pull ) noexcept : m_pull { pull } {
+            m_pull();
+        }
+
         pull_type& m_pull;
     };
 
+    class push_type {
+        friend pull_type;
+    public:
+        void operator ()( R value ) noexcept {
+            m_value = value;
+            m_hasValue = true;
+            __agbabi_swapcontext( &m_pull.m_context, &m_pull.m_link );
+        }
+
+    private:
+        push_type( pull_type& pull ) noexcept : m_pull { pull }, m_hasValue { false }, m_value {} {}
+
+        pull_type& m_pull;
+        volatile bool m_hasValue;
+        volatile R m_value;
+    };
+
     class pull_type {
-        friend push_type;
+        friend class push_type;
     public:
         template <typename Fn, class... Ts>
-        pull_type( void * sp, std::size_t sz, Fn&& fn, Ts... args ) noexcept : 
-            m_push( *this ), m_startContext {}, m_link {}, m_fiber {}
-        {
-            m_fiber.uc_link = &m_link;
-            m_fiber.uc_stack.ss_sp = sp;
-            m_fiber.uc_stack.ss_size = sz;
-            
+        pull_type( const stack_t& stack, Fn&& fn, Ts... args ) noexcept : m_context { &m_link, stack },  m_push( *this ) {
             const auto fnPtr = reinterpret_cast<void( * )( void )>( static_cast<void( * )( push_type&, Ts... )>( fn ) );
-
-            __agbabi_makecontext( &m_fiber, fnPtr, 2 + sizeof...( Ts ),
-                std::ref( m_push ),
-                std::forward<Ts>( args )...
-            );
-            m_startContext = m_fiber.uc_mcontext;
-
-            __agbabi_swapcontext( &m_link, &m_fiber );
+            __agbabi_makecontext( &m_context, fnPtr, 1 + sizeof...( Ts ), std::ref( m_push ), std::forward<Ts>( args )... );
+            m_start = m_context.uc_mcontext;
         }
 
         pull_type( const pull_type& ) = delete;
         pull_type& operator =( const pull_type& ) = delete;
 
-        void operator ()( void ) noexcept {
-            if ( m_link.uc_stack.ss_size == 0 ) {
-                // Restartable co-routine
-                m_fiber.uc_mcontext = m_startContext;
+        pull_type& operator ()( void ) noexcept {
+            if ( !m_push.m_hasValue ) {
+                m_context.uc_mcontext = m_start;
             } else {
-                m_link.uc_stack.ss_size = 0; // HACK : Reset yield flag
+                m_push.m_hasValue = false;
             }
-            __agbabi_swapcontext( &m_link, &m_fiber );
+            __agbabi_swapcontext( &m_link, &m_context );
+            return *this;
         }
 
-        explicit operator bool() const noexcept {
-            return m_link.uc_stack.ss_size == 0;
+        [[nodiscard]]
+        operator bool() const noexcept {
+            return m_push.m_hasValue;
         }
 
-        bool operator!() const noexcept {
-            return m_link.uc_stack.ss_size != 0;
-        }
-
+        [[nodiscard]]
         R get() const noexcept {
             return m_push.m_value;
         }
 
-        /**
-         * 
-         */ 
-        class iterator {
-        public:
-            iterator( pull_type& pull ) noexcept : m_pull { pull } {}
-
-            bool operator !=( bool ) const noexcept {
-                return !m_pull;
-            }
-
-            R operator *() noexcept {
-                return m_pull.get();
-            }
-
-            iterator& operator ++() noexcept {
-                m_pull();
-                return *this;
-            }
-
-        protected:
-            pull_type& m_pull;
-        };
-
+        [[nodiscard]]
         iterator begin() noexcept {
             return iterator( *this );
         }
 
-        bool end() noexcept {
+        [[nodiscard]]
+        bool end() const noexcept {
             return false;
         }
 
-    protected:
-        void join() noexcept {
-            m_link.uc_stack.ss_size = 1; // HACK : Set yield flag
-            __agbabi_swapcontext( &m_fiber, &m_link );
+    private:
+        ucontext_t m_context;
+        ucontext_t m_link;
+        mcontext_t m_start;
+        push_type m_push;
+    };
+
+};
+
+template <>
+struct coroutine<void> {
+
+    class pull_type;
+
+    class iterator {
+        friend pull_type;
+    public:
+        [[nodiscard]]
+        bool operator ==( bool ) const noexcept {
+            return !m_pull;
         }
 
-        push_type m_push;
-        mcontext_t m_startContext;
+        [[nodiscard]]
+        bool operator !=( bool ) const noexcept {
+            return m_pull;
+        }
+
+        iterator& operator ++() noexcept {
+            m_pull();
+            return *this;
+        }
+
+        iterator& operator ++( int ) noexcept {
+            m_pull();
+            return *this;
+        }
+
+    private:
+        iterator( pull_type& pull ) noexcept : m_pull { pull } {
+            m_pull();
+        }
+
+        pull_type& m_pull;
+    };
+
+    class push_type {
+        friend pull_type;
+    public:
+        void operator ()() noexcept {
+            m_hasReturned = true;
+            __agbabi_swapcontext( &m_pull.m_context, &m_pull.m_link );
+        }
+
+    private:
+        push_type( pull_type& pull ) noexcept : m_pull { pull }, m_hasReturned { false } {}
+
+        pull_type& m_pull;
+        volatile bool m_hasReturned;
+    };
+
+    class pull_type {
+        friend class push_type;
+    public:
+        template <typename Fn, class... Ts>
+        pull_type( const stack_t& stack, Fn&& fn, Ts... args ) noexcept : m_context { &m_link, stack },  m_push( *this ) {
+            const auto fnPtr = reinterpret_cast<void( * )( void )>( static_cast<void( * )( push_type&, Ts... )>( fn ) );
+            __agbabi_makecontext( &m_context, fnPtr, 1 + sizeof...( Ts ), std::ref( m_push ), std::forward<Ts>( args )... );
+            m_start = m_context.uc_mcontext;
+        }
+
+        pull_type( const pull_type& ) = delete;
+        pull_type& operator =( const pull_type& ) = delete;
+
+        pull_type& operator ()( void ) noexcept {
+            if ( !m_push.m_hasReturned ) {
+                m_context.uc_mcontext = m_start;
+            } else {
+                m_push.m_hasReturned = false;
+            }
+            __agbabi_swapcontext( &m_link, &m_context );
+            return *this;
+        }
+
+        [[nodiscard]]
+        operator bool() const noexcept {
+            return m_push.m_hasReturned;
+        }
+
+        [[nodiscard]]
+        iterator begin() noexcept {
+            return iterator( *this );
+        }
+
+        [[nodiscard]]
+        bool end() const noexcept {
+            return false;
+        }
+
+    private:
+        ucontext_t m_context;
         ucontext_t m_link;
-        ucontext_t m_fiber;
+        mcontext_t m_start;
+        push_type m_push;
     };
 
 };
 
 } // agbabi
 } // gba
+
+#endif
 
 #endif // define GBAXX_EXT_AGBABI_COROUTINE_HPP

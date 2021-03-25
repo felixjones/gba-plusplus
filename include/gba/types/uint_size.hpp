@@ -29,7 +29,7 @@ private:
 };
 
 using uint_size8 = uint_size<8>;
-using uint_size6 = uint_size<16>;
+using uint_size16 = uint_size<16>;
 using uint_size32 = uint_size<32>;
 
 } // gba
