@@ -14,48 +14,64 @@ int __agbabi_swapcontext( ucontext_t *, const ucontext_t * );
 
 }
 
+#include <cstddef>
+#include <functional>
+
 namespace gba {
 namespace agbabi {
 
 template <typename R>
 struct coroutine {
 
+    struct sentinel {};
+
     class pull_type;
 
+    template <class PullType>
     class iterator {
-        friend pull_type;
+        friend PullType;
     public:
+        using value_type = typename PullType::value_type;
+        using difference_type = std::ptrdiff_t;
+        using reference_type = value_type&;
+        using pointer_type = value_type *;
+
+        iterator() = default;
+        iterator( iterator& ) = default;
+        iterator( iterator&& ) = default;
+        iterator& operator =( iterator& ) = default;
+
         [[nodiscard]]
-        bool operator ==( bool ) const noexcept {
-            return !m_pull;
+        bool operator ==( sentinel ) const noexcept {
+            return !( *m_pull );
         }
 
         [[nodiscard]]
-        bool operator !=( bool ) const noexcept {
-            return m_pull;
+        bool operator !=( sentinel ) const noexcept {
+            return *m_pull;
         }
 
         [[nodiscard]]
-        R operator *() const noexcept {
-            return m_pull.get();
+        auto operator *() const noexcept {
+            return m_pull->get();
         }
 
         iterator& operator ++() noexcept {
-            m_pull();
+            ( *m_pull )();
             return *this;
         }
 
         iterator& operator ++( int ) noexcept {
-            m_pull();
+            ( *m_pull )();
             return *this;
         }
 
     private:
-        iterator( pull_type& pull ) noexcept : m_pull { pull } {
-            m_pull();
+        iterator( PullType& pull ) noexcept : m_pull { &pull } {
+            ( *m_pull )();
         }
 
-        pull_type& m_pull;
+        PullType * m_pull;
     };
 
     class push_type {
@@ -78,6 +94,8 @@ struct coroutine {
     class pull_type {
         friend class push_type;
     public:
+        using value_type = R;
+
         template <typename Fn, class... Ts>
         pull_type( const stack_t& stack, Fn&& fn, Ts... args ) noexcept : m_context { &m_link, stack },  m_push( *this ) {
             const auto fnPtr = reinterpret_cast<void( * )( void )>( static_cast<void( * )( push_type&, Ts... )>( fn ) );
@@ -109,13 +127,13 @@ struct coroutine {
         }
 
         [[nodiscard]]
-        iterator begin() noexcept {
-            return iterator( *this );
+        iterator<pull_type> begin() noexcept {
+            return iterator<pull_type>( *this );
         }
 
         [[nodiscard]]
-        bool end() const noexcept {
-            return false;
+        sentinel end() const noexcept {
+            return {};
         }
 
     private:
@@ -130,18 +148,20 @@ struct coroutine {
 template <>
 struct coroutine<void> {
 
+    struct sentinel {};
+
     class pull_type;
 
     class iterator {
         friend pull_type;
     public:
         [[nodiscard]]
-        bool operator ==( bool ) const noexcept {
+        bool operator ==( sentinel ) const noexcept {
             return !m_pull;
         }
 
         [[nodiscard]]
-        bool operator !=( bool ) const noexcept {
+        bool operator !=( sentinel ) const noexcept {
             return m_pull;
         }
 
@@ -212,8 +232,8 @@ struct coroutine<void> {
         }
 
         [[nodiscard]]
-        bool end() const noexcept {
-            return false;
+        sentinel end() const noexcept {
+            return {};
         }
 
     private:
