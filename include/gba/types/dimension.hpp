@@ -80,8 +80,8 @@ public:
         const uint8 * const m_data;
     };
 
-    constexpr dimension() noexcept = default;
-    constexpr dimension( const dimension& ) noexcept = default;
+    constexpr dimension() noexcept : m_data { 0 } {}
+    constexpr dimension( const dimension& o ) noexcept : m_data { o.m_data } {}
 
     constexpr dimension( uint32 width, uint32 height ) noexcept : m_data( ( ( height - 1 ) & mask ) << 4 | ( ( width - 1 ) & mask ) ) {}
 

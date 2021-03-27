@@ -19,19 +19,7 @@ struct swi<Swi, void( void )> {
 #elif defined( __arm__ )
         "swi\t%[Swi] << 16"
 #endif
-        :: [Swi]"i"( Swi )
-        );
-    }
-
-    [[gnu::always_inline]]
-    static void call_clobber_0_1() noexcept {
-        asm(
-#if defined( __thumb__ )
-        "swi\t%[Swi]"
-#elif defined( __arm__ )
-        "swi\t%[Swi] << 16"
-#endif
-        :: [Swi]"i"( Swi ) : "r0", "r1"
+        :: [Swi]"i"( Swi ) : "r0", "r1", "r2", "r3", "r12"
         );
     }
 };
@@ -48,7 +36,7 @@ struct swi<Swi, void( int )> {
         "mov\tr0, %[r0]\n\t"
         "swi\t%[Swi] << 16"
 #endif
-        :: [Swi]"i"( Swi ), [r0]"r"( arg0 ) : "r0"
+        :: [Swi]"i"( Swi ), [r0]"r"( arg0 ) : "r0", "r1", "r2", "r3", "r12"
         );
     }
 
@@ -62,7 +50,7 @@ struct swi<Swi, void( int )> {
         "mov\tr2, %[r0]\n\t"
         "swi\t%[Swi] << 16"
 #endif
-        :: [Swi]"i"( Swi ), [r0]"r"( arg0 ) : "r2"
+        :: [Swi]"i"( Swi ), [r0]"r"( arg0 ) : "r0", "r1", "r2", "r3", "r12"
         );
     }
 };
@@ -81,7 +69,7 @@ struct swi<Swi, void( int, int )> {
         "mov\tr1, %[r1]\n\t"
         "swi\t%[Swi] << 16"
 #endif
-        :: [Swi]"i"( Swi ), [r0]"r"( arg0 ), [r1]"r"( arg1 ) : "r0", "r1"
+        :: [Swi]"i"( Swi ), [r0]"r"( arg0 ), [r1]"r"( arg1 ) : "r0", "r1", "r2", "r3", "r12"
         );
     }
 };
@@ -100,7 +88,7 @@ struct swi<Swi, unsigned int( unsigned int )> {
         "swi\t%[Swi] << 16\n\t"
         "mov\t%[r0], r0"
 #endif
-        : [r0]"+r"( arg0 ) : [Swi]"i"( Swi ) : "r0"
+        : [r0]"+r"( arg0 ) : [Swi]"i"( Swi ) : "r0", "r1", "r2", "r3", "r12"
         );
         return arg0;
     }
@@ -123,7 +111,7 @@ struct swi<Swi, short( short, short )> {
         "swi\t%[Swi] << 16\n\t"
         "mov\t%[out], r0"
 #endif
-        : [out]"+r"( result ) : [Swi]"i"( Swi ), [r0]"r"( arg0 ), [r1]"r"( arg1 ) : "r0", "r1"
+        : [out]"+r"( result ) : [Swi]"i"( Swi ), [r0]"r"( arg0 ), [r1]"r"( arg1 ) : "r0", "r1", "r2", "r3", "r12"
         );
         return result;
     }
@@ -132,7 +120,7 @@ struct swi<Swi, short( short, short )> {
 template <unsigned Swi>
 struct swi<Swi, std::tuple<int, int, unsigned int>( int, int )> {
     [[nodiscard, gnu::always_inline, gnu::pure]]
-    static auto call_clobber_3( int arg0, int arg1 ) noexcept {
+    static auto call( int arg0, int arg1 ) noexcept {
         unsigned int r3;
         asm(
 #if defined( __thumb__ )
@@ -151,7 +139,7 @@ struct swi<Swi, std::tuple<int, int, unsigned int>( int, int )> {
         "mov\t%[r3], r3"
 #endif
         : [r0]"+r"( arg0 ), [r1]"+r"( arg1 ), [r3]"+r"( r3 )
-        : [Swi]"i"( Swi ) : "r0", "r1", "r3"
+        : [Swi]"i"( Swi ) : "r0", "r1", "r2", "r3", "r12"
         );
         return std::make_tuple( arg0, arg1, r3 );
     }
@@ -173,7 +161,7 @@ struct swi<Swi, void( const void *, void *, unsigned int )> {
         "mov\tr2, %[r2]\n\t"
         "swi\t%[Swi] << 16"
 #endif
-        :: [Swi]"i"( Swi ), [r0]"r"( arg0 ), [r1]"r"( arg1 ), [r2]"r"( arg2 ) : "r0", "r1", "r2"
+        :: [Swi]"i"( Swi ), [r0]"r"( arg0 ), [r1]"r"( arg1 ), [r2]"r"( arg2 ) : "r0", "r1", "r2", "r3", "r12"
         );
     }
 };
@@ -200,7 +188,7 @@ struct swi<Swi, void( const void *, void *, unsigned int, unsigned int )> {
         "swi\t%[Swi] << 16"
         "pop\t{r0-r3}"
 #endif
-        :: [Swi]"i"( Swi ), [r0]"r"( arg0 ), [r1]"r"( arg1 ), [r2]"r"( arg2 ), [r3]"r"( arg3 )
+        :: [Swi]"i"( Swi ), [r0]"r"( arg0 ), [r1]"r"( arg1 ), [r2]"r"( arg2 ), [r3]"r"( arg3 ) : "r0", "r1", "r2", "r3", "r12"
         );
     }
 };

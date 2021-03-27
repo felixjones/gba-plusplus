@@ -50,7 +50,8 @@ public:
     constexpr keypad_manager() noexcept : m_keys { 0x3ff }, m_xor { 0 } {}
 
     auto& poll() noexcept {
-        poll_switches();
+        const auto keys = imemmap<uint16, KeypadSource::address>::read();
+        m_xor = m_keys ^ keys;
         m_keys ^= m_xor;
         return *this;
     }
@@ -91,11 +92,6 @@ public:
     }
 
 protected:
-    [[gnu::always_inline]]
-    void poll_switches() volatile noexcept {
-        m_xor = m_keys ^ imemmap<uint16, KeypadSource::address>::read();
-    }
-
     uint16 m_keys;
     uint16 m_xor;
 

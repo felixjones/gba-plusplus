@@ -10,7 +10,7 @@ namespace bios {
 
 [[nodiscard, gnu::always_inline, gnu::pure]]
 inline auto div( int number, int denom ) noexcept {
-    return swi<6, std::tuple<int, int, unsigned int>( int, int )>::call_clobber_3( number, denom );
+    return swi<6, std::tuple<int, int, unsigned int>( int, int )>::call( number, denom );
 }
 
 [[nodiscard, gnu::always_inline, gnu::pure]]

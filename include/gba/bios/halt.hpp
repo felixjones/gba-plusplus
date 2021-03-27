@@ -25,7 +25,7 @@ inline void intr_wait( bool resetFlag, interrupt_mask flags ) noexcept {
 
 [[gnu::always_inline]]
 inline void vblank_intr_wait() noexcept {
-    swi<5, void( void )>::call_clobber_0_1();
+    swi<5, void( void )>::call();
 }
 
 namespace undocumented {

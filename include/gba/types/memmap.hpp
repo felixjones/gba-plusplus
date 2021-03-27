@@ -33,7 +33,7 @@ class imemmap<Type, Address, typename std::enable_if<!std::is_fundamental<Type>:
 public:
     [[nodiscard, gnu::always_inline]]
     static Type read() noexcept {
-        return from_bit_container<Type>( *reinterpret_cast<const volatile container_type *>( Address ) );
+        return from_bit_container<Type>( *reinterpret_cast<volatile const container_type *>( Address ) );
     }
 };
 
@@ -61,7 +61,7 @@ public:
 
     [[gnu::always_inline]]
     static void write( Type&& value ) noexcept {
-        *reinterpret_cast<container_type *>( Address ) = to_bit_container( value );
+        *reinterpret_cast<volatile container_type *>( Address ) = to_bit_container( value );
     }
 };
 
