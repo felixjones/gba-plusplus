@@ -54,4 +54,7 @@
 #include <gba/types/uint_size.hpp>
 #include <gba/types/vector.hpp>
 
+#include <gba/vram/allocator.hpp>
+#include <gba/vram/screen_tile.hpp>
+
 #endif // define GBAXX_GBA_HPP
