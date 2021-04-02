@@ -8,7 +8,7 @@
 namespace gba {
 namespace bios {
 
-struct alignas( 8 ) obj_affine_input {
+struct alignas( 4 ) obj_affine_input {
     fixed_point<int16, -8> scale_x;
     fixed_point<int16, -8> scale_y;
     fixed_point<uint16, -8> rotation;
