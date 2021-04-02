@@ -1,5 +1,5 @@
-#ifndef GBAXX_VRAM_ALLOCATOR_HPP
-#define GBAXX_VRAM_ALLOCATOR_HPP
+#ifndef GBAXX_VRAM_SCREEN_TILE_ALLOCATOR_HPP
+#define GBAXX_VRAM_SCREEN_TILE_ALLOCATOR_HPP
 
 #if defined( __agb_abi )
 extern "C" {
@@ -97,8 +97,8 @@ namespace vram {
     protected:
         constexpr tile_block( const uint32 mask, const uint32 tiles, const uint32 start ) noexcept : block( mask ), m_tiles( tiles ), m_start( start ) {}
 
-        uint16 m_tiles;
-        uint16 m_start;
+        const uint16 m_tiles;
+        const uint16 m_start;
     };
 
     class tile_block_4bpp : public tile_block {
@@ -176,7 +176,7 @@ namespace vram {
     protected:
         constexpr screen_block( const uint32 mask, const uint32 start ) noexcept : block( mask ), m_start( start ) {}
 
-        uint32 m_start;
+        const uint32 m_start;
     };
 
     class screen_block_regular : public screen_block {
@@ -372,4 +372,4 @@ namespace vram {
 } // vram
 } // gba
 
-#endif // define GBAXX_VRAM_ALLOCATOR_HPP
+#endif // define GBAXX_VRAM_SCREEN_TILE_ALLOCATOR_HPP

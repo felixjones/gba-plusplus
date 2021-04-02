@@ -46,7 +46,7 @@ constexpr auto sin_bam16( int32 x ) noexcept {
 #endif
     x = static_cast<uint32>( x ) << 17;
     if ( static_cast<int32>( x ^ ( static_cast<uint32>( x ) << 1 ) ) < 0 ) {
-        x = ( 1 << 31 ) - x;
+        x = 0x80000000 - static_cast<uint32>( x );
     }
     x = x >> 17;
     return make_fixed<2, 29>::from_data( x * ( ( 3 << 15 ) - ( x * x >> 11 ) ) );
@@ -54,14 +54,14 @@ constexpr auto sin_bam16( int32 x ) noexcept {
 
 template <class Rep, int Exponent>
 constexpr int32 radian_to_bam16( const fixed_point<Rep, Exponent>& radian ) noexcept {
-    constexpr auto radTo16 = fixed_point<Rep, Exponent>( 16384.0 / 3.14159265358979323846264338327950288 );
+    constexpr auto radTo16 = make_fixed<13, 18>( 16384.0 / 3.14159265358979323846264338327950288 );
     return static_cast<int32>( radian * radTo16 );
 }
 
 template <class Rep, int Exponent>
-constexpr int32 radian_to_ubam16( const fixed_point<Rep, Exponent>& radian ) noexcept {
-    constexpr auto radTo16 = fixed_point<Rep, Exponent>( 16384.0 / 3.14159265358979323846264338327950288 ) * 2;
-    return static_cast<int32>( radian * radTo16 );
+constexpr uint32 radian_to_ubam16( const fixed_point<Rep, Exponent>& radian ) noexcept {
+    constexpr auto radTo16 = make_ufixed<14, 18>( ( 16384.0 * 2.0 ) / 3.14159265358979323846264338327950288 );
+    return static_cast<uint32>( radian * radTo16 );
 }
 
 template <class Rep>
