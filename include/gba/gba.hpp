@@ -28,9 +28,15 @@
 #include <gba/keypad/keypad.hpp>
 #include <gba/keypad/keypad_manager.hpp>
 
+#include <gba/object/attributes.hpp>
+#include <gba/object/oam_allocator.hpp>
+
 #include <gba/registers/display.hpp>
 #include <gba/registers/interrupt_control.hpp>
 #include <gba/registers/keypad_input.hpp>
+#include <gba/registers/timers.hpp>
+
+#include <gba/time/timer_control.hpp>
 
 #include <gba/types/matrix/mat2x2.hpp>
 #include <gba/types/matrix/mat3x2.hpp>
@@ -55,6 +61,9 @@
 #include <gba/types/vector.hpp>
 
 #include <gba/vram/screen_tile.hpp>
-#include <gba/vram/screen_tile_allocator.hpp>
+#include <gba/vram/vram_bg_allocator.hpp>
+#include <gba/vram/vram_bg_blocks.hpp>
+#include <gba/vram/vram_obj_allocator.hpp>
+#include <gba/vram/vram_obj_blocks.hpp>
 
 #endif // define GBAXX_GBA_HPP

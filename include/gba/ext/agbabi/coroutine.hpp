@@ -97,7 +97,7 @@ struct coroutine {
         using value_type = R;
 
         template <typename Fn, class... Ts>
-        pull_type( const stack_t& stack, Fn&& fn, Ts... args ) noexcept : m_context { &m_link, stack },  m_push( *this ) {
+        pull_type( const stack_t& stack, Fn&& fn, Ts... args ) noexcept : m_context { &m_link, stack, {} },  m_push( *this ) {
             const auto fnPtr = reinterpret_cast<void( * )( void )>( static_cast<void( * )( push_type&, Ts... )>( fn ) );
             __agbabi_makecontext( &m_context, fnPtr, 1 + sizeof...( Ts ), std::ref( m_push ), std::forward<Ts>( args )... );
             m_start = m_context.uc_mcontext;
@@ -202,7 +202,7 @@ struct coroutine<void> {
         friend class push_type;
     public:
         template <typename Fn, class... Ts>
-        pull_type( const stack_t& stack, Fn&& fn, Ts... args ) noexcept : m_context { &m_link, stack },  m_push( *this ) {
+        pull_type( const stack_t& stack, Fn&& fn, Ts... args ) noexcept : m_context { &m_link, stack, {} },  m_push( *this ) {
             const auto fnPtr = reinterpret_cast<void( * )( void )>( static_cast<void( * )( push_type&, Ts... )>( fn ) );
             __agbabi_makecontext( &m_context, fnPtr, 1 + sizeof...( Ts ), std::ref( m_push ), std::forward<Ts>( args )... );
             m_start = m_context.uc_mcontext;
