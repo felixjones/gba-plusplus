@@ -1,5 +1,5 @@
-#ifndef GBAXX_VRAM_SCREEN_TILE_HPP
-#define GBAXX_VRAM_SCREEN_TILE_HPP
+#ifndef GBAXX_TYPES_SCREEN_TILE_HPP
+#define GBAXX_TYPES_SCREEN_TILE_HPP
 
 #include <gba/types/int_type.hpp>
 
@@ -12,14 +12,14 @@ enum class tile_flip : uint8 {
     both = 3
 };
 
-struct regular_tile {
+struct screen_tile {
     uint16 tile_index : 10;
     tile_flip flip : 2;
     uint16 palette_bank : 4;
 };
 
-static_assert( sizeof( regular_tile ) == 2, "screen_tile must be tightly packed" );
+static_assert( sizeof( screen_tile ) == 2, "screen_tile must be tightly packed" );
 
 } // gba
 
-#endif // define GBAXX_VRAM_SCREEN_TILE_HPP
+#endif // define GBAXX_TYPES_SCREEN_TILE_HPP

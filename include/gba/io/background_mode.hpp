@@ -2,16 +2,10 @@
 #define GBAXX_IO_BACKGROUND_MODE_HPP
 
 #include <gba/display/background_control.hpp>
+#include <gba/types/screen_size.hpp>
 
 namespace gba {
 namespace io {
-
-enum class regular_screen_size : uint16 {
-    _32x32 = static_cast<uint16>( gba::screen_size::regular_32x32 ),
-    _64x32 = static_cast<uint16>( gba::screen_size::regular_64x32 ),
-    _32x64 = static_cast<uint16>( gba::screen_size::regular_32x64 ),
-    _64x64 = static_cast<uint16>( gba::screen_size::regular_64x64 )
-};
 
 class background_control_regular {
 public:
@@ -68,13 +62,13 @@ public:
         return m_data.screen_base_block;
     }
 
-    constexpr auto& set_screen_size( io::regular_screen_size v ) noexcept {
+    constexpr auto& set_screen_size( screen_size_regular v ) noexcept {
         m_data.screen_size = static_cast<gba::screen_size>( v );
         return *this;
     }
 
     constexpr auto get_screen_size() const noexcept {
-        return static_cast<io::regular_screen_size>( m_data.screen_size );
+        return static_cast<screen_size_regular>( m_data.screen_size );
     }
 
 protected:
@@ -83,13 +77,6 @@ protected:
 };
 
 static_assert( sizeof( background_control_regular ) == 2, "background_control_regular must be tightly packed" );
-
-enum class affine_screen_size : uint16 {
-    _16x16 = static_cast<uint16>( gba::screen_size::affine_16x16 ),
-    _32x32 = static_cast<uint16>( gba::screen_size::affine_32x32 ),
-    _64x64 = static_cast<uint16>( gba::screen_size::affine_64x64 ),
-    _128x128 = static_cast<uint16>( gba::screen_size::affine_128x128 )
-};
 
 class background_control_affine {
 public:
@@ -146,13 +133,13 @@ public:
         return m_data.affine_background_wrap;
     }
 
-    constexpr auto& set_screen_size( io::affine_screen_size v ) noexcept {
+    constexpr auto& set_screen_size( screen_size_affine v ) noexcept {
         m_data.screen_size = static_cast<gba::screen_size>( v );
         return *this;
     }
 
     constexpr auto get_screen_size() const noexcept {
-        return static_cast<io::affine_screen_size>( m_data.screen_size );
+        return static_cast<screen_size_affine>( m_data.screen_size );
     }
 
 protected:

@@ -57,12 +57,10 @@
 #include <gba/types/interrupt_mask.hpp>
 #include <gba/types/matrix.hpp>
 #include <gba/types/memmap.hpp>
+#include <gba/types/screen_tile.hpp>
 #include <gba/types/uint_size.hpp>
 #include <gba/types/vector.hpp>
 
-#include <gba/vram/screen_tile.hpp>
-#include <gba/vram/vram_bg_allocator.hpp>
-#include <gba/vram/vram_bg_blocks.hpp>
 #include <gba/vram/vram_obj_allocator.hpp>
 #include <gba/vram/vram_obj_blocks.hpp>
 

@@ -3,6 +3,7 @@
 
 #include <gba/types/color.hpp>
 #include <gba/types/int_type.hpp>
+#include <gba/types/screen_size.hpp>
 
 namespace gba {
 
@@ -11,17 +12,6 @@ enum class affine_background_wrap : bool {
     wrap = true,
     clamp = false,
     repeat = true
-};
-
-enum class screen_size : uint16 {
-    regular_32x32 = 0,
-    regular_64x32 = 1,
-    regular_32x64 = 2,
-    regular_64x64 = 3,
-    affine_16x16 = 0,
-    affine_32x32 = 1,
-    affine_64x64 = 2,
-    affine_128x128 = 3
 };
 
 struct background_control {
