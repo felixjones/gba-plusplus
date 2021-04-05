@@ -2,9 +2,10 @@
 #define GBAXX_OBJECT_OAM_ALLOCATOR_HPP
 
 #if defined( __agb_abi )
+#include <gba/ext/agbabi.hpp>
+
 extern "C" {
 void __aeabi_memcpy4( void * dest, const void * src, std::size_t n );
-void __agbabi_oamcpy( void * dest, const void * srcA, const void * srcB, std::size_t n );
 }
 #else
 #include <gba/bios/cpu_copy.hpp>
@@ -86,7 +87,7 @@ public:
 #else
         bios::cpu_set( data, dest, bios::transfer {
             .transfers = size / 4,
-            .type = transfer_type::word
+            .type = transfer::type::word
         } );
 #endif
     }
@@ -98,7 +99,7 @@ public:
 #else
         bios::cpu_set( data, dest, bios::transfer {
             .transfers = size / 4,
-            .type = transfer_type::word
+            .type = transfer::type::word
         } );
 #endif
     }
@@ -106,11 +107,11 @@ public:
     void data2( const uint32 size, const void * data, const void * matrices ) const noexcept {
         auto * dest = reinterpret_cast<void *>( 0x7000000 + start() );
 #if defined( __agb_abi )
-        __agbabi_oamcpy( dest, data, matrices, size );
+        agbabi::oamcpy( dest, data, matrices, size );
 #else
         bios::cpu_set( data, dest, bios::transfer {
             .transfers = size / 4,
-            .type = transfer_type::word
+            .type = transfer::type::word
         } );
         auto * matDst = reinterpret_cast<uint16 *>( dest ) + 3;
         const auto * matSrc = reinterpret_cast<const uint16 *>( matrices );
@@ -125,11 +126,11 @@ public:
     void sub_data2( const uint32 offset, const uint32 size, const void * data, const void * matrices ) const noexcept {
         auto * dest = reinterpret_cast<void *>( 0x7000000 + ( start() + offset ) );
 #if defined( __agb_abi )
-        __agbabi_oamcpy( dest, data, matrices, size );
+        agbabi::oamcpy( dest, data, matrices, size );
 #else
         bios::cpu_set( data, dest, bios::transfer {
             .transfers = size / 4,
-            .type = transfer_type::word
+            .type = transfer::type::word
         } );
         auto * matDst = reinterpret_cast<uint16 *>( dest ) + 3;
         const auto * matSrc = reinterpret_cast<const uint16 *>( matrices );

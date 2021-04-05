@@ -14,7 +14,7 @@ struct mode<2> {
 
     class display_control {
     public:
-        constexpr display_control() noexcept : m_data { value, false, 0, oam_hblank_access::locked, object_tile_map::two_dimensional, false,
+        constexpr display_control() noexcept : m_data { value, false, 0, oam_hblank_access::locked, object::tile_map::two_dimensional, false,
                                                         false, false, false, false, false, false, false,
                                                         false } {}
 
@@ -35,7 +35,7 @@ struct mode<2> {
             return m_data.oam_hblank_access;
         }
 
-        constexpr auto& set_object_tile_map( object_tile_map v ) noexcept {
+        constexpr auto& set_object_tile_map( object::tile_map v ) noexcept {
             m_data.object_tile_map = v;
             return *this;
         }

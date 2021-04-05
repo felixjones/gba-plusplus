@@ -22,15 +22,15 @@ inline void cpu_fast_set( const void * src, void * dst, fast_transfer mode ) noe
     swi<12, void( const void *, void *, unsigned int )>::call( src, dst, to_bit_container( mode ) );
 }
 
-enum class transfer_type {
-    half = 0,
-    word = 1
-};
-
 struct transfer {
+    enum class type {
+        half = 0,
+        word = 1
+    };
+
     uint32 transfers : 21, : 3;
     bool fill : 1, : 1;
-    transfer_type type : 1;
+    transfer::type type : 1;
 };
 
 static_assert( sizeof( transfer ) == 4, "transfer must be tightly packed" );

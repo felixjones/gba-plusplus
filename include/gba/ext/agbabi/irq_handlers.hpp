@@ -1,12 +1,12 @@
 #ifndef GBAXX_EXT_AGBABI_INTERRUPT_HANDLERS_HPP
 #define GBAXX_EXT_AGBABI_INTERRUPT_HANDLERS_HPP
 
+#if defined( __agb_abi )
+
 #include <gba/types/interrupt_mask.hpp>
 #include <gba/types/memmap.hpp>
 
 #include <sys/ucontext.h>
-
-#if defined( __agb_abi )
 
 extern "C" {
 
@@ -17,8 +17,6 @@ void __agbabi_irq_ucontext();
 } // extern "C"
 
 extern void * __agbabi_irq_uproc;
-
-#endif
 
 namespace gba {
 namespace agbabi {
@@ -46,5 +44,7 @@ inline void interrupt_handler_init() noexcept {
 
 } // agbabi
 } // gba
+
+#endif // __agb_abi
 
 #endif // define GBAXX_EXT_AGBABI_INTERRUPT_HANDLERS_HPP

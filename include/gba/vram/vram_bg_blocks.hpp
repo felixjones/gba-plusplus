@@ -9,8 +9,8 @@ void __aeabi_memcpy4( void * dest, const void * src, size_t n );
 #include <gba/bios/cpu_copy.hpp>
 #endif
 
-#include <gba/display/background_control.hpp>
 #include <gba/io/background_mode.hpp>
+#include <gba/types/color.hpp>
 #include <gba/types/int_type.hpp>
 #include <gba/vram/screen_tile.hpp>
 

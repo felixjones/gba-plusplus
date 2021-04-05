@@ -4,16 +4,19 @@
 #include <gba/types/int_type.hpp>
 
 namespace gba {
+namespace object {
+
+enum class tile_map : bool {
+    two_dimensional = false,
+    one_dimensional = true,
+    linear = true
+};
+
+} // object
 
 enum class oam_hblank_access : bool {
     locked = false,
     unlocked = true
-};
-
-enum class object_tile_map : bool {
-    two_dimensional = false,
-    one_dimensional = true,
-    linear = true
 };
 
 struct display_control {
@@ -21,7 +24,7 @@ struct display_control {
     bool color_game_boy : 1;
     uint16 page : 1;
     gba::oam_hblank_access oam_hblank_access : 1;
-    gba::object_tile_map object_tile_map : 1;
+    object::tile_map object_tile_map : 1;
     bool force_blank : 1,
             layer_background_0 : 1,
             layer_background_1 : 1,

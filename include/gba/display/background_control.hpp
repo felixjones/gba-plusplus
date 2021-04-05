@@ -1,16 +1,10 @@
 #ifndef GBAXX_DISPLAY_BACKGROUND_CONTROL_HPP
 #define GBAXX_DISPLAY_BACKGROUND_CONTROL_HPP
 
+#include <gba/types/color.hpp>
 #include <gba/types/int_type.hpp>
 
 namespace gba {
-
-enum class color_depth : bool {
-    color_16 = false,
-    color_256 = true,
-    bpp_4 = false,
-    bpp_8 = true
-};
 
 enum class affine_background_wrap : bool {
     transparent = false,

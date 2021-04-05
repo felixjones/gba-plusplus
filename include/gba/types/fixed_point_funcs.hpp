@@ -28,11 +28,7 @@
 #include <gba/types/fixed_point_operators.hpp>
 
 #if defined( __agb_abi )
-extern "C" {
-
-int __agbabi_sin( int angle );
-
-}
+#include <gba/ext/agbabi.hpp>
 #endif
 
 namespace gba {
@@ -41,7 +37,7 @@ namespace detail {
 constexpr auto sin_bam16( int32 x ) noexcept {
 #if defined( __agb_abi )
     if ( gbaxx_fixed_point_funcs_constant( x ) == false ) {
-        return make_fixed<2, 29>::from_data( __agbabi_sin( x ) );
+        return agbabi::sin( x );
     }
 #endif
     x = static_cast<uint32>( x ) << 17;
@@ -120,7 +116,7 @@ constexpr auto cos( const fixed_point<Rep, Exponent>& radian ) noexcept {
     return detail::sin_bam16( detail::radian_to_bam16( radian ) + 0x2000 );
 }
 
-using cosine_type = gba::fixed_point<int16, -8>;
+using cosine_type = object::mat2::column0_type::value_type;
 
 template <class Rep, int Exponent>
 constexpr std::tuple<cosine_type, cosine_type> cosine( const fixed_point<Rep, Exponent>& radian ) noexcept {
@@ -129,11 +125,11 @@ constexpr std::tuple<cosine_type, cosine_type> cosine( const fixed_point<Rep, Ex
     } else {
         bios::obj_affine_input i {
                 1, 1,
-                cosine_type::from_data( detail::radian_to_ubam16( radian ) )
+                make_ufixed<8, 8>::from_data( detail::radian_to_ubam16( radian ) )
         };
-        bios::obj_affine_matrix m; // NOLINT(cppcoreguidelines-pro-type-member-init)
+        object::mat2 m; // NOLINT(cppcoreguidelines-pro-type-member-init)
         bios::obj_affine_set( &i, &m, 1, 2 );
-        return std::make_tuple( m.pa, m.pc );
+        return std::make_tuple( m.column0.x, m.column1.x );
     }
 }
 

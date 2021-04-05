@@ -17,7 +17,9 @@ namespace {
 
 [[nodiscard]]
 constexpr window_dimension make_window_dimension( const uint32 origin, const uint32 size ) noexcept {
-    return window_dimension { size, uint8( origin ) };
+    return window_dimension { origin + size, uint8( origin ) };
+}
+
 }
 
 struct window_control {
@@ -39,7 +41,6 @@ struct window_control {
 
 static_assert( sizeof( window_control ) == 2, "window_control must be tightly packed" );
 
-}
 } // gba
 
 #endif // define GBAXX_DISPLAY_WINDOW_HPP

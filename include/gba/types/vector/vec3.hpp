@@ -7,6 +7,8 @@ namespace gba {
 
 template <typename T>
 struct vec<3, T> {
+    using value_type = T;
+
     constexpr vec() noexcept : x { 0 }, y { 0 }, z { 0 } {}
 
     template <typename S>
@@ -36,7 +38,7 @@ struct vec<3, T> {
         return x != o.x || y != o.y || z != o.z;
     }
 
-    T x, y, z;
+    value_type x, y, z;
 };
 
 template <typename T>

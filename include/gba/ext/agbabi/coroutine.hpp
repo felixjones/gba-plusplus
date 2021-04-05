@@ -248,6 +248,6 @@ struct coroutine<void> {
 } // agbabi
 } // gba
 
-#endif
+#endif // __agb_abi
 
 #endif // define GBAXX_EXT_AGBABI_COROUTINE_HPP
