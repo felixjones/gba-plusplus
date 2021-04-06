@@ -14,33 +14,35 @@ void __aeabi_memcpy4( void * dest, const void * src, std::size_t n );
 #include <gba/object/attributes.hpp>
 
 namespace gba {
+namespace allocator {
 
-class oam_block {
+class oam_buffer {
 public:
-    constexpr oam_block( const uint32 shift, const uint32 bits ) noexcept : m_shift( shift ), m_bits( bits ) {}
-    constexpr oam_block( const std::nullptr_t&& ) noexcept : m_shift( 0 ), m_bits( 0 ) {}
+    constexpr oam_buffer( const uint32 shift, const uint32 bits ) noexcept : m_shift( shift ), m_bits( bits ) {}
+
+    constexpr oam_buffer( const std::nullptr_t&& ) noexcept : m_shift( 0 ), m_bits( 0 ) {}
 
     constexpr operator bool() const noexcept {
         return m_bits;
     }
 
-    constexpr bool operator ==( const oam_block& other ) const noexcept {
+    constexpr bool operator==( const oam_buffer& other ) const noexcept {
         return m_shift == other.m_shift && m_bits == other.m_bits;
     }
 
-    constexpr bool operator !=( const oam_block& other ) const noexcept {
+    constexpr bool operator!=( const oam_buffer& other ) const noexcept {
         return m_shift != other.m_shift && m_bits != other.m_bits;
     }
 
-    constexpr bool operator ==( std::nullptr_t&& ) const noexcept {
+    constexpr bool operator==( std::nullptr_t&& ) const noexcept {
         return m_bits == 0;
     }
 
-    constexpr bool operator !=( std::nullptr_t&& ) const noexcept {
+    constexpr bool operator!=( std::nullptr_t&& ) const noexcept {
         return m_bits;
     }
 
-    constexpr oam_block& operator =( std::nullptr_t&& ) noexcept {
+    constexpr oam_buffer& operator=( std::nullptr_t&& ) noexcept {
         m_bits = 0;
         return *this;
     }
@@ -141,6 +143,7 @@ public:
         }
 #endif
     }
+
 private:
     [[nodiscard]]
     constexpr uint32 start() const noexcept {
@@ -151,22 +154,22 @@ private:
     uint16 m_bits;
 };
 
-class oam_allocator {
+class oam {
 public:
-    constexpr oam_allocator() noexcept : m_bitset( 0 ) {}
+    constexpr oam() noexcept : m_bitset( 0 ) {}
 
     [[nodiscard]]
-    oam_block memory_protect( const void * const address, const uint32 length ) noexcept {
+    oam_buffer memory_protect( const void * const address, const uint32 length ) noexcept {
         const auto shift = ( reinterpret_cast<uint32>( address ) - 0x7000000 ) / 32u;
         const auto bits = ( length + 31u ) / 32u;
 
         const auto mask = ( ( 1u << bits ) - 1 ) << shift;
         m_bitset |= mask;
-        return oam_block( shift, bits );
+        return oam_buffer( shift, bits );
     }
 
     [[nodiscard]]
-    constexpr oam_block allocate( uint32 objects ) noexcept {
+    constexpr oam_buffer allocate( uint32 objects ) noexcept {
         const uint32 blocks = ( objects + 3u ) / 4u;
 
         uint32 mask = ( ( 1u << blocks ) - 1u ) << ( 32u - blocks );
@@ -176,11 +179,11 @@ public:
         }
 
         m_bitset |= mask;
-        return oam_block( ( 32u - shift ) - blocks, blocks );
+        return oam_buffer( ( 32u - shift ) - blocks, blocks );
     }
 
     [[nodiscard]]
-    constexpr oam_block allocate_front( uint32 objects ) noexcept {
+    constexpr oam_buffer allocate_front( uint32 objects ) noexcept {
         const uint32 blocks = ( objects + 3u ) / 4u;
 
         uint32 mask = ( 1u << blocks ) - 1u;
@@ -190,10 +193,10 @@ public:
         }
 
         m_bitset |= mask;
-        return oam_block( shift, blocks );
+        return oam_buffer( shift, blocks );
     }
 
-    constexpr void deallocate( oam_block& block ) noexcept {
+    constexpr void deallocate( oam_buffer& block ) noexcept {
         m_bitset &= ~block.mask();
         block = nullptr;
     }
@@ -222,6 +225,7 @@ private:
     uint32 m_bitset;
 };
 
+} // allocator
 } // gba
 
 #endif // define GBAXX_OBJECT_OAM_ALLOCATOR_HPP

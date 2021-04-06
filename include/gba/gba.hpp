@@ -9,6 +9,7 @@
 #include <gba/allocator/mode3.hpp>
 #include <gba/allocator/mode4.hpp>
 #include <gba/allocator/mode5.hpp>
+#include <gba/allocator/oam.hpp>
 #include <gba/allocator/object_tile.hpp>
 #include <gba/allocator/screen_affine.hpp>
 #include <gba/allocator/screen_regular.hpp>
@@ -46,7 +47,6 @@
 #include <gba/keypad/keypad_manager.hpp>
 
 #include <gba/object/attributes.hpp>
-#include <gba/object/oam_allocator.hpp>
 
 #include <gba/registers/display.hpp>
 #include <gba/registers/interrupt_control.hpp>
