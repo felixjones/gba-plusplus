@@ -1,20 +1,23 @@
 #ifndef GBAXX_ALLOCATOR_MODE1_HPP
 #define GBAXX_ALLOCATOR_MODE1_HPP
 
+#include <gba/allocator/bitset_types.hpp>
+#include <gba/allocator/buffer.hpp>
+#include <gba/allocator/object_tile.hpp>
 #include <gba/allocator/screen_affine.hpp>
 #include <gba/allocator/screen_regular.hpp>
 #include <gba/allocator/tile_4bpp.hpp>
 #include <gba/allocator/tile_8bpp.hpp>
 #include <gba/allocator/vram.hpp>
 #include <gba/types/int_type.hpp>
-#include <gba/types/color.hpp>
-#include <gba/types/screen_size.hpp>
 
 namespace gba {
 namespace allocator {
 
 template <>
 struct mode<1> {
+
+using object = object_tile<32, 0x6010000, 0x8000>;
 
 class background : public simple_bitset {
 public:

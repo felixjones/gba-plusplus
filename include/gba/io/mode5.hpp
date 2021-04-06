@@ -126,8 +126,6 @@ struct mode<5> {
         using bg2_mat3x2 = omemmap<io::background_mat3x2, 0x4000020>;
         using bg2_vec2 = omemmap<vec2<make_fixed<19, 8>>, 0x4000028>;
     };
-
-    using obj_allocator = vram::obj_allocator<16u, 0x6014000>;
 };
 
 } // io

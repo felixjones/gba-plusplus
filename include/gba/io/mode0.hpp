@@ -5,7 +5,6 @@
 #include <gba/io/background_mode.hpp>
 #include <gba/io/io.hpp>
 #include <gba/types/vector/vec2.hpp>
-#include <gba/vram/vram_obj_allocator.hpp>
 
 namespace gba {
 namespace io {
@@ -153,8 +152,6 @@ struct mode<0> {
         using bg2ofs_vec2 = omemmap<vec2<int16>, 0x4000018>;
         using bg3ofs_vec2 = omemmap<vec2<int16>, 0x400001c>;
     };
-
-    using obj_allocator = vram::obj_allocator<32u, 0x6010000>;
 };
 
 } // io

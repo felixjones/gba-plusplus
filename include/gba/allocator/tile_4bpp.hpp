@@ -1,7 +1,9 @@
 #ifndef GBAXX_ALLOCATOR_TILE_4BPP_HPP
 #define GBAXX_ALLOCATOR_TILE_4BPP_HPP
 
-#include <gba/allocator/vram.hpp>
+#include <algorithm>
+
+#include <gba/allocator/buffer.hpp>
 #include <gba/types/color.hpp>
 
 #if defined( __agb_abi )
@@ -19,6 +21,7 @@ namespace gba {
 class buffer_tile4bpp : public allocator::buffer {
 public:
     constexpr buffer_tile4bpp( const uint32 address, const uint32 tiles, const uint32 startIndex, const uint32 baseBlock, const uint32 x, const uint32 width ) noexcept : allocator::buffer( address, x, 0, width, 1 ), m_tiles( tiles ), m_startIndex( startIndex ), m_baseBlock( baseBlock ) {}
+    constexpr buffer_tile4bpp( const uint32 address, const uint32 tiles, const uint32 startIndex, const uint32 baseBlock, const uint32 x, const uint32 y, const uint32 width, const uint32 height ) noexcept : allocator::buffer( address, x, y, width, height ), m_tiles( tiles ), m_startIndex( startIndex ), m_baseBlock( baseBlock ) {}
     constexpr buffer_tile4bpp( std::nullptr_t&& ) noexcept : allocator::buffer( nullptr ), m_tiles(), m_startIndex(), m_baseBlock() {}
 
     [[nodiscard]]

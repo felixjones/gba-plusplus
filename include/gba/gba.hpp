@@ -1,6 +1,23 @@
 #ifndef GBAXX_GBA_HPP
 #define GBAXX_GBA_HPP
 
+#include <gba/allocator/bitset_types.hpp>
+#include <gba/allocator/buffer.hpp>
+#include <gba/allocator/mode0.hpp>
+#include <gba/allocator/mode1.hpp>
+#include <gba/allocator/mode2.hpp>
+#include <gba/allocator/mode3.hpp>
+#include <gba/allocator/mode4.hpp>
+#include <gba/allocator/mode5.hpp>
+#include <gba/allocator/object_tile.hpp>
+#include <gba/allocator/screen_affine.hpp>
+#include <gba/allocator/screen_regular.hpp>
+#include <gba/allocator/tile_4bpp.hpp>
+#include <gba/allocator/tile_4bpp_2d.hpp>
+#include <gba/allocator/tile_8bpp.hpp>
+#include <gba/allocator/tile_8bpp_2d.hpp>
+#include <gba/allocator/vram.hpp>
+
 #include <gba/bios/affine.hpp>
 #include <gba/bios/cpu_copy.hpp>
 #include <gba/bios/halt.hpp>
@@ -60,8 +77,5 @@
 #include <gba/types/screen_tile.hpp>
 #include <gba/types/uint_size.hpp>
 #include <gba/types/vector.hpp>
-
-#include <gba/vram/vram_obj_allocator.hpp>
-#include <gba/vram/vram_obj_blocks.hpp>
 
 #endif // define GBAXX_GBA_HPP

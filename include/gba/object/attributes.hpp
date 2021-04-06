@@ -60,6 +60,98 @@ struct attr2 {
         palette_bank : 4;
 };
 
+static constexpr auto tile_width( const object::shape shape, const uint32 size ) noexcept {
+    switch ( shape ) {
+        case shape::square:
+            switch ( size ) {
+                case 0:
+                    return 1;
+                case 1:
+                    return 2;
+                case 2:
+                    return 4;
+                case 3:
+                    return 8;
+                default:
+                    return 0;
+            }
+        case shape::wide:
+            switch ( size ) {
+                case 0:
+                    return 2;
+                case 1:
+                    return 4;
+                case 2:
+                    return 4;
+                case 3:
+                    return 8;
+                default:
+                    return 0;
+            }
+        case shape::tall:
+            switch ( size ) {
+                case 0:
+                    return 1;
+                case 1:
+                    return 1;
+                case 2:
+                    return 2;
+                case 3:
+                    return 4;
+                default:
+                    return 0;
+            }
+        default:
+            return 0;
+    }
+}
+
+static constexpr auto tile_height( const object::shape shape, const uint32 size ) noexcept {
+    switch ( shape ) {
+        case shape::square:
+            switch ( size ) {
+                case 0:
+                    return 1;
+                case 1:
+                    return 2;
+                case 2:
+                    return 4;
+                case 3:
+                    return 8;
+                default:
+                    return 0;
+            }
+        case shape::wide:
+            switch ( size ) {
+                case 0:
+                    return 1;
+                case 1:
+                    return 1;
+                case 2:
+                    return 2;
+                case 3:
+                    return 4;
+                default:
+                    return 0;
+            }
+        case shape::tall:
+            switch ( size ) {
+                case 0:
+                    return 2;
+                case 1:
+                    return 4;
+                case 2:
+                    return 4;
+                case 3:
+                    return 8;
+                default:
+                    return 0;
+            }
+        default:
+            return 0;
+    }
+}
+
 } // object
 
 struct object_regular {

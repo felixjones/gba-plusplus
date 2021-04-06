@@ -3,7 +3,7 @@
 
 #include <algorithm>
 
-#include <gba/allocator/vram.hpp>
+#include <gba/allocator/buffer.hpp>
 #include <gba/types/screen_size.hpp>
 #include <gba/types/screen_tile.hpp>
 
