@@ -11,6 +11,7 @@
 #include <gba/allocator/mode5.hpp>
 #include <gba/allocator/oam.hpp>
 #include <gba/allocator/object_tile.hpp>
+#include <gba/allocator/palette.hpp>
 #include <gba/allocator/screen_affine.hpp>
 #include <gba/allocator/screen_regular.hpp>
 #include <gba/allocator/tile_4bpp.hpp>

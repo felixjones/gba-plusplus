@@ -1,10 +1,9 @@
 #ifndef GBAXX_OBJECT_ATTRIBUTES_HPP
 #define GBAXX_OBJECT_ATTRIBUTES_HPP
 
-#include <gba/display/background_control.hpp>
+#include <gba/types/color.hpp>
 #include <gba/types/fixed_point.hpp>
 #include <gba/types/int_type.hpp>
-#include <gba/types/vector.hpp>
 #include <gba/types/matrix.hpp>
 
 namespace gba {
