@@ -20,6 +20,8 @@ public:
     static constexpr uint32 length = Length;
     static constexpr uint32 stride = 32u;
 
+    constexpr object_tile() noexcept : bitset_2d<Pages>() {}
+
     void deallocate( buffer& buffer ) noexcept {
         bitset_2d<Pages>::unset( buffer );
     }

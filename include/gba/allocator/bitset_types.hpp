@@ -26,6 +26,8 @@ public:
 
 class simple_bitset : public bitset_access {
 protected:
+    constexpr simple_bitset() noexcept : m_bitset { 0 } {}
+
     constexpr void unset( buffer& buffer ) noexcept {
         m_bitset &= buffer_mask( buffer );
     }
@@ -74,6 +76,8 @@ protected:
 template <unsigned Pages>
 class bitset_2d : public bitset_access {
 protected:
+    constexpr bitset_2d() noexcept : m_bitset {} {}
+
     constexpr void unset( buffer& buffer ) noexcept {
         const auto mask = buffer_mask( buffer );
         for ( int ii = 0; ii < buffer_height( buffer ); ++ii ) {
