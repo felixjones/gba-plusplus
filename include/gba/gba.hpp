@@ -11,6 +11,7 @@
 #include <gba/allocator/mode5.hpp>
 #include <gba/allocator/oam.hpp>
 #include <gba/allocator/object_tile.hpp>
+#include <gba/allocator/palette.hpp>
 #include <gba/allocator/screen_affine.hpp>
 #include <gba/allocator/screen_regular.hpp>
 #include <gba/allocator/tile_4bpp.hpp>
@@ -51,7 +52,15 @@
 #include <gba/registers/display.hpp>
 #include <gba/registers/interrupt_control.hpp>
 #include <gba/registers/keypad_input.hpp>
+#include <gba/registers/sound.hpp>
 #include <gba/registers/timers.hpp>
+
+#include <gba/sound/dmg/channel1.hpp>
+
+#include <gba/sound/duty_control.hpp>
+#include <gba/sound/frequency_control.hpp>
+#include <gba/sound/sound_control.hpp>
+#include <gba/sound/sweep_control.hpp>
 
 #include <gba/time/timer_control.hpp>
 

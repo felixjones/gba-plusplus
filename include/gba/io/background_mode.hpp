@@ -26,7 +26,7 @@ public:
         return m_data.priority;
     }
 
-    constexpr auto& set_character_base_block( int v ) noexcept {
+    constexpr auto& set_character_base_block( uint32 v ) noexcept {
         m_data.character_base_block = v;
         return *this;
     }
@@ -53,7 +53,7 @@ public:
         return m_data.color_depth;
     }
 
-    constexpr auto& set_screen_base_block( int v ) noexcept {
+    constexpr auto& set_screen_base_block( uint32 v ) noexcept {
         m_data.screen_base_block = v;
         return *this;
     }
