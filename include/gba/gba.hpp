@@ -55,12 +55,9 @@
 #include <gba/registers/sound.hpp>
 #include <gba/registers/timers.hpp>
 
-#include <gba/sound/dmg/channel1.hpp>
-
-#include <gba/sound/duty_control.hpp>
-#include <gba/sound/frequency_control.hpp>
-#include <gba/sound/sound_control.hpp>
-#include <gba/sound/sweep_control.hpp>
+#include <gba/sound/direct.hpp>
+#include <gba/sound/dmg.hpp>
+#include <gba/sound/sound.hpp>
 
 #include <gba/time/timer_control.hpp>
 
