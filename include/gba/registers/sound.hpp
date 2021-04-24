@@ -54,6 +54,9 @@ using soundbias = iomemmap<sound::bias_control, 0x4000088>;
 
 using wave_ram = iomemmap<sound::wave_ram, 0x4000090>;
 
+using fifo_a = iomemmap<uint32, 0x40000A0>;
+using fifo_b = iomemmap<uint32, 0x40000A4>;
+
 } // reg
 } // gba
 
