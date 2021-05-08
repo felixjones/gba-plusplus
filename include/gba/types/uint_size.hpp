@@ -12,7 +12,7 @@ class uint_size {
     using data_type = typename uint_type<Bits>::type;
 public:
     constexpr uint_size() noexcept = default;
-    constexpr uint_size( uint32 data ) noexcept : m_data { static_cast<data_type>( data - 1 ) } {}
+    constexpr uint_size( const uint32 data ) noexcept : m_data { data_type( data - 1 ) } {}
 
     [[nodiscard]]
     constexpr operator uint32() const noexcept {

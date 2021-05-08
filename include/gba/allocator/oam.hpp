@@ -18,6 +18,8 @@ namespace allocator {
 
 class oam_buffer {
 public:
+    oam_buffer() = default;
+
     constexpr oam_buffer( const uint32 shift, const uint32 bits ) noexcept : m_shift( shift ), m_bits( bits ) {}
 
     constexpr oam_buffer( const std::nullptr_t&& ) noexcept : m_shift( 0 ), m_bits( 0 ) {}
@@ -104,6 +106,32 @@ public:
             .type = transfer::type::word
         } );
 #endif
+    }
+
+    uint32 dma3_data( const uint32 size, const void * data ) noexcept {
+        auto * dest = reinterpret_cast<void *>( 0x7000000 + start() );
+
+        reg::dma3cnt_h::write( {} );
+        reg::dma3sad::write( reinterpret_cast<uint32>( data ) );
+        reg::dma3dad::write( reinterpret_cast<uint32>( dest ) );
+        reg::dma3cnt::write( {
+            .transfers = uint16( size / 4 ),
+            .control = { .type = dma_control::type::word, .enable = true }
+        } );
+        return size;
+    }
+
+    uint32 dma3_sub_data( const uint32 offset, const uint32 size, const void * data ) noexcept {
+        auto * dest = reinterpret_cast<void *>( 0x7000000 + ( start() + offset ) );
+
+        reg::dma3cnt_h::write( {} );
+        reg::dma3sad::write( reinterpret_cast<uint32>( data ) );
+        reg::dma3dad::write( reinterpret_cast<uint32>( dest ) );
+        reg::dma3cnt::write( {
+            .transfers = uint16( size / 4 ),
+            .control = { .type = dma_control::type::word, .enable = true }
+        } );
+        return size;
     }
 
     void data2( const uint32 size, const void * data, const void * matrices ) const noexcept {

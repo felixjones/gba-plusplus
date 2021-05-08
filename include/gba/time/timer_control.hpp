@@ -4,20 +4,24 @@
 #include <gba/types/int_type.hpp>
 
 namespace gba {
-namespace time {
-
-enum class frequency : uint16 {
-    _1 = 0,
-    _64 = 1,
-    _256 = 2,
-    _1024 = 3
-};
-
-} // time
 
 struct timer_control {
-    time::frequency frequency : 2;
-    bool cascade : 1;
+    enum class cycles : uint16 {
+        _1 = 0,
+        _64 = 1,
+        _256 = 2,
+        _1024 = 3
+    };
+
+    enum class cascade : bool {
+        off = false,
+        on = true,
+
+        overflow = on
+    };
+
+    timer_control::cycles cycles : 2;
+    timer_control::cascade cascade : 1;
     uint16 : 3;
     bool timer_irq : 1,
         enable : 1;
@@ -27,7 +31,7 @@ struct timer_control {
 static_assert( sizeof( timer_control ) == 2, "timer_control must be tightly packed" );
 
 struct timer_counter_control {
-    int16 counter;
+    uint16 counter;
     timer_control control;
 };
 
