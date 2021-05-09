@@ -18,23 +18,23 @@ void __agbabi_oamset( void * dest, const void * srcA, const void * srcB, std::si
 namespace gba {
 namespace agbabi {
 
-void rmemcpy4( void * dest, const void * src, std::size_t n ) noexcept {
+inline void rmemcpy4( void * dest, const void * src, std::size_t n ) noexcept {
     __agbabi_rmemcpy4( dest, src, n );
 }
 
-void rmemcpy( void * dest, const void * src, std::size_t n ) noexcept {
+inline void rmemcpy( void * dest, const void * src, std::size_t n ) noexcept {
     __agbabi_rmemcpy( dest, src, n );
 }
 
-void wordset4( void * dest, std::size_t n, int c ) noexcept {
+inline void wordset4( void * dest, std::size_t n, int c ) noexcept {
     __agbabi_wordset4( dest, n, c );
 }
 
-void oamcpy( void * dest, const void * srcA, const void * srcB, std::size_t n ) noexcept {
+inline void oamcpy( void * dest, const void * srcA, const void * srcB, std::size_t n ) noexcept {
     __agbabi_oamcpy( dest, srcA, srcB, n );
 }
 
-void oamset( void * dest, const void * srcA, const void * srcB, std::size_t n ) noexcept {
+inline void oamset( void * dest, const void * srcA, const void * srcB, std::size_t n ) noexcept {
     __agbabi_oamset( dest, srcA, srcB, n );
 }
 

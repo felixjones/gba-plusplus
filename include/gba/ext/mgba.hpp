@@ -14,7 +14,7 @@ extern "C" {
 namespace gba {
 namespace mgba {
 
-enum class debug_level : int {
+enum class log_level : int {
     fatal = 0,
     error = 1,
     warn = 2,
@@ -41,7 +41,7 @@ inline void close() noexcept {
 }
 
 template <typename ...Args>
-inline void printf( const debug_level lvl, const char * fmt, Args... args ) noexcept {
+inline void printf( const log_level lvl, const char * fmt, Args... args ) noexcept {
     char * const address = reinterpret_cast<char *>( 0x4fff600 );
 #if defined( __posprintf )
     posprintf( address, fmt, args... );
