@@ -17,6 +17,53 @@ private:
 
     class pull_type {
         friend push_coroutine;
+    private:
+        struct sentinel {};
+
+        class iterator {
+        public:
+            using value_type = typename push_coroutine::value_type;
+            using difference_type = std::ptrdiff_t;
+            using reference_type = value_type&;
+            using pointer_type = value_type *;
+
+            iterator() = default;
+            iterator( iterator& ) = default;
+            iterator( iterator&& ) = default;
+            iterator& operator =( iterator& ) = default;
+
+            iterator( pull_type& pull ) noexcept : m_pull { &pull } {
+                ( *m_pull )();
+            }
+
+            [[nodiscard]]
+            bool operator ==( sentinel ) const noexcept {
+                return !( *m_pull );
+            }
+
+            [[nodiscard]]
+            bool operator !=( sentinel ) const noexcept {
+                return *m_pull;
+            }
+
+            [[nodiscard]]
+            auto operator *() const noexcept {
+                return m_pull->get();
+            }
+
+            iterator& operator ++() noexcept {
+                ( *m_pull )();
+                return *this;
+            }
+
+            iterator& operator ++( int ) noexcept {
+                ( *m_pull )();
+                return *this;
+            }
+
+        private:
+            pull_type * const m_pull;
+        };
     public:
         const value_type& operator ()() noexcept {
             m_value.reset();
@@ -24,6 +71,25 @@ private:
             return m_value.value();
         }
 
+        [[nodiscard]]
+        operator bool() const noexcept {
+            return m_value.has_value();
+        }
+
+        [[nodiscard]]
+        const value_type& get() const noexcept {
+            return m_value.value();
+        }
+
+        [[nodiscard]]
+        iterator begin() noexcept {
+            return iterator( *this );
+        }
+
+        [[nodiscard]]
+        sentinel end() const noexcept {
+            return {};
+        }
     private:
         pull_type( push_coroutine * const push ) noexcept : m_push { push } {}
 

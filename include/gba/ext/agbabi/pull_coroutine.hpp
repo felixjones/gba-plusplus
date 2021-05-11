@@ -42,6 +42,53 @@ private:
     };
 
     using function_type = std::function<void( push_type& )>;
+
+    struct sentinel {};
+
+    class iterator {
+    public:
+        using value_type = typename pull_coroutine::value_type;
+        using difference_type = std::ptrdiff_t;
+        using reference_type = value_type&;
+        using pointer_type = value_type *;
+
+        iterator() = default;
+        iterator( iterator& ) = default;
+        iterator( iterator&& ) = default;
+        iterator& operator =( iterator& ) = default;
+
+        iterator( pull_coroutine& pull ) noexcept : m_pull { &pull } {
+            ( *m_pull )();
+        }
+
+        [[nodiscard]]
+        bool operator ==( sentinel ) const noexcept {
+            return !( *m_pull );
+        }
+
+        [[nodiscard]]
+        bool operator !=( sentinel ) const noexcept {
+            return *m_pull;
+        }
+
+        [[nodiscard]]
+        auto operator *() const noexcept {
+            return m_pull->get();
+        }
+
+        iterator& operator ++() noexcept {
+            ( *m_pull )();
+            return *this;
+        }
+
+        iterator& operator ++( int ) noexcept {
+            ( *m_pull )();
+            return *this;
+        }
+
+    private:
+        pull_coroutine * const m_pull;
+    };
 public:
     pull_coroutine( const pull_coroutine& ) = delete;
     pull_coroutine& operator =( const pull_coroutine& ) = delete;
@@ -73,13 +120,23 @@ public:
     }
 
     [[nodiscard]]
-    explicit operator bool() const noexcept {
+    operator bool() const noexcept {
         return m_push.m_value.has_value();
     }
 
     [[nodiscard]]
     const value_type& get() const noexcept {
         return m_push.m_value.value();
+    }
+
+    [[nodiscard]]
+    iterator begin() noexcept {
+        return iterator( *this );
+    }
+
+    [[nodiscard]]
+    sentinel end() const noexcept {
+        return {};
     }
 private:
     void reset() noexcept {
