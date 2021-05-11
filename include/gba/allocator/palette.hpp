@@ -1,7 +1,18 @@
 #ifndef GBAXX_ALLOCATOR_PALETTE_HPP
 #define GBAXX_ALLOCATOR_PALETTE_HPP
 
+#include <gba/registers/dma.hpp>
 #include <gba/types/int_type.hpp>
+
+#if defined( __agb_abi )
+#include <cstddef>
+
+extern "C" {
+void __aeabi_memcpy( void * dest, const void * src, std::size_t n );
+}
+#else
+#include <gba/bios/cpu_copy.hpp>
+#endif
 
 namespace gba {
 namespace allocator {
@@ -59,7 +70,7 @@ public:
 #else
         bios::cpu_set( data, dest, bios::transfer {
             .transfers = size / 2,
-            .type = transfer::type::half_word
+            .type = bios::transfer::type::half
         } );
 #endif
     }
@@ -71,9 +82,33 @@ public:
 #else
         bios::cpu_set( data, dest, bios::transfer {
             .transfers = size / 2,
-            .type = transfer::type::half_word
+            .type = bios::transfer::type::half
         } );
 #endif
+    }
+
+    void dma3_data( const uint32 size, const void * data ) const noexcept {
+        auto * dest = reinterpret_cast<void *>( 0x5000000 + start() );
+
+        reg::dma3cnt_h::write( {} );
+        reg::dma3sad::write( reinterpret_cast<uint32>( data ) );
+        reg::dma3dad::write( reinterpret_cast<uint32>( dest ) );
+        reg::dma3cnt::write( {
+            .transfers = uint16( size / 2 ),
+            .control = { .enable = true }
+        } );
+    }
+
+    void dma3_sub_data( const uint32 offset, const uint32 size, const void * data ) const noexcept {
+        auto * dest = reinterpret_cast<void *>( 0x5000000 + ( start() + offset ) );
+
+        reg::dma3cnt_h::write( {} );
+        reg::dma3sad::write( reinterpret_cast<uint32>( data ) );
+        reg::dma3dad::write( reinterpret_cast<uint32>( dest ) );
+        reg::dma3cnt::write( {
+            .transfers = uint16( size / 2 ),
+            .control = { .enable = true }
+        } );
     }
 
 private:

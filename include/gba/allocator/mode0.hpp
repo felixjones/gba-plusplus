@@ -23,6 +23,8 @@ public:
     static constexpr uint32 address = 0x6000000;
     static constexpr uint32 length = 0x10000;
 
+    constexpr background() noexcept : simple_bitset() {}
+
     void deallocate( buffer& buffer ) noexcept {
         unset( buffer );
     }

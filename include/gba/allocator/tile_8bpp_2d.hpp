@@ -66,6 +66,34 @@ public:
         return size;
     }
 
+    uint32 dma3_data( const uint32 index, uint32 size, const void * data ) noexcept {
+        size = std::min( size, this->size() / m_height );
+        auto * dest = map( index );
+
+        reg::dma3cnt_h::write( {} );
+        reg::dma3sad::write( reinterpret_cast<uint32>( data ) );
+        reg::dma3dad::write( reinterpret_cast<uint32>( dest ) );
+        reg::dma3cnt::write( {
+            .transfers = uint16( size / 4 ),
+            .control = { .type = dma_control::type::word, .enable = true }
+        } );
+        return size;
+    }
+
+    uint32 dma3_sub_data( const uint32 index, const uint32 offset, uint32 size, const void * data ) noexcept {
+        size = std::min( size, ( this->size() / m_height ) - offset );
+        auto * dest = map_range( index, offset );
+
+        reg::dma3cnt_h::write( {} );
+        reg::dma3sad::write( reinterpret_cast<uint32>( data ) );
+        reg::dma3dad::write( reinterpret_cast<uint32>( dest ) );
+        reg::dma3cnt::write( {
+            .transfers = uint16( size / 4 ),
+            .control = { .type = dma_control::type::word, .enable = true }
+        } );
+        return size;
+    }
+
     [[nodiscard]]
     constexpr uint32 start_index() const noexcept {
         return m_startIndex;

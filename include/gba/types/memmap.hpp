@@ -5,6 +5,10 @@
 
 #include <gba/types/bit_container.hpp>
 
+extern "C" {
+void __aeabi_memcpy4( void * dest, const void * src, std::size_t n );
+}
+
 namespace gba {
 
 template <typename Type, unsigned Address>
@@ -56,12 +60,20 @@ class omemmap<Type, Address, typename std::enable_if<!std::is_fundamental<Type>:
 public:
     [[gnu::always_inline]]
     static void write( const Type& value ) noexcept {
-        *reinterpret_cast<volatile container_type *>( Address ) = to_bit_container( value );
+        if constexpr ( std::is_fundamental<container_type>::value ) {
+            *reinterpret_cast<volatile container_type *>( Address ) = to_bit_container( value );
+        } else {
+            __aeabi_memcpy4( reinterpret_cast<void *>( Address ), &value, sizeof( value ) );
+        }
     }
 
     [[gnu::always_inline]]
     static void write( Type&& value ) noexcept {
-        *reinterpret_cast<volatile container_type *>( Address ) = to_bit_container( value );
+        if constexpr ( std::is_fundamental<container_type>::value ) {
+            *reinterpret_cast<volatile container_type *>( Address ) = to_bit_container( value );
+        } else {
+            __aeabi_memcpy4( reinterpret_cast<void *>( Address ), &value, sizeof( value ) );
+        }
     }
 };
 

@@ -4,6 +4,7 @@
 #include <algorithm>
 
 #include <gba/allocator/buffer.hpp>
+#include <gba/registers/dma.hpp>
 #include <gba/types/screen_size.hpp>
 #include <gba/types/screen_tile.hpp>
 
@@ -66,6 +67,34 @@ public:
             .type = bios::transfer::type::half
         } );
 #endif
+        return size;
+    }
+
+    uint32 dma3_data( uint32 size, const void * data ) noexcept {
+        size = std::min( size, this->size() );
+        auto * dest = map();
+
+        reg::dma3cnt_h::write( {} );
+        reg::dma3sad::write( reinterpret_cast<uint32>( data ) );
+        reg::dma3dad::write( reinterpret_cast<uint32>( dest ) );
+        reg::dma3cnt::write( {
+            .transfers = uint16( size / 2 ),
+            .control = { .enable = true }
+        } );
+        return size;
+    }
+
+    uint32 dma3_sub_data( const uint32 offset, uint32 size, const void * data ) noexcept {
+        size = std::min( size, this->size() - offset );
+        auto * dest = map_range( offset );
+
+        reg::dma3cnt_h::write( {} );
+        reg::dma3sad::write( reinterpret_cast<uint32>( data ) );
+        reg::dma3dad::write( reinterpret_cast<uint32>( dest ) );
+        reg::dma3cnt::write( {
+            .transfers = uint16( size / 2 ),
+            .control = { .enable = true }
+        } );
         return size;
     }
 

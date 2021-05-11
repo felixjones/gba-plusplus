@@ -27,12 +27,16 @@
 #include <gba/bios/reset.hpp>
 #include <gba/bios/swi.hpp>
 
+#include <gba/comms/sio_control.hpp>
+
 #include <gba/display/background_control.hpp>
 #include <gba/display/color_blend.hpp>
 #include <gba/display/display_control.hpp>
 #include <gba/display/interrupt_status.hpp>
 #include <gba/display/mosaic.hpp>
 #include <gba/display/window.hpp>
+
+#include <gba/dma/dma_control.hpp>
 
 #include <gba/io/background_matrix.hpp>
 #include <gba/io/background_mode.hpp>
@@ -50,11 +54,19 @@
 #include <gba/object/attributes.hpp>
 
 #include <gba/registers/display.hpp>
+#include <gba/registers/dma.hpp>
 #include <gba/registers/interrupt_control.hpp>
 #include <gba/registers/keypad_input.hpp>
+#include <gba/registers/sio.hpp>
+#include <gba/registers/sound.hpp>
 #include <gba/registers/timers.hpp>
 
+#include <gba/sound/direct.hpp>
+#include <gba/sound/dmg.hpp>
+#include <gba/sound/sound.hpp>
+
 #include <gba/time/timer_control.hpp>
+#include <gba/time/generate_timers.hpp>
 
 #include <gba/types/matrix/mat2x2.hpp>
 #include <gba/types/matrix/mat3x2.hpp>
