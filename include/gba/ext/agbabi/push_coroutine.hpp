@@ -65,6 +65,8 @@ private:
             pull_type * const m_pull;
         };
     public:
+        pull_type( push_coroutine * const push ) noexcept : m_push { push } {}
+
         const value_type& operator ()() noexcept {
             m_value.reset();
             __agbabi_swapcontext( &m_push->m_context, &m_push->m_link );
@@ -91,8 +93,6 @@ private:
             return {};
         }
     private:
-        pull_type( push_coroutine * const push ) noexcept : m_push { push } {}
-
         pull_type( pull_type&& other ) noexcept : m_push { other.m_push }, m_value( std::move( other.m_value ) ) {
             other.m_push = nullptr;
             other.m_value.reset();
@@ -107,25 +107,29 @@ public:
     push_coroutine( const push_coroutine& ) = delete;
     push_coroutine& operator =( const push_coroutine& ) = delete;
 
-    push_coroutine( const stack_t& stack, function_type&& function ) noexcept : m_context { &m_link, stack, {} }, m_pull( this ) {
-        // Allocate space for function on stack
+    push_coroutine( const stack_t& stack, function_type&& function ) noexcept : m_context { &m_link, stack, {} } {
+        // Allocate space in our stack for control object and call function
+        m_pull = detail::stack_emplace<pull_type>( m_context.uc_stack, this );
         auto * const functionOnStack = detail::stack_put( m_context.uc_stack, function );
         const auto callFunc = reinterpret_cast<void( * )( void )>( call );
 
-        __agbabi_makecontext( &m_context, callFunc, 2, std::ref( m_pull ), functionOnStack );
+        __agbabi_makecontext( &m_context, callFunc, 2, std::ref( *m_pull ), functionOnStack );
         m_start = m_context.uc_mcontext;
     }
 
-    push_coroutine( push_coroutine&& other ) noexcept : m_context { other.m_context }, m_link { other.m_link }, m_start { other.m_start }, m_pull( std::move( other.m_pull ) ) {
+    push_coroutine( push_coroutine&& other ) noexcept : m_context { other.m_context }, m_link { other.m_link }, m_start { other.m_start }, m_pull { other.m_pull } {
         other.m_context = {};
         other.m_link = {};
         other.m_start = {};
-        m_pull.m_push = this;
-        m_start.arm_r0 = reinterpret_cast<unsigned long int>( &m_pull ); // Update the initial m_pull address
+        other.m_pull = nullptr;
+        m_pull->m_push = this;
         detail::stack_set_link( m_context.uc_stack, m_link );
+    }
 
-        // Quirk: Moved coroutines are reset (only move coroutines that haven't been ran!)
-        reset();
+    ~push_coroutine() noexcept {
+        if ( m_pull ) {
+            m_pull->~pull_type();
+        }
     }
 
     push_coroutine& operator ()( const value_type& value ) noexcept {
@@ -133,7 +137,7 @@ public:
             __agbabi_swapcontext( &m_link, &m_context );
         }
 
-        m_pull.m_value.emplace( value );
+        m_pull->m_value.emplace( value );
         __agbabi_swapcontext( &m_link, &m_context );
         return *this;
     }
@@ -143,14 +147,14 @@ public:
             __agbabi_swapcontext( &m_link, &m_context );
         }
 
-        m_pull.m_value.emplace( std::move( value ) );
+        m_pull->m_value.emplace( std::move( value ) );
         __agbabi_swapcontext( &m_link, &m_context );
         return *this;
     }
 
     [[nodiscard]]
     explicit operator bool() const noexcept {
-        return !m_pull.m_value.has_value();
+        return !m_pull->m_value.has_value();
     }
 private:
     bool is_initialized() const noexcept {
@@ -170,7 +174,7 @@ private:
     ucontext_t m_context;
     ucontext_t m_link;
     mcontext_t m_start;
-    pull_type m_pull;
+    pull_type * m_pull;
 };
 
 } // agbabi

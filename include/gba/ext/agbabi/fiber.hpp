@@ -17,6 +17,14 @@ namespace gba {
 namespace agbabi {
 namespace detail {
 
+template <typename Type, typename... Args>
+Type * stack_emplace( stack_t& stack, Args... args ) noexcept {
+    auto * stackEnd = reinterpret_cast<char *>( stack.ss_sp ) + stack.ss_size;
+    stackEnd -= sizeof( Type );
+    stack.ss_size -= sizeof( Type );
+    return new ( stackEnd ) Type( std::forward<Args>( args )... );
+}
+
 template <typename Type>
 Type * stack_put( stack_t& stack, const Type& type ) noexcept {
     auto * stackEnd = reinterpret_cast<char *>( stack.ss_sp ) + stack.ss_size;
@@ -39,13 +47,14 @@ private:
     class yield_type {
         friend fiber;
     public:
+        yield_type( fiber * owner ) noexcept : m_owner { owner }, m_hasYielded { false } {}
+
         void operator ()() noexcept {
             m_hasYielded = true;
             __agbabi_swapcontext( &m_owner->m_context, &m_owner->m_link );
         }
 
     private:
-        yield_type( fiber * owner ) noexcept : m_owner { owner }, m_hasYielded { false } {}
         yield_type( yield_type&& other ) noexcept : m_owner { other.m_owner }, m_hasYielded { other.m_hasYielded } {
             other.m_owner = nullptr;
         }
@@ -59,36 +68,40 @@ public:
     fiber( const fiber& ) = delete;
     fiber& operator =( const fiber& ) = delete;
 
-    fiber( const stack_t& stack, function_type&& function ) noexcept : m_context { &m_link, stack, {} }, m_yielder( this ) {
-        // Allocate space for function on stack
+    fiber( const stack_t& stack, function_type&& function ) noexcept : m_context { &m_link, stack, {} } {
+        // Allocate space in our stack for control object and call function
+        m_yield = detail::stack_emplace<yield_type>( m_context.uc_stack, this );
         auto * const functionOnStack = detail::stack_put( m_context.uc_stack, function );
         const auto callFunc = reinterpret_cast<void( * )( void )>( call );
 
-        __agbabi_makecontext( &m_context, callFunc, 2, std::ref( m_yielder ), functionOnStack );
+        __agbabi_makecontext( &m_context, callFunc, 2, std::ref( *m_yield ), functionOnStack );
         m_start = m_context.uc_mcontext;
     }
 
-    fiber( fiber&& other ) noexcept : m_context { other.m_context }, m_link { other.m_link }, m_start { other.m_start }, m_yielder( std::move( other.m_yielder ) ) {
+    fiber( fiber&& other ) noexcept : m_context { other.m_context }, m_link { other.m_link }, m_start { other.m_start }, m_yield { other.m_yield } {
         other.m_context = {};
         other.m_link = {};
         other.m_start = {};
-        m_yielder.m_owner = this;
-        m_start.arm_r0 = reinterpret_cast<unsigned long int>( &m_yielder ); // Update the initial m_yielder address
+        other.m_yield = nullptr;
+        m_yield->m_owner = this;
         detail::stack_set_link( m_context.uc_stack, m_link );
+    }
 
-        // Quirk: Moved coroutines are reset (only move coroutines that haven't been ran!)
-        reset();
+    ~fiber() noexcept {
+        if ( m_yield ) {
+            m_yield->~yield_type();
+        }
     }
 
     fiber& operator ()() noexcept {
-        m_yielder.m_hasYielded = false;
+        m_yield->m_hasYielded = false;
         __agbabi_swapcontext( &m_link, &m_context );
         return *this;
     }
 
     [[nodiscard]]
     operator bool() const noexcept {
-        return m_yielder.m_hasYielded;
+        return m_yield->m_hasYielded;
     }
 private:
     void reset() noexcept {
@@ -103,7 +116,7 @@ private:
     ucontext_t m_context;
     ucontext_t m_link;
     mcontext_t m_start;
-    yield_type m_yielder;
+    yield_type * m_yield;
 };
 
 } // agbabi
