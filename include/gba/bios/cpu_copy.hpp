@@ -4,7 +4,7 @@
 #include <tuple>
 
 #include <gba/bios/swi.hpp>
-#include <gba/types/bit_container.hpp>
+#include <gba/types/int_cast.hpp>
 #include <gba/types/int_type.hpp>
 
 namespace gba {
@@ -19,7 +19,7 @@ static_assert( sizeof( fast_transfer ) == 4, "fast_transfer must be tightly pack
 
 [[gnu::always_inline]]
 inline void cpu_fast_set( const void * src, void * dst, fast_transfer mode ) noexcept {
-    swi<12, void( const void *, void *, unsigned int )>::call( src, dst, to_bit_container( mode ) );
+    swi<12, void( const void *, void *, unsigned int )>::call( src, dst, uint_cast( mode ) );
 }
 
 struct transfer {
@@ -37,7 +37,7 @@ static_assert( sizeof( transfer ) == 4, "transfer must be tightly packed" );
 
 [[gnu::always_inline]]
 inline void cpu_set( const void * src, void * dst, transfer mode ) noexcept {
-    swi<11, void( const void *, void *, unsigned int )>::call( src, dst, to_bit_container( mode ) );
+    swi<11, void( const void *, void *, unsigned int )>::call( src, dst, uint_cast( mode ) );
 }
 
 } // bios

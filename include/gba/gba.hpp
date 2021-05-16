@@ -77,12 +77,12 @@
 #include <gba/types/vector/vec3.hpp>
 #include <gba/types/vector/vec4.hpp>
 
-#include <gba/types/bit_container.hpp>
 #include <gba/types/dimension.hpp>
 #include <gba/types/fixed_point.hpp>
 #include <gba/types/fixed_point_funcs.hpp>
 #include <gba/types/fixed_point_make.hpp>
 #include <gba/types/fixed_point_operators.hpp>
+#include <gba/types/int_cast.hpp>
 #include <gba/types/int_type.hpp>
 #include <gba/types/interrupt_mask.hpp>
 #include <gba/types/matrix.hpp>

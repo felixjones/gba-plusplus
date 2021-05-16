@@ -91,6 +91,19 @@ public:
         return is_switched( mask ) && is_up( mask );
     }
 
+    [[nodiscard]]
+    constexpr bool any_switched_down( key_mask mask ) const noexcept {
+        return ( m_xor & mask ) && ( m_keys & mask ) != mask;
+    }
+
+    [[nodiscard]]
+    constexpr bool any_switched_up( key_mask mask ) const noexcept {
+        return ( m_xor & mask ) && ( m_keys & mask ) == mask;
+    }
+
+    constexpr gba::key_mask key_mask() const noexcept {
+        return gba::key_mask { ~uint32( m_keys ) };
+    }
 protected:
     uint16 m_keys;
     uint16 m_xor;

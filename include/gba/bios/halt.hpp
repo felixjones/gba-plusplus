@@ -2,8 +2,8 @@
 #define GBAXX_BIOS_HALT_HPP
 
 #include <gba/bios/swi.hpp>
+#include <gba/types/int_cast.hpp>
 #include <gba/types/interrupt_mask.hpp>
-#include <gba/types/bit_container.hpp>
 
 namespace gba {
 namespace bios {
@@ -20,7 +20,7 @@ inline void stop() noexcept {
 
 [[gnu::always_inline]]
 inline void intr_wait( bool resetFlag, interrupt_mask flags ) noexcept {
-    swi<4, void( int, int )>::call( resetFlag, to_bit_container( flags ) );
+    swi<4, void( int, int )>::call( resetFlag, int_cast( flags ) );
 }
 
 [[gnu::always_inline]]

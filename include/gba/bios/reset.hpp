@@ -2,7 +2,7 @@
 #define GBAXX_BIOS_RESET_HPP
 
 #include <gba/bios/swi.hpp>
-#include <gba/types/bit_container.hpp>
+#include <gba/types/int_cast.hpp>
 
 namespace gba {
 namespace bios {
@@ -26,7 +26,7 @@ struct reset_flags {
 
 [[gnu::always_inline]]
 inline void register_ram_reset( reset_flags flags ) noexcept {
-    swi<1, void( int )>::call( to_bit_container( flags ) );
+    swi<1, void( int )>::call( int_cast( flags ) );
 }
 
 namespace undocumented {
