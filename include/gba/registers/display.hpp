@@ -66,7 +66,7 @@ using bldy = omemmap<blend_gamma, 0x4000054>;
 
 namespace undocumented {
 
-using green_swap = iomemmap<uint16, 0x4000002>;
+using green_swap = iomemmap<gba::undocumented::green_swap, 0x4000002>;
 
 } // undocumented
 } // reg

@@ -1,6 +1,11 @@
 #ifndef GBAXX_GBA_HPP
 #define GBAXX_GBA_HPP
 
+#define GBAXX_VERSION_MAJOR 0
+#define GBAXX_VERSION_MINOR 0
+#define GBAXX_VERSION_PATCH 1
+#define GBAXX_VERSION ( GBAXX_VERSION_MAJOR * 10000 ) + ( GBAXX_VERSION_MINOR * 100 ) + GBAXX_VERSION_PATCH
+
 #include <gba/allocator/bitset_types.hpp>
 #include <gba/allocator/buffer.hpp>
 #include <gba/allocator/mode0.hpp>
@@ -57,6 +62,7 @@
 #include <gba/registers/keypad_input.hpp>
 #include <gba/registers/sio.hpp>
 #include <gba/registers/sound.hpp>
+#include <gba/registers/system.hpp>
 #include <gba/registers/timers.hpp>
 
 #include <gba/sio/general_purpose.hpp>
@@ -69,6 +75,9 @@
 #include <gba/sound/direct.hpp>
 #include <gba/sound/dmg.hpp>
 #include <gba/sound/sound.hpp>
+
+#include <gba/system/undocumented.hpp>
+#include <gba/system/waitstate.hpp>
 
 #include <gba/time/timer_control.hpp>
 #include <gba/time/generate_timers.hpp>

@@ -43,6 +43,16 @@ struct display_control {
 
 static_assert( sizeof( display_control ) == 2, "display_control must be tightly packed" );
 
+namespace undocumented {
+
+enum class green_swap : uint16 {
+    normal = 0,
+    swap = 1
+};
+
+static_assert( sizeof( green_swap ) == 2, "green_swap must be size 2" );
+
+} // undocumented
 } // gba
 
 #endif // define GBAXX_DISPLAY_DISPLAY_CONTROL_HPP
