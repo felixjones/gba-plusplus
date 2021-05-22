@@ -1,87 +1,69 @@
-# gba++
+# gba-plusplus
 
-Modern Header-only C++ library for Game Boy Advance
+Modern drop-in C++ library for the Game Boy Advance. Zlib license.
 
-# Status
-
-This library is currently in the design & implementation phase.    
-The first version, `0.0.1`, will be considered ready when we are functionally equivalent to [Tonclib](https://www.coranac.com/man/tonclib/modules.htm).
-
-# Example style
+# Example
 
 ```C++
 #include <gba/gba.hpp>
-#include <gba/ext/agbabi.hpp>
-
-#define EVER ;;
 
 using namespace gba;
 
-static constexpr auto reset_keys = key::button_a | key::button_b | key::start | key::select;
+using video_memory_type = std::array<std::array<uint16, 240>, 160>;
+
+static auto& video_memory = *reinterpret_cast<video_memory_type *>( 0x06000000 );
+
+struct bgr555_type {
+    uint16 red : 5;
+    uint16 green : 5;
+    uint16 blue : 5;
+};
 
 int main() {
-    reg::dispcnt::write( io::mode<4>::display_control()
-        .set_object_tile_map( object_tile_map::linear )
-        .set_layer_background_2( true )
-    );
+    reg::dispcnt::write( { .mode = 3, .layer_background_2 = true } );
     
-    reg::dispstat::write( display_status {
-        .vblank_irq = true
-    } );
+    video_memory[80][120] = uint_cast( bgr555_type { .red = 31 } );
+    video_memory[80][136] = uint_cast( bgr555_type { .green = 31 } );
+    video_memory[96][120] = uint_cast( bgr555_type { .blue = 31 } );
     
-    reg::ie::write( interrupt_mask {
-        .vblank = true
-    } );
-    
-    reg::ime::write( true );
-    
-    io::keypad_manager keypad;
-    for ( EVER ) {
-        keypad.poll();
-        if ( keypad.is_down( reset_keys ) ) {
-            bios::soft_reset();
-        }
-        
-        bios::vblank_intr_wait();
-    }
+    while ( true ) {}
+    __builtin_unreachable();
 }
-
 ```
 
-# Philosophy
+# About
 
-Where possible, try to keep some compatibility with [libgba](https://github.com/devkitPro/libgba) and [Tonclib](https://www.coranac.com/man/tonclib/main.htm).
+gba-plusplus is a light-weight C++ abstraction of the Game Boy Advance hardware.
 
-The user/toolchain manages memory (no static EWRAM/IWRAM allocations).
+* Hardware tested
+* Assembler inspected
+* Optimized for `-Og` and `-O3`
+* C++17
+* Both GCC and Clang compatible
+* Compatible with [Tonclib](https://www.coranac.com/man/tonclib/main.htm) and [libgba](https://github.com/devkitPro/libgba)
 
-Interfaces to memory mapped types do not have state. Direct changes to memory should always be reflected in gba++ types.
+## *NOT* a game engine
 
-Not a game engine.
+We make close-to-zero assumptions about the type of GBA game you are making.
 
-No "tools". Just code.
+## Zero tools
 
-STL used where it makes "perfect" sense.
+We do not restrict you to use any particular file formats or force you to use any additional tools.
 
-Do as much as possible at compile-time.
+## Explicit
 
-Cool things are separate library projects (SRAM, SD file system, RTC time, dynamic libraries, Nitro types). 
+The API is verbose and hides as little as possible.
 
-Some helpful, optional utilities (VRAM allocators, general allocators, perspective 3D matrices).
+Register names match the familiar documentation.
 
-Explicit API, functions and types should be understandable in terms of GBA features (80 column IDEs are not a concern).
+We respect the programmer, the code you write to shoot yourself in the foot will read like code that is shooting you in the foot.
 
-Do not stop the user from doing what they explicitly ask (addressing VRAM as Mode 3 whilst in Mode 0 should be possible).
+# Extensions
 
-The user decides if a header is compiled as ARM or Thumb.
+The `gba/ext/` headers provide features outside of the core GBA hardware.
 
-# Code style
+Some of these may depend on external libraries, such as [agbabi](https://github.com/felixjones/agbabi).
 
-Pretty much [Boost style](https://github.com/boostorg/geometry/wiki/Guidelines-for-Developers) but without the concern for 80 column IDEs.
+# In-development
 
-Everything is within a `gba::` namespace.
-
-Use gba++ types `gba::int16 gba::uint16` and keep volatile as a separate keyword.
-
-# What License?
-
-zlib going forward.
+We welcome all forms of feedback in the form of GitHub issues. The API will change when necessary, but don't worry all releases will be archived.

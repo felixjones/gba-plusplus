@@ -26,14 +26,14 @@ struct display_control {
     gba::oam_hblank_access oam_hblank_access : 1;
     object::tile_map object_tile_map : 1;
     bool force_blank : 1,
-            layer_background_0 : 1,
-            layer_background_1 : 1,
-            layer_background_2 : 1,
-            layer_background_3 : 1,
-            layer_object : 1,
-            window_0 : 1,
-            window_1 : 1,
-            window_object : 1;
+        layer_background_0 : 1,
+        layer_background_1 : 1,
+        layer_background_2 : 1,
+        layer_background_3 : 1,
+        layer_object : 1,
+        window_0 : 1,
+        window_1 : 1,
+        window_object : 1;
 
     display_control& flip_page() noexcept {
         page ^= 1;
