@@ -27,8 +27,6 @@
 #include <gba/bios/reset.hpp>
 #include <gba/bios/swi.hpp>
 
-#include <gba/comms/sio_control.hpp>
-
 #include <gba/display/background_control.hpp>
 #include <gba/display/color_blend.hpp>
 #include <gba/display/display_control.hpp>
@@ -60,6 +58,13 @@
 #include <gba/registers/sio.hpp>
 #include <gba/registers/sound.hpp>
 #include <gba/registers/timers.hpp>
+
+#include <gba/sio/general_purpose.hpp>
+#include <gba/sio/joy_bus.hpp>
+#include <gba/sio/multiplayer.hpp>
+#include <gba/sio/normal.hpp>
+#include <gba/sio/serial_control.hpp>
+#include <gba/sio/uart.hpp>
 
 #include <gba/sound/direct.hpp>
 #include <gba/sound/dmg.hpp>

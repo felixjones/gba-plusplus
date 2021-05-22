@@ -241,16 +241,17 @@ public:
 #else
             bit_type asBitType;
             if constexpr ( std::is_trivially_move_constructible<type>::value ) {
-                new ( &asBitType ) type { std::move( value ) };
+                new ( &asBitType ) type { value };
             } else {
                 asBitType = *reinterpret_cast<const bit_type *>( &value );
             }
+
 #endif
             detail::volatile_op<bit_type>::move( reinterpret_cast<volatile bit_type *>( address ), std::move( asBitType ) );
         } else if constexpr ( std::is_trivially_move_constructible<type>::value ) {
             using bit_type = typename detail::packed_bit_container<type>::type;
             bit_type asBitType;
-            new ( &asBitType ) type { std::move( value ) };
+            new ( &asBitType ) type { value };
             detail::volatile_op<bit_type>::move( reinterpret_cast<volatile bit_type *>( address ), std::move( asBitType ) );
         } else {
             static_assert( !std::is_same<type, type>::value, "Type incompatible with omemmap" );
@@ -273,7 +274,11 @@ public:
 };
 
 template <typename Type, unsigned Address>
-class iomemmap : public imemmap<Type, Address>, public omemmap<Type, Address> {};
+class iomemmap : public imemmap<Type, Address>, public omemmap<Type, Address> {
+public:
+    using type = typename memmap<Type, Address>::type;
+    static constexpr auto address = memmap<Type, Address>::address;
+};
 
 } // gba
 
