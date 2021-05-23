@@ -96,14 +96,13 @@ constexpr auto sqrt_solve1( Rep n ) noexcept {
 
 template <class Rep, int Exponent>
 constexpr auto sqrt( const fixed_point<Rep, Exponent>& x ) noexcept {
-    using larger = typename gba::uint_type<std::numeric_limits<Rep>::digits>::fast;
-    constexpr auto larger_exponent = Exponent - ( std::numeric_limits<larger>::digits - std::numeric_limits<Rep>::digits );
+    constexpr auto larger_exponent = Exponent - ( std::numeric_limits<uint32>::digits - std::numeric_limits<typename std::make_unsigned<Rep>::type>::digits );
 
     if ( gbaxx_fixed_point_funcs_constant( x.data() ) ) {
-        return fixed_point<uint32, larger_exponent / 2>::from_data( detail::sqrt_solve1( fixed_point<larger, larger_exponent>( x ).data() ) );
+        return fixed_point<uint16, larger_exponent / 2>::from_data( detail::sqrt_solve1( fixed_point<uint32, larger_exponent>( x ).data() ) );
     }
 
-    return fixed_point<uint32, larger_exponent / 2>::from_data( bios::sqrt( std::move( fixed_point<larger, larger_exponent>( x ).data() ) ) );
+    return fixed_point<uint16, larger_exponent / 2>::from_data( bios::sqrt( fixed_point<uint32, larger_exponent>( x ).data() ) );
 }
 
 template <class Rep, int Exponent>
