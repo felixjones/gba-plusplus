@@ -4,6 +4,10 @@ Code samples and tutorials available on the [project Wiki](https://github.com/fe
 
 Modern drop-in C++ library for the Game Boy Advance. Zlib license.
 
+Feel free to ask for help on the [gbadev Discord](https://discord.io/gbadev).
+
+For a CMake GBA development toolchain see our sister project: [gba-toolchain](https://github.com/felixjones/gba-toolchain).
+
 # Example
 
 ```C++
