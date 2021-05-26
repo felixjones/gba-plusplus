@@ -3,7 +3,7 @@
 
 #define GBAXX_VERSION_MAJOR 0
 #define GBAXX_VERSION_MINOR 0
-#define GBAXX_VERSION_PATCH 1
+#define GBAXX_VERSION_PATCH 2
 #define GBAXX_VERSION ( GBAXX_VERSION_MAJOR * 10000 ) + ( GBAXX_VERSION_MINOR * 100 ) + GBAXX_VERSION_PATCH
 
 #include <gba/allocator/bitset_types.hpp>
@@ -26,11 +26,17 @@
 #include <gba/allocator/vram.hpp>
 
 #include <gba/bios/affine.hpp>
+#include <gba/bios/compression.hpp>
 #include <gba/bios/cpu_copy.hpp>
 #include <gba/bios/halt.hpp>
+#include <gba/bios/huff.hpp>
+#include <gba/bios/lz77.hpp>
 #include <gba/bios/math.hpp>
 #include <gba/bios/reset.hpp>
+#include <gba/bios/rle.hpp>
+#include <gba/bios/sound.hpp>
 #include <gba/bios/swi.hpp>
+#include <gba/bios/system.hpp>
 
 #include <gba/display/background_control.hpp>
 #include <gba/display/color_blend.hpp>

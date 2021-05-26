@@ -113,7 +113,7 @@ public:
         auto * const functionOnStack = detail::stack_put( m_context.uc_stack, function );
         const auto callFunc = reinterpret_cast<void( * )( void )>( call );
 
-        __agbabi_makecontext( &m_context, callFunc, 2, std::ref( *m_pull ), functionOnStack );
+        __agbabi_makecontext( &m_context, callFunc, 2, std::ref( *m_pull ), std::ref( *functionOnStack ) );
         m_start = m_context.uc_mcontext;
     }
 
@@ -166,8 +166,8 @@ private:
         m_context.uc_mcontext = m_start;
     }
 
-    static void call( pull_type& pull, function_type * const function ) noexcept {
-        ( *function )( pull );
+    static void call( pull_type& pull, function_type& function ) noexcept {
+        function( pull );
         pull.m_push->reset();
     }
 

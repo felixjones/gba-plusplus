@@ -2,6 +2,7 @@
 #define GBAXX_TYPES_MEMMAP_HPP
 
 #include <type_traits>
+#include <utility>
 
 #include <gba/types/int_type.hpp>
 
