@@ -62,7 +62,9 @@ using mosaic = omemmap<mosaic_size, 0x400004c>;
 
 using bldcnt = iomemmap<blend_control, 0x4000050>;
 using bldalpha = iomemmap<blend_alpha, 0x4000052>;
-using bldy = omemmap<blend_gamma, 0x4000054>;
+using bldy = omemmap<make_ufixed<28, 4>, 0x4000054>;
+
+using bldgamma = omemmap<make_ufixed<28, 4>, 0x4000054>;
 
 namespace undocumented {
 
