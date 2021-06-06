@@ -46,7 +46,7 @@ inline void printf( const log_level lvl, const char * fmt, Args... args ) noexce
 #if defined( __posprintf )
     posprintf( address, fmt, args... );
 #else
-    std::vsnprintf( address, 0x100, fmt, args... );
+    std::snprintf( address, 0x100, fmt, args... );
 #endif
     reg::debug_flags::write( static_cast<uint16>( lvl ) | 0x100 );
 }
