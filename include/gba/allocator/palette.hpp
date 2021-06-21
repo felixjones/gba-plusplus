@@ -139,28 +139,28 @@ public:
     constexpr palette_buffer allocate_background( uint32 colors ) noexcept {
         const uint32 blocks = ( colors + 15u ) / 16u;
 
-        uint32 mask = ( ( 1u << blocks ) - 1u ) << ( 16u - blocks );
+        uint32 mask = ( ( 1u << blocks ) - 1u ) << blocks;
         const auto shift = alloc_background_blocks( blocks, mask );
         if ( shift > ( 16u - blocks ) ) {
             return nullptr;
         }
 
         m_bitset |= mask;
-        return palette_buffer( ( 16u - shift ) - blocks, blocks );
+        return palette_buffer( shift, blocks );
     }
 
     [[nodiscard]]
     constexpr palette_buffer allocate_object( uint32 colors ) noexcept {
         const uint32 blocks = ( colors + 15u ) / 16u;
 
-        uint32 mask = ( ( 1u << blocks ) - 1u ) << ( 16u - blocks + 16u );
+        uint32 mask = ( ( 1u << blocks ) - 1u ) << ( blocks + 16u );
         const auto shift = alloc_object_blocks( blocks, mask );
         if ( shift > ( 32u - blocks ) ) {
             return nullptr;
         }
 
         m_bitset |= mask;
-        return palette_buffer( ( 32u - shift ) - blocks + 16u, blocks );
+        return palette_buffer( shift, blocks );
     }
 
 private:
