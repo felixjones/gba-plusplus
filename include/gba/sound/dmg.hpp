@@ -278,9 +278,9 @@ struct noise_frequency {
 static_assert( sizeof( noise_frequency ) == 2, "noise_frequency must be tightly packed" );
 
 struct dmg_control {
-    uint16 volume_left : 3,
-            : 1;
     uint16 volume_right : 3,
+            : 1;
+    uint16 volume_left : 3,
             : 1;
     bool right_square1 : 1,
             right_square2 : 1,

@@ -60,6 +60,24 @@ constexpr uint32 radian_to_ubam16( const fixed_point<Rep, Exponent>& radian ) no
     return static_cast<uint32>( radian * radTo16 );
 }
 
+static constexpr auto bam16_to_radian( const int32 bam16 ) noexcept {
+    constexpr auto two_pi = make_fixed<15, 16>( 3.14159265358979323846264338327950288 * 2.0 );
+
+    return two_pi * make_fixed<15, 16>::from_data( ( bam16 << 16 ) >> 16 );
+}
+
+static constexpr auto ubam16_to_radian( const uint32 bam16 ) noexcept {
+    constexpr auto two_pi = make_ufixed<16, 16>( 3.14159265358979323846264338327950288 * 2.0 );
+
+    return two_pi * make_ufixed<16, 16>::from_data( bam16 & 0xffff );
+}
+
+template <class Rep, int Exponent>
+constexpr uint32 ubam16_to_radian( const fixed_point<Rep, Exponent>& radian ) noexcept {
+    constexpr auto radTo16 = make_ufixed<14, 18>( ( 16384.0 * 2.0 ) / 3.14159265358979323846264338327950288 );
+    return static_cast<uint32>( radian * radTo16 );
+}
+
 template <class Rep>
 constexpr Rep sqrt_bit( Rep n, Rep bit ) noexcept {
     if ( bit > n ) {
@@ -152,6 +170,17 @@ constexpr auto nexttoward( const fixed_point<LhsRep, LhsExponent>& from, const f
     }
 
     return from;
+}
+
+template <class LhsRep, int LhsExponent, class RhsRep, int RhsExponent>
+constexpr auto atan2( const fixed_point<LhsRep, LhsExponent>& y, const fixed_point<RhsRep, RhsExponent>& x ) noexcept {
+    using atan2_type = make_fixed<1, 14>;
+
+    if constexpr ( std::is_unsigned_v<LhsRep> && std::is_unsigned_v<RhsRep> ) {
+        return detail::ubam16_to_radian( bios::arc_tan2( atan2_type( x ).data(), atan2_type( y ).data() ) );
+    } else {
+        return detail::bam16_to_radian( bios::arc_tan2( atan2_type( x ).data(), atan2_type( y ).data() ) );
+    }
 }
 
 } // gba

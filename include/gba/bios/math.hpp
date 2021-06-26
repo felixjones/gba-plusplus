@@ -29,8 +29,8 @@ inline auto arc_tan( short x ) noexcept {
 }
 
 [[nodiscard, gnu::always_inline, gnu::const]]
-inline auto arc_tan2( short x, short y ) noexcept {
-    return swi<0xa, short( short, short )>::call( x, y );
+inline auto arc_tan2( int x, int y ) noexcept {
+    return swi<0xa, int( int, int )>::call( x, y );
 }
 
 } // bios

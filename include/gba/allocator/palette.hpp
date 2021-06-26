@@ -49,6 +49,11 @@ public:
     }
 
     [[nodiscard]]
+    constexpr uint32 bank() const noexcept {
+        return m_shift;
+    }
+
+    [[nodiscard]]
     constexpr uint32 mask() const noexcept {
         return ( ( 1u << m_bits ) - 1u ) << m_shift;
     }
@@ -139,7 +144,7 @@ public:
     constexpr palette_buffer allocate_background( uint32 colors ) noexcept {
         const uint32 blocks = ( colors + 15u ) / 16u;
 
-        uint32 mask = ( ( 1u << blocks ) - 1u ) << blocks;
+        uint32 mask = ( 1u << blocks ) - 1u;
         const auto shift = alloc_background_blocks( blocks, mask );
         if ( shift > ( 16u - blocks ) ) {
             return nullptr;
@@ -153,7 +158,7 @@ public:
     constexpr palette_buffer allocate_object( uint32 colors ) noexcept {
         const uint32 blocks = ( colors + 15u ) / 16u;
 
-        uint32 mask = ( ( 1u << blocks ) - 1u ) << ( blocks + 16u );
+        uint32 mask = ( ( 1u << blocks ) - 1u ) << 16u;
         const auto shift = alloc_object_blocks( blocks, mask );
         if ( shift > ( 32u - blocks ) ) {
             return nullptr;
@@ -163,25 +168,36 @@ public:
         return palette_buffer( shift, blocks );
     }
 
+    constexpr void deallocate( palette_buffer& block ) noexcept {
+        m_bitset &= ~block.mask();
+        block = nullptr;
+    }
+
 private:
     [[nodiscard]]
     constexpr uint32 alloc_background_blocks( const uint32 blocks, uint32& mask ) const noexcept {
         uint32 shift = 0;
-        while ( shift <= ( 16u - blocks ) && mask & m_bitset ) {
-            mask >>= 1;
+        while ( shift <= ( 16u - blocks ) ) {
+            if ( ( mask & m_bitset ) == 0 ) {
+                return shift;
+            }
+            mask <<= 1;
             shift += 1;
         }
-        return shift;
+        return -1;
     }
 
     [[nodiscard]]
     constexpr uint32 alloc_object_blocks( const uint32 blocks, uint32& mask ) const noexcept {
         uint32 shift = 16u;
-        while ( shift <= ( 32u - blocks ) && mask & m_bitset ) {
-            mask >>= 1;
+        while ( shift <= ( 32u - blocks ) ) {
+            if ( ( mask & m_bitset ) == 0 ) {
+                return shift;
+            }
+            mask <<= 1;
             shift += 1;
         }
-        return shift;
+        return -1;
     }
 
     uint32 m_bitset;

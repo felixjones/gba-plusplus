@@ -75,6 +75,28 @@ struct swi<Swi, void( int, int )> {
 };
 
 template <unsigned Swi>
+struct swi<Swi, int( int, int )> {
+    [[nodiscard, gnu::always_inline]]
+    static auto call( int arg0, int arg1 ) noexcept {
+        asm(
+#if defined( __thumb__ )
+        "movs\tr0, %[r0]\n\t"
+        "movs\tr1, %[r1]\n\t"
+        "swi\t%[Swi]\n\t"
+        "movs\t%[out], r0"
+#elif defined( __arm__ )
+        "mov\tr0, %[r0]\n\t"
+        "mov\tr1, %[r1]\n\t"
+        "swi\t%[Swi] << 16\n\t"
+        "mov\t%[out], r0"
+#endif
+        : [out]"+r"( arg0 ) : [Swi]"i"( Swi ), [r0]"r"( arg0 ), [r1]"r"( arg1 ) : "r0", "r1", "r3"
+        );
+        return arg0;
+    }
+};
+
+template <unsigned Swi>
 struct swi<Swi, unsigned int( unsigned int )> {
     [[nodiscard, gnu::always_inline]]
     static auto call( unsigned int arg0 ) noexcept {
@@ -117,7 +139,6 @@ template <unsigned Swi>
 struct swi<Swi, short( short )> {
     [[nodiscard, gnu::always_inline]]
     static auto call( short arg0 ) noexcept {
-        short result;
         asm(
 #if defined( __thumb__ )
         "movs\tr0, %[r0]\n\t"
@@ -128,9 +149,9 @@ struct swi<Swi, short( short )> {
         "swi\t%[Swi] << 16\n\t"
         "mov\t%[out], r0"
 #endif
-        : [out]"+r"( result ) : [Swi]"i"( Swi ), [r0]"r"( arg0 ) : "r0", "r1", "r3"
+        : [out]"+r"( arg0 ) : [Swi]"i"( Swi ), [r0]"r"( arg0 ) : "r0", "r1", "r3"
         );
-        return result;
+        return arg0;
     }
 };
 
@@ -138,7 +159,6 @@ template <unsigned Swi>
 struct swi<Swi, short( short, short )> {
     [[nodiscard, gnu::always_inline]]
     static auto call( short arg0, short arg1 ) noexcept {
-        short result;
         asm(
 #if defined( __thumb__ )
         "movs\tr0, %[r0]\n\t"
@@ -151,9 +171,9 @@ struct swi<Swi, short( short, short )> {
         "swi\t%[Swi] << 16\n\t"
         "mov\t%[out], r0"
 #endif
-        : [out]"+r"( result ) : [Swi]"i"( Swi ), [r0]"r"( arg0 ), [r1]"r"( arg1 ) : "r0", "r1", "r3"
+        : [out]"+r"( arg0 ) : [Swi]"i"( Swi ), [r0]"r"( arg0 ), [r1]"r"( arg1 ) : "r0", "r1", "r3"
         );
-        return result;
+        return arg0;
     }
 };
 

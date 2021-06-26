@@ -45,6 +45,10 @@ inline auto sin( int bam16 ) noexcept {
     return make_fixed<2, 29>::from_data( __agbabi_sin( bam16 ) );
 }
 
+inline auto cos( int bam16 ) noexcept {
+    return make_fixed<2, 29>::from_data( __agbabi_sin( bam16 + 0x2000 ) );
+}
+
 } // agbabi
 } // gba
 

@@ -3,7 +3,7 @@
 
 #define GBAXX_VERSION_MAJOR 0
 #define GBAXX_VERSION_MINOR 0
-#define GBAXX_VERSION_PATCH 3
+#define GBAXX_VERSION_PATCH 4
 #define GBAXX_VERSION ( GBAXX_VERSION_MAJOR * 10000 ) + ( GBAXX_VERSION_MINOR * 100 ) + GBAXX_VERSION_PATCH
 
 #include <gba/allocator/bitset_types.hpp>

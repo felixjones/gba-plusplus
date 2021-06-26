@@ -108,6 +108,8 @@ protected:
                 x += 1u;
                 mask <<= 1u;
             }
+
+            x = 0;
         }
 
         return 0;
