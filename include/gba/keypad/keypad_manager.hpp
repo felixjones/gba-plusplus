@@ -101,6 +101,7 @@ public:
         return ( m_xor & mask ) && ( m_keys & mask ) == mask;
     }
 
+    [[nodiscard]]
     constexpr gba::key_mask key_mask() const noexcept {
         return gba::key_mask { ~uint32( m_keys ) };
     }
