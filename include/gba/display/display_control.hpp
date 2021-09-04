@@ -15,9 +15,9 @@ namespace object {
  * See display_control.object_tile_map
  */
 enum class tile_map : bool {
-    two_dimensional = false,
-    one_dimensional = true,
-    linear = true
+    two_dimensional = false, ///< Object tiles are arranged as a tile-map in memory
+    one_dimensional = true, ///< Object tiles are arranged sequentially in memory
+    linear = true ///< alias of one_dimensional
 };
 
 } // object
@@ -28,8 +28,8 @@ enum class tile_map : bool {
  * See display_control.oam_hblank_access
  */
 enum class oam_hblank_access : bool {
-    locked = false,
-    unlocked = true
+    locked = false, ///< OAM memory cannot be modified during hblank
+    unlocked = true ///< OAM can be modified during hblank
 };
 
 /**
@@ -77,8 +77,8 @@ namespace undocumented {
  * Green-swap mode
  */
 enum class green_swap : uint16 {
-    normal = 0,
-    swap = 1
+    normal = 0, ///< disabled
+    swap = 1 ///< enabled
 };
 
 static_assert( sizeof( green_swap ) == 2, "green_swap must be size 2" );

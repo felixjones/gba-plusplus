@@ -72,8 +72,12 @@ using bldy = omemmap<make_ufixed<28, 4>, 0x4000054>;
 
 using bldgamma = omemmap<make_ufixed<28, 4>, 0x4000054>;
 
+/**
+ * Undocumented display registers
+ */
 namespace undocumented {
 
+/// 4000002h REG_GREEN_SWAP \ref gba::undocumented::green_swap
 using green_swap = iomemmap<gba::undocumented::green_swap, 0x4000002>;
 
 } // undocumented
