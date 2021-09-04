@@ -1,9 +1,23 @@
 #ifndef GBAXX_GBA_HPP
 #define GBAXX_GBA_HPP
 
+/**
+ * Major version
+ */
 #define GBAXX_VERSION_MAJOR 0
+/**
+ * Minor version
+ */
 #define GBAXX_VERSION_MINOR 0
+/**
+ * Patch version
+ */
 #define GBAXX_VERSION_PATCH 4
+/**
+ * Combined version number
+ *
+ * Calculated as `( major * 10000 ) + ( minor * 100 ) + patch`
+ */
 #define GBAXX_VERSION ( GBAXX_VERSION_MAJOR * 10000 ) + ( GBAXX_VERSION_MINOR * 100 ) + GBAXX_VERSION_PATCH
 
 #include <gba/allocator/bitset_types.hpp>

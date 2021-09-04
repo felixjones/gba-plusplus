@@ -161,6 +161,11 @@ struct volatile_op<Type, typename std::enable_if<!std::is_fundamental<Type>::val
 
 } // detail
 
+/**
+ * Base memory mapped register type
+ * @tparam Type value type stored in the memory mapping
+ * @tparam Address location within the memory mapping
+ */
 template <typename Type, unsigned Address>
 class memmap {
 public:
@@ -168,12 +173,23 @@ public:
     static constexpr auto address = Address;
 };
 
+/**
+ * Input (read-only) memory mapped register type
+ * @tparam Type value type stored in the memory mapping
+ * @tparam Address location within the memory mapping
+ */
 template <typename Type, unsigned Address>
 class imemmap : public memmap<Type, Address> {
 public:
+    /// Value type stored in the memory mapping
     using type = typename memmap<Type, Address>::type;
+    /// Address location within the memory mapping
     static constexpr auto address = memmap<Type, Address>::address;
 
+    /**
+     * Read value stored in this memory map
+     * @return value stored in this memory mapping
+     */
     [[nodiscard]]
     static inline type read() noexcept {
         if constexpr ( std::is_fundamental<type>::value ) {
@@ -196,12 +212,23 @@ public:
     }
 };
 
+/**
+ * Output (write-only) memory mapped register type
+ * @tparam Type value type stored in the memory mapping
+ * @tparam Address location within the memory mapping
+ */
 template <typename Type, unsigned Address>
 class omemmap : public memmap<Type, Address> {
 public:
+    /// Value type stored in the memory mapping
     using type = typename memmap<Type, Address>::type;
+    /// Address location within the memory mapping
     static constexpr auto address = memmap<Type, Address>::address;
 
+    /**
+     * Move value into this memory map
+     * @param value value to move into this memory map
+     */
     static inline void write( type&& value ) noexcept {
         if constexpr ( std::is_fundamental<type>::value ) {
             *reinterpret_cast<volatile type *>( address ) = value;
@@ -230,6 +257,10 @@ public:
         }
     }
 
+    /**
+     * Copy value into this memory map
+     * @param value value to copy into this memory map
+     */
     static inline void write( const type& value ) noexcept {
         if constexpr ( std::is_fundamental<type>::value ) {
             *reinterpret_cast<volatile type *>( address ) = value;
@@ -259,6 +290,11 @@ public:
         }
     }
 
+    /**
+     * Construct value into this memory map with the provided arguments
+     * @tparam Args variadic argument types
+     * @param args variadic list of arguments
+     */
     template <typename... Args>
     static inline void emplace( Args&&... args ) noexcept {
         if constexpr ( std::is_fundamental<type>::value ) {
@@ -274,10 +310,17 @@ public:
     }
 };
 
+/**
+ * Input/output (read/write) memory mapped register type
+ * @tparam Type value type stored in the memory mapping
+ * @tparam Address location within the memory mapping
+ */
 template <typename Type, unsigned Address>
 class iomemmap : public imemmap<Type, Address>, public omemmap<Type, Address> {
 public:
+    /// Value type stored in the memory mapping
     using type = typename memmap<Type, Address>::type;
+    /// Address location within the memory mapping
     static constexpr auto address = memmap<Type, Address>::address;
 };
 
