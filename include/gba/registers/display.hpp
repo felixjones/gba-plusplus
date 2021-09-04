@@ -13,10 +13,16 @@
 #include <gba/types/memmap.hpp>
 
 namespace gba {
+/**
+ * GBA memory mapped registers
+ */
 namespace reg {
 
+/// 4000000h REG_DISPCNT \ref display_control
 using dispcnt = iomemmap<display_control, 0x4000000>;
+/// 4000004h REG_DISPSTAT \ref display_status
 using dispstat = iomemmap<display_status, 0x4000004>;
+/// 4000006h REG_VCOUNT
 using vcount = imemmap<uint16, 0x4000006>;
 
 using bg0cnt = iomemmap<background_control, 0x4000008>;

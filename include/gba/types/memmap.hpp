@@ -277,7 +277,6 @@ public:
             } else {
                 asBitType = *reinterpret_cast<const bit_type *>( &value );
             }
-
 #endif
             detail::volatile_op<bit_type>::move( reinterpret_cast<volatile bit_type *>( address ), std::move( asBitType ) );
         } else if constexpr ( std::is_trivially_move_constructible<type>::value ) {
@@ -308,6 +307,17 @@ public:
             static_assert( !std::is_same<type, type>::value, "Type incompatible with omemmap" );
         }
     }
+
+    /**
+     * Calls generator to provide value to write into this memory map
+     * @tparam Generator function object type
+     * @param g function object that will be called
+     */
+    template <class Generator>
+    static inline void generate( Generator g ) noexcept {
+        const auto value = g();
+        write( std::move( value ) );
+    }
 };
 
 /**
@@ -322,6 +332,18 @@ public:
     using type = typename memmap<Type, Address>::type;
     /// Address location within the memory mapping
     static constexpr auto address = memmap<Type, Address>::address;
+
+    /**
+     * Reads the stored value, transforms it, then writes the modified value back
+     * @tparam TransformOp function object type
+     * @param t function object that will be called
+     */
+    template <class TransformOp>
+    static inline void transform( TransformOp t ) noexcept {
+        auto value = imemmap<type, address>::read();
+        t( value );
+        omemmap<type, address>::write( std::move( value ) );
+    }
 };
 
 } // gba

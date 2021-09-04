@@ -12,6 +12,8 @@ Welcome to gba-plusplus's documentation!
    :glob:
 
    gba/gba
+   gba/display/*
+   gba/registers/*
    gba/types/*
 
 Index
