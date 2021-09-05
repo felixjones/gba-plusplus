@@ -188,6 +188,9 @@ public:
 
     /**
      * Read value stored in this memory map
+     * \code{.cpp}
+     * short dispcnt = imemmap<short, 0x4000000>::read();
+     * \endcode
      * @return value stored in this memory mapping
      */
     [[nodiscard]]
@@ -227,6 +230,10 @@ public:
 
     /**
      * Move value into this memory map
+     * \code{.cpp}
+     * short value = 3;
+     * omemmap<short, 0x4000000>::write( std::move( value ) );
+     * \endcode
      * @param value value to move into this memory map
      */
     static inline void write( type&& value ) noexcept {
@@ -259,6 +266,10 @@ public:
 
     /**
      * Copy value into this memory map
+     * \code{.cpp}
+     * short value = 3;
+     * omemmap<short, 0x4000000>::write( value );
+     * \endcode
      * @param value value to copy into this memory map
      */
     static inline void write( const type& value ) noexcept {
@@ -291,6 +302,9 @@ public:
 
     /**
      * Construct value into this memory map with the provided arguments
+     * \code{.cpp}
+     * omemmap<short, 0x4000000>::emplace( 3 );
+     * \endcode
      * @tparam Args variadic argument types
      * @param args variadic list of arguments
      */
@@ -310,6 +324,11 @@ public:
 
     /**
      * Calls generator to provide value to write into this memory map
+     * \code{.cpp}
+     * omemmap<short, 0x4000000>::generate( []() {
+     *     return 3;
+     * } );
+     * \endcode
      * @tparam Generator function object type
      * @param g function object that will be called
      */
@@ -335,6 +354,11 @@ public:
 
     /**
      * Reads the stored value, transforms it, then writes the modified value back
+     * \code{.cpp}
+     * iomemmap<short, 0x4000000>::transform( []( short& value ) {
+     *     value = 3;
+     * } );
+     * \endcode
      * @tparam TransformOp function object type
      * @param t function object that will be called
      */

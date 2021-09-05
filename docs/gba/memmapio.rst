@@ -21,5 +21,26 @@ Memory Mapped IO
         }
     } );
 
-.. doxygenfile:: gba/types/memmap.hpp
+.. doxygenclass:: gba::memmap
    :project: gba-plusplus
+   :members:
+
+.. doxygenclass:: gba::imemmap
+   :project: gba-plusplus
+   :members:
+
+.. doxygenclass:: gba::omemmap
+   :project: gba-plusplus
+   :members:
+
+.. doxygenclass:: gba::iomemmap
+   :project: gba-plusplus
+   :members:
+
+.. toctree::
+   :maxdepth: 4
+   :caption: Memory Mapped IO Registers:
+   :glob:
+
+   registers/*
+   display/*

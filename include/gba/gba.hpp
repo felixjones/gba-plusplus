@@ -16,7 +16,10 @@
 /**
  * Combined version number
  *
- * Calculated as `( major * 10000 ) + ( minor * 100 ) + patch`
+ * Calculated as:
+ * \code
+ * ( GBAXX_VERSION_MAJOR * 10000 ) + ( GBAXX_VERSION_MINOR * 100 ) + ( GBAXX_VERSION_PATCH * 1 )
+ * \endcode
  */
 #define GBAXX_VERSION ( GBAXX_VERSION_MAJOR * 10000 ) + ( GBAXX_VERSION_MINOR * 100 ) + GBAXX_VERSION_PATCH
 
