@@ -78,9 +78,15 @@ gba-plusplus provides 8-bit, 16-bit and 32-bit sized integer types:
 
 These are defined by the ``gba::int_type<>`` and ``gba::uint_type<>`` templates, which provides appropriately sized storage for a desired minimum bit-length.
 
+Signed Integers
+~~~~~~~~~~~~~~~
+
 .. doxygenstruct:: gba::int_type
    :project: gba-plusplus
    :members:
+
+Unsigned Integers
+~~~~~~~~~~~~~~~~~
 
 .. doxygenstruct:: gba::uint_type
    :project: gba-plusplus
