@@ -104,6 +104,8 @@ private:
 
     using function_type = std::function<void( pull_type& )>;
 public:
+    using yield_type = pull_type;
+
     push_coroutine( const push_coroutine& ) = delete;
     push_coroutine& operator =( const push_coroutine& ) = delete;
 

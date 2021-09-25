@@ -90,6 +90,8 @@ private:
         pull_coroutine * const m_pull;
     };
 public:
+    using yield_type = push_type;
+
     pull_coroutine( const pull_coroutine& ) = delete;
     pull_coroutine& operator =( const pull_coroutine& ) = delete;
 
