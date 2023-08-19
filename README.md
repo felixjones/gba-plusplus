@@ -1,3 +1,7 @@
+# gba-plusplus has been replaced by gba-hpp!
+
+[Go to gba-hpp (github.com/felixjones/gba-hpp)](https://github.com/felixjones/gba-hpp)
+
 # gba-plusplus
 
 [![Documentation Status](https://readthedocs.org/projects/gba-plusplus/badge/?version=latest)](https://gba-plusplus.readthedocs.io/en/latest/?badge=latest)
